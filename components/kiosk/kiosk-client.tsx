@@ -23,14 +23,14 @@ export function KioskClient() {
   const [secondsRemaining, setSecondsRemaining] = useState(SUCCESS_RESET_DELAY)
 
   const activeIdempotencyKey = useRef<string | null>(null)
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const resetTimer = useRef<number | null>(null)
 
   const clearResetTimer = useCallback(() => {
-    if (!resetTimer.current) {
+    if (resetTimer.current === null) {
       return
     }
 
-    clearTimeout(resetTimer.current)
+    window.clearTimeout(resetTimer.current)
     resetTimer.current = null
   }, [])
 
