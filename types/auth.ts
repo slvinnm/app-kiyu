@@ -18,3 +18,14 @@ export type AuthUser = {
   role: UserRole
   profile?: unknown
 }
+
+export type AuthResponse = {
+  success: boolean
+  message: string
+  data: {
+    token: string
+    user: AuthUser & {
+      profile?: unknown
+    }
+  }
+}

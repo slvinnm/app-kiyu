@@ -6,6 +6,12 @@ export default auth((request) => {
   const pathname = request.nextUrl.pathname
   const user = request.auth?.user
 
+  const isAuthPage = pathname === "/login" || pathname === "/signup"
+
+  if (isAuthPage && user) {
+    return Response.redirect(new URL("/dashboard", request.url))
+  }
+
   const rule = getRouteRule(pathname)
 
   if (!rule) {
