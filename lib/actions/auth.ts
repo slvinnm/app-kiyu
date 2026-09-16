@@ -81,7 +81,7 @@ export async function register(
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/staff",
+      redirectTo: "/dashboard",
     })
   } catch (error) {
     if (error instanceof AuthError) {

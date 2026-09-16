@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 
 import { authConfig } from "@/auth.config"
-import type { LaravelAuthResponse } from "@/types/auth"
+import type { AuthResponse, UserRole } from "@/types/auth"
 
 const API_BASE_URL = process.env.API_BASE_URL
 
@@ -63,7 +63,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             cache: "no-store",
           })
 
-          const payload = (await response.json()) as LaravelAuthResponse
+          const payload = (await response.json()) as AuthResponse
 
           if (!response.ok || !payload.success) {
             return null

@@ -1,9 +1,6 @@
-import NextAuth from "next-auth"
+import { auth } from "@/auth"
 
-import { authConfig } from "@/auth.config"
 import { getRouteRule, isRoleAllowed } from "@/lib/auth/route-access"
-
-const { auth } = NextAuth(authConfig)
 
 export default auth((request) => {
   const pathname = request.nextUrl.pathname

@@ -1,9 +1,13 @@
-export default function StaffQueuesPage() {
+import { logout } from "@/lib/actions/auth"
+
+export default function Page() {
   return (
     <div>
-      <h1>Queues</h1>
+      <h1>Halaman Pasien</h1>
 
-      <p>Halaman pengelolaan antrean.</p>
+      <form action={logout}>
+        <button type="submit">Logout</button>
+      </form>
     </div>
   )
 }
