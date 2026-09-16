@@ -1,12 +1,11 @@
-import { RefreshCw, WifiOff } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { RefreshCw, WifiOff } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip"
 
 export function DepartmentError({
   message,
@@ -25,18 +24,12 @@ export function DepartmentError({
         Data poliklinik tidak dapat dimuat
       </h3>
 
-      <p className="mt-2 text-muted-foreground">
-        {message}
-      </p>
+      <p className="mt-2 text-muted-foreground">{message}</p>
 
       <Tooltip>
         <TooltipTrigger
           render={
-            <Button
-              size="lg"
-              onClick={onRetry}
-              className="mt-6 rounded-xl"
-            >
+            <Button size="lg" onClick={onRetry} className="mt-6 rounded-xl">
               <RefreshCw className="mr-2 size-4" />
               Muat Ulang
             </Button>
@@ -50,4 +43,3 @@ export function DepartmentError({
     </Card>
   )
 }
-

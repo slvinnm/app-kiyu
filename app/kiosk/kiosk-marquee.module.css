@@ -1,4 +1,17 @@
-@keyframes kiosk-marquee {
+.marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  min-width: max-content;
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+@keyframes marquee {
   from {
     transform: translateX(0);
   }
@@ -8,13 +21,8 @@
   }
 }
 
-.animate-kiosk-marquee {
-  animation: kiosk-marquee 35s linear infinite;
-  will-change: transform;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .animate-kiosk-marquee {
+  .track {
     animation: none;
   }
 }

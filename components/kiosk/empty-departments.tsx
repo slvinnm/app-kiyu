@@ -1,6 +1,5 @@
-import { Ticket } from 'lucide-react'
-
-import { Card } from '@/components/ui/card'
+import { Ticket } from "lucide-react"
+import { Card } from "@/components/ui/card"
 
 export function EmptyDepartments() {
   return (
