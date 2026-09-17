@@ -1,8 +1,8 @@
 "use server"
 
 import { AuthError } from "next-auth"
-
 import { signIn, signOut } from "@/auth"
+import { flash } from "@/lib/flash"
 
 const API_BASE_URL = process.env.API_BASE_URL
 
@@ -122,6 +122,8 @@ export async function register(
 }
 
 export async function logout() {
+  await flash("success-logout", "Berhasil logout")
+
   await signOut({
     redirectTo: "/login",
   })

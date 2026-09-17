@@ -24,6 +24,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useFlash } from "@/components/providers/flash-provider"
 
 export function LoginForm({
   className,
@@ -51,14 +52,20 @@ export function LoginForm({
     })
   }, [state, danger])
 
+  const { flash } = useFlash()
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <AlertViewport id="login" />
 
+      <div>
+        {typeof flash.message === "string" && (
+          <p className="text-xl">{flash.message}</p>
+        )}
+      </div>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
-
           <CardDescription>Login with your Google account</CardDescription>
         </CardHeader>
 
