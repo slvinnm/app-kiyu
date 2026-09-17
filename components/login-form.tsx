@@ -47,12 +47,13 @@ export function LoginForm({
     danger({
       title: "Login gagal!",
       description: state.message,
+      viewportId: "login",
     })
   }, [state, danger])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <AlertViewport />
+      <AlertViewport id="login" />
 
       <Card>
         <CardHeader className="text-center">

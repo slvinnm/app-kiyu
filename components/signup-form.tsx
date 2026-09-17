@@ -40,12 +40,13 @@ export function SignupForm({
     danger({
       title: "Registrasi gagal!",
       description: state.message,
+      viewportId: "signup",
     })
   }, [state, danger])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <AlertViewport />
+      <AlertViewport id="signup" />
 
       <Card>
         <CardHeader className="text-center">

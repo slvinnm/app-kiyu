@@ -24,10 +24,20 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 type AlertType = "neutral" | "success" | "warning" | "danger" | "info"
 
+type AlertPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+
 type AlertOptions = {
   title: string
   description?: string
   duration?: number
+  position?: AlertPosition
+  viewportId?: string
 }
 
 type AlertItem = {
@@ -36,6 +46,8 @@ type AlertItem = {
   title: string
   description?: string
   duration?: number
+  position: AlertPosition
+  viewportId?: string
 }
 
 type AlertContextType = {
@@ -93,6 +105,20 @@ const alertStyles: Record<
   },
 }
 
+const positionClasses: Record<AlertPosition, string> = {
+  "top-left": "fixed top-4 left-4",
+
+  "top-center": "fixed top-4 left-1/2 -translate-x-1/2",
+
+  "top-right": "fixed top-4 right-4",
+
+  "bottom-left": "fixed bottom-4 left-4",
+
+  "bottom-center": "fixed bottom-4 left-1/2 -translate-x-1/2",
+
+  "bottom-right": "fixed right-4 bottom-4",
+}
+
 export function AlertProvider({ children }: { children: ReactNode }) {
   const [alerts, setAlerts] = useState<AlertItem[]>([])
   const idRef = useRef(0)
@@ -108,6 +134,8 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         title: options.title,
         description: options.description,
         duration: options.duration ?? 5000,
+        position: options.position ?? "top-right",
+        viewportId: options.viewportId,
       },
     ])
   }, [])
@@ -170,7 +198,13 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     [alerts, show, close, closeAll, neutral, success, warning, danger, info]
   )
 
-  return <AlertContext.Provider value={value}>{children}</AlertContext.Provider>
+  return (
+    <AlertContext.Provider value={value}>
+      {children}
+
+      <GlobalAlertView />
+    </AlertContext.Provider>
+  )
 }
 
 export function useAlert() {
@@ -183,16 +217,71 @@ export function useAlert() {
   return context
 }
 
-export function AlertViewport({ className }: { className?: string }) {
+function GlobalAlertView() {
   const { alerts, close } = useAlert()
 
-  if (alerts.length === 0) {
+  const globalAlerts = alerts.filter((alert) => !alert.viewportId)
+
+  if (globalAlerts.length === 0) {
+    return null
+  }
+
+  const positions: AlertPosition[] = [
+    "top-left",
+    "top-center",
+    "top-right",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+  ]
+
+  return (
+    <>
+      {positions.map((position) => {
+        const positionAlerts = globalAlerts.filter(
+          (alert) => alert.position === position
+        )
+
+        if (positionAlerts.length === 0) {
+          return null
+        }
+
+        return (
+          <div
+            key={position}
+            className={cn(
+              "pointer-events-none z-50 flex w-[calc(100vw-2rem)] max-w-md flex-col gap-3",
+              positionClasses[position]
+            )}
+          >
+            {positionAlerts.map((alert) => (
+              <AlertItemView key={alert.id} alert={alert} onClose={close} />
+            ))}
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+export function AlertViewport({
+  id,
+  className,
+}: {
+  id: string
+  className?: string
+}) {
+  const { alerts, close } = useAlert()
+
+  const viewportAlerts = alerts.filter((alert) => alert.viewportId === id)
+
+  if (viewportAlerts.length === 0) {
     return null
   }
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      {alerts.map((alert) => (
+      {viewportAlerts.map((alert) => (
         <AlertItemView key={alert.id} alert={alert} onClose={close} />
       ))}
     </div>
