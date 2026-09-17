@@ -10,10 +10,17 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { useFlash } from "@/components/providers/flash-provider"
 
 export function SectionCards() {
+  const { has, get } = useFlash()
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+      {has("success-login") && (
+        <div>
+          <p className="text-2xl">{get<string>("success-login")}</p>
+        </div>
+      )}
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Total Revenue</CardDescription>

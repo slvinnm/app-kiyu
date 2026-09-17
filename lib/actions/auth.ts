@@ -23,6 +23,8 @@ export async function authenticate(
   formData: FormData
 ): Promise<AuthActionState> {
   try {
+    await flash("success-login", "Berhasil login")
+
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
