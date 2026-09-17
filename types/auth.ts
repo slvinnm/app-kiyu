@@ -24,8 +24,6 @@ export type AuthResponse = {
   message: string
   data: {
     token: string
-    user: AuthUser & {
-      profile?: unknown
-    }
+    user: AuthUser
   }
 }

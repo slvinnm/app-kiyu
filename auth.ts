@@ -14,8 +14,7 @@ if (!API_BASE_URL) {
 }
 
 const credentialsSchema = z.object({
-  email: z.string().email("Invalid email address."),
-
+  email: z.email("Invalid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 })
 
@@ -33,7 +32,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           label: "Email",
           type: "email",
         },
-
         password: {
           label: "Password",
           type: "password",
@@ -77,9 +75,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             profile: payload.data.user.profile ?? null,
             accessToken: payload.data.token,
           }
-        } catch (error) {
-          console.error("[AUTH] Laravel request failed:", error)
-
+        } catch {
           return null
         }
       },
@@ -102,7 +98,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = token.id as string
       session.user.role = token.role as UserRole
       session.user.profile = token.profile
-      session.user.accessToken = token.accessToken as string
 
       return session
     },
