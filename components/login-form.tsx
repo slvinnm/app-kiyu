@@ -1,12 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 
 import { authenticate } from "@/lib/actions/auth"
 
 import { cn } from "cn"
 
+import { AlertViewport, useAlert } from "@/components/providers/alert-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -28,13 +29,25 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [errorMessage, formAction, isPending] = useActionState(
-    authenticate,
-    undefined
-  )
+  const [state, formAction, isPending] = useActionState(authenticate, undefined)
+
+  const { danger } = useAlert()
+
+  useEffect(() => {
+    if (!state?.message) {
+      return
+    }
+
+    danger({
+      title: "Login gagal!",
+      description: state.message,
+    })
+  }, [state, danger])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <AlertViewport />
+
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -92,12 +105,6 @@ export function LoginForm({
                   required
                 />
               </Field>
-
-              {errorMessage && (
-                <p className="text-sm text-destructive" aria-live="polite">
-                  {errorMessage}
-                </p>
-              )}
 
               <Field>
                 <Button type="submit" disabled={isPending}>

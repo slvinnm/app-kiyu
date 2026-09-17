@@ -2,7 +2,8 @@ import { Geist_Mono, Inter } from "next/font/google"
 
 import "@/app/globals.css"
 
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { AlertProvider } from "@/components/providers/alert-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +35,9 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <AlertProvider>{children}</AlertProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

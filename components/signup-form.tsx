@@ -1,12 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 
 import { register } from "@/lib/actions/auth"
 
 import { cn } from "cn"
 
+import { AlertViewport, useAlert } from "@/components/providers/alert-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -27,13 +28,25 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [errorMessage, formAction, isPending] = useActionState(
-    register,
-    undefined
-  )
+  const [state, formAction, isPending] = useActionState(register, undefined)
+
+  const { danger } = useAlert()
+
+  useEffect(() => {
+    if (!state?.message) {
+      return
+    }
+
+    danger({
+      title: "Registrasi gagal!",
+      description: state.message,
+    })
+  }, [state, danger])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <AlertViewport />
+
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create your account</CardTitle>
@@ -106,12 +119,6 @@ export function SignupForm({
                 </FieldDescription>
               </Field>
 
-              {errorMessage && (
-                <p className="text-sm text-destructive" aria-live="polite">
-                  {errorMessage}
-                </p>
-              )}
-
               <Field>
                 <Button type="submit" disabled={isPending}>
                   {isPending ? "Creating Account..." : "Create Account"}
@@ -128,7 +135,7 @@ export function SignupForm({
 
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a> and <a href="#">Privacy Policy</a>.
+        and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
   )

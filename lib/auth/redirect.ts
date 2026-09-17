@@ -3,7 +3,7 @@ import type { UserRole } from "@/types/auth"
 export function getRoleRedirect(role: UserRole): string {
   switch (role) {
     case "admin":
-      return "/admin"
+      return "/admin/dashboard"
 
     case "staff":
     case "doctor":
@@ -11,7 +11,7 @@ export function getRoleRedirect(role: UserRole): string {
     case "nurse":
     case "pharmacy":
     case "lab":
-      return "/staff"
+      return "/staff/dashboard"
 
     case "patient":
       return "/patient/dashboard"
