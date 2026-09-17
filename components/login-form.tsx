@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useActionState, useEffect } from "react"
-
+import { useSearchParams } from "next/navigation"
 import { authenticate } from "@/lib/actions/auth"
 
 import { cn } from "cn"
@@ -29,7 +29,13 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [state, formAction, isPending] = useActionState(authenticate, undefined)
+  const searchParams = useSearchParams()
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
+  const action = authenticate.bind(null, callbackUrl)
+
+  const [state, formAction, isPending] = useActionState(action, undefined)
 
   const { danger } = useAlert()
 

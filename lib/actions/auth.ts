@@ -18,6 +18,7 @@ export type AuthActionState =
   | undefined
 
 export async function authenticate(
+  callbackUrl: string | undefined,
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
@@ -25,7 +26,7 @@ export async function authenticate(
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      redirectTo: "/dashboard",
+      redirectTo: callbackUrl || "/dashboard",
     })
   } catch (error) {
     if (error instanceof AuthError) {
