@@ -7,6 +7,8 @@ import type { FlashData } from "@/types/flash"
 
 type FlashContextType = {
   flash: FlashData
+  has: (key: string) => boolean
+  get: <T = unknown>(key: string) => T | undefined
   clear: (key: string) => void
   clearAll: () => void
 }
@@ -50,6 +52,14 @@ export function FlashProvider({ children }: { children: React.ReactNode }) {
     }
   }, [pathname])
 
+  function has(key: string) {
+    return key in flash
+  }
+
+  function get<T = unknown>(key: string) {
+    return flash[key] as T | undefined
+  }
+
   function clear(key: string) {
     setFlash((current) => {
       const next = { ...current }
@@ -68,6 +78,8 @@ export function FlashProvider({ children }: { children: React.ReactNode }) {
     <FlashContext.Provider
       value={{
         flash,
+        has,
+        get,
         clear,
         clearAll,
       }}

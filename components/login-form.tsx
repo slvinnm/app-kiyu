@@ -52,17 +52,16 @@ export function LoginForm({
     })
   }, [state, danger])
 
-  const { flash } = useFlash()
+  const { has, get } = useFlash()
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <AlertViewport id="login" />
 
       <div>
-        {typeof flash.message === "string" && (
-          <p className="text-xl">{flash.message}</p>
-        )}
+        {has("success-logout") && <p>{get<string>("success-logout")}</p>}
       </div>
+
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
