@@ -20,7 +20,7 @@ export function SuccessScreen({
   return (
     <div className="flex w-full max-w-3xl items-center justify-center">
       <Card className="w-full overflow-hidden rounded-3xl">
-        <div className="px-6 py-8 md:px-10 md:py-10">
+        <div className="px-6 py-8 md:px-5 md:py-5">
           <div className="text-center">
             <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border bg-muted">
               <CheckCircle2 className="size-7" />
