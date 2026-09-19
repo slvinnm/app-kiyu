@@ -7,7 +7,6 @@ import { toast } from "sonner"
 
 import { authenticate } from "@/lib/actions/auth"
 import { cn } from "cn"
-import { useFlash } from "@/components/providers/flash-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -39,8 +38,6 @@ export function LoginForm({
 
   const [email, setEmail] = useState("")
 
-  const { get } = useFlash()
-
   useEffect(() => {
     if (!state?.message) {
       return
@@ -50,16 +47,6 @@ export function LoginForm({
       description: "Login gagal",
     })
   }, [state])
-
-  useEffect(() => {
-    const message = get<string>("success-logout")
-
-    if (!message) {
-      return
-    }
-
-    toast.success(message)
-  }, [get])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

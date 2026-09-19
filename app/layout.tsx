@@ -7,6 +7,7 @@ import { FlashProvider } from "@/components/providers/flash-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
+import { FlashToast } from "@/components/providers/flash-toast"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
             <FlashProvider>
               {children}
               <Toaster position="top-center" />
+              <FlashToast />
             </FlashProvider>
           </TooltipProvider>
         </ThemeProvider>
