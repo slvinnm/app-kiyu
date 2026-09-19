@@ -6,15 +6,15 @@ import { toast } from "sonner"
 import { useFlash } from "@/components/providers/flash-provider"
 
 export function FlashToast() {
-    const { flash } = useFlash()
+  const { flash } = useFlash()
 
-    useEffect(() => {
-        for (const value of Object.values(flash)) {
-            if (typeof value === "string") {
-                toast.success(value)
-            }
-        }
-    }, [flash])
+  useEffect(() => {
+    for (const value of Object.values(flash)) {
+      if (typeof value === "string") {
+        toast.success(value)
+      }
+    }
+  }, [flash])
 
-    return null
+  return null
 }
