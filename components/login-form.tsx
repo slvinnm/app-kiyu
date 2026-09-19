@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { toast } from "sonner"
+
 import { authenticate } from "@/lib/actions/auth"
-
 import { cn } from "cn"
-
-import { AlertViewport, useAlert } from "@/components/providers/alert-provider"
+import { useFlash } from "@/components/providers/flash-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -24,7 +24,6 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useFlash } from "@/components/providers/flash-provider"
 
 export function LoginForm({
   className,
@@ -38,33 +37,36 @@ export function LoginForm({
 
   const [state, formAction, isPending] = useActionState(action, undefined)
 
-  const { danger } = useAlert()
+  const [email, setEmail] = useState("")
+
+  const { get } = useFlash()
 
   useEffect(() => {
     if (!state?.message) {
       return
     }
 
-    danger({
-      title: "Login gagal!",
-      description: state.message,
-      viewportId: "login",
+    toast.error(state.message, {
+      description: "Login gagal",
     })
-  }, [state, danger])
+  }, [state])
 
-  const { has, get } = useFlash()
+  useEffect(() => {
+    const message = get<string>("success-logout")
+
+    if (!message) {
+      return
+    }
+
+    toast.success(message)
+  }, [get])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <AlertViewport id="login" />
-
-      <div>
-        {has("success-logout") && <p>{get<string>("success-logout")}</p>}
-      </div>
-
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
+
           <CardDescription>Login with your Google account</CardDescription>
         </CardHeader>
 
@@ -94,6 +96,8 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   required
                 />
               </Field>

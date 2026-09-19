@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 import { register } from "@/lib/actions/auth"
 
 import { cn } from "cn"
 
-import { AlertViewport, useAlert } from "@/components/providers/alert-provider"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -30,24 +30,21 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const [state, formAction, isPending] = useActionState(register, undefined)
 
-  const { danger } = useAlert()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
 
   useEffect(() => {
     if (!state?.message) {
       return
     }
 
-    danger({
-      title: "Registrasi gagal!",
-      description: state.message,
-      viewportId: "signup",
+    toast.error(state.message, {
+      description: "Registrasi gagal",
     })
-  }, [state, danger])
+  }, [state])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <AlertViewport id="signup" />
-
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create your account</CardTitle>
@@ -69,6 +66,8 @@ export function SignupForm({
                   type="text"
                   placeholder="John Doe"
                   autoComplete="name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
                   required
                 />
               </Field>
@@ -82,6 +81,8 @@ export function SignupForm({
                   type="email"
                   placeholder="m@example.com"
                   autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   required
                 />
               </Field>

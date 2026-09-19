@@ -9,8 +9,6 @@ type FlashContextType = {
   flash: FlashData
   has: (key: string) => boolean
   get: <T = unknown>(key: string) => T | undefined
-  clear: (key: string) => void
-  clearAll: () => void
 }
 
 const FlashContext = createContext<FlashContextType | null>(null)
@@ -60,28 +58,12 @@ export function FlashProvider({ children }: { children: React.ReactNode }) {
     return flash[key] as T | undefined
   }
 
-  function clear(key: string) {
-    setFlash((current) => {
-      const next = { ...current }
-
-      delete next[key]
-
-      return next
-    })
-  }
-
-  function clearAll() {
-    setFlash({})
-  }
-
   return (
     <FlashContext.Provider
       value={{
         flash,
         has,
         get,
-        clear,
-        clearAll,
       }}
     >
       {children}
