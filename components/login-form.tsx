@@ -4,7 +4,6 @@ import Link from "next/link"
 import { useActionState, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
-
 import { authenticate } from "@/lib/actions/auth"
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
@@ -30,7 +29,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams()
 
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+  const callbackUrl = searchParams.get("callbackUrl") || "/redirect"
 
   const action = authenticate.bind(null, callbackUrl)
 

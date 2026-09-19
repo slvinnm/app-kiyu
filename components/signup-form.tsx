@@ -3,11 +3,8 @@
 import Link from "next/link"
 import { useActionState, useEffect, useState } from "react"
 import { toast } from "sonner"
-
 import { register } from "@/lib/actions/auth"
-
 import { cn } from "cn"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,

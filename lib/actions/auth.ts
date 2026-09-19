@@ -28,7 +28,7 @@ export async function authenticate(
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      redirectTo: callbackUrl || "/dashboard",
+      redirectTo: callbackUrl || "/redirect",
     })
   } catch (error) {
     if (error instanceof AuthError) {
@@ -109,7 +109,7 @@ export async function register(
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/dashboard",
+      redirectTo: "/redirect",
     })
   } catch (error) {
     if (error instanceof AuthError) {
