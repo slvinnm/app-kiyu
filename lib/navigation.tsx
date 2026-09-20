@@ -5,6 +5,9 @@ import {
   LayoutDashboardIcon,
   SearchIcon,
   UsersIcon,
+  UserPlus,
+  Ticket,
+  Users,
 } from "lucide-react"
 
 export type NavItem = {
@@ -80,8 +83,23 @@ const navigation: Record<UserRole, NavItem[]> = {
   receptionist: [
     {
       title: "Dashboard",
-      url: "/staff/dashboard",
+      url: "/receptionist/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Registration",
+      url: "/receptionist/registration",
+      icon: <UserPlus />,
+    },
+    {
+      title: "Queue",
+      url: "/receptionist/queue",
+      icon: <Ticket />,
+    },
+    {
+      title: "Patient",
+      url: "/receptionist/patient",
+      icon: <Users />,
     },
   ],
 
