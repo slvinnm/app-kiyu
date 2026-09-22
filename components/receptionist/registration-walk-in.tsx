@@ -158,7 +158,7 @@ export function RegistrationWalkIn() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-6 p-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid gap-6 p-6 lg:grid-cols-[1fr_480px]">
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-semibold">Registrasi Walk-in</h2>
@@ -199,7 +199,7 @@ export function RegistrationWalkIn() {
           />
         </div>
 
-        <div className="lg:sticky lg:top-6 lg:self-start">
+        <div className="sticky lg:top-6 lg:self-start">
           <RegistrationSummary
             patientType={patientType}
             selectedPatient={selectedPatient}

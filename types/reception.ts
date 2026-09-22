@@ -92,3 +92,27 @@ export type WalkInSuccess = {
   patientName: string
   visit: Visit
 }
+
+export type QueueAcquisition = {
+  id: number
+  status: string | null
+  channel: string | null
+  acquired_at: string | null
+  department: Department | null
+  visit: {
+    id: number | null
+    visit_number: string | null
+  } | null
+  queue_ticket: {
+    id: number | null
+    queue_number: string | null
+    status: string | null
+    priority: string | null
+    station_id: number | null
+  } | null
+}
+
+export type KioskRegistrationSuccess = {
+  patient: Patient
+  acquisition: QueueAcquisition
+}

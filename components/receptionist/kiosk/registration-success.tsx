@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { WalkInSuccess } from "@/types/reception"
+import type { KioskRegistrationSuccess } from "@/types/reception"
 
 type RegistrationSuccessProps = {
-  success: WalkInSuccess
+  success: KioskRegistrationSuccess
   onReset: () => void
 }
 
@@ -20,7 +20,7 @@ export function RegistrationSuccess({
   success,
   onReset,
 }: RegistrationSuccessProps) {
-  const queueTicket = success.visit.queue_tickets[0]
+  const { patient, acquisition } = success
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4 sm:p-6">
@@ -35,7 +35,7 @@ export function RegistrationSuccess({
           </CardTitle>
 
           <CardDescription className="mt-1 text-xs text-muted-foreground sm:text-sm">
-            Kunjungan pasien telah berhasil dibuat.
+            Pasien telah terdaftar dan siap untuk alur pelayanan berikutnya.
           </CardDescription>
         </CardHeader>
 
@@ -46,7 +46,7 @@ export function RegistrationSuccess({
             </p>
 
             <p className="py-1 font-mono text-5xl font-black tracking-tight text-foreground sm:text-6xl">
-              {queueTicket?.queue_number ?? "-"}
+              {acquisition.queue_ticket?.queue_number ?? "-"}
             </p>
 
             <div className="pt-1">
@@ -54,19 +54,29 @@ export function RegistrationSuccess({
                 variant="outline"
                 className="bg-background px-3 py-1 text-xs font-medium"
               >
-                {success.visit.department?.name ?? "Departemen Belum Dipilih"}
+                {acquisition.department?.name ?? "Departemen Belum Dipilih"}
               </Badge>
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="rounded-lg border bg-card p-4">
-              <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                Nama Pasien
-              </p>
-              <p className="text-base font-semibold text-foreground">
-                {success.patientName}
-              </p>
+            <div className="flex items-center justify-between rounded-lg border bg-card p-4">
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  Nama Pasien
+                </p>
+                <p className="text-base font-semibold text-foreground">
+                  {patient.name}
+                </p>
+              </div>
+              <div className="space-y-0.5 text-right">
+                <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  No. Rekam Medis
+                </p>
+                <p className="font-mono text-sm font-medium text-foreground">
+                  {patient.medical_record_number ?? "Belum ada No. RM"}
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/20 p-3.5 text-xs">
@@ -75,7 +85,7 @@ export function RegistrationSuccess({
                   No. Kunjungan (Visit)
                 </span>
                 <span className="font-mono font-medium text-foreground">
-                  {success.visit.visit_number ?? "-"}
+                  {acquisition.visit?.visit_number ?? "-"}
                 </span>
               </div>
               <div>
@@ -83,23 +93,23 @@ export function RegistrationSuccess({
                   Status
                 </span>
                 <span className="font-medium text-foreground capitalize">
-                  {success.visit.status ?? "-"}
+                  {acquisition.status ?? "-"}
                 </span>
               </div>
               <div>
                 <span className="block text-[11px] text-muted-foreground">
-                  Station
+                  Channel
                 </span>
-                <span className="font-medium text-foreground">
-                  {queueTicket?.station?.name ?? "-"}
+                <span className="font-medium text-foreground capitalize">
+                  {acquisition.channel ?? "-"}
                 </span>
               </div>
               <div>
                 <span className="block text-[11px] text-muted-foreground">
-                  Kode Station
+                  ID Akuisisi
                 </span>
                 <span className="font-mono font-medium text-foreground">
-                  {queueTicket?.station?.code ?? "-"}
+                  #{acquisition.id}
                 </span>
               </div>
             </div>
