@@ -8,42 +8,35 @@ type RouteRule = {
 export const routeRules: RouteRule[] = [
   {
     prefix: "/admin",
-    roles: [
-      "admin",
-      "staff",
-      "doctor",
-      "patient",
-      "receptionist",
-      "nurse",
-      "pharmacy",
-      "lab",
-    ],
+    roles: ["admin"],
+  },
+  {
+    prefix: "/receptionist",
+    roles: ["receptionist"],
   },
   {
     prefix: "/staff",
-    roles: [
-      "admin",
-      "staff",
-      "doctor",
-      "patient",
-      "receptionist",
-      "nurse",
-      "pharmacy",
-      "lab",
-    ],
+    roles: ["staff"],
+  },
+  {
+    prefix: "/doctor",
+    roles: ["doctor"],
+  },
+  {
+    prefix: "/nurse",
+    roles: ["nurse"],
+  },
+  {
+    prefix: "/pharmacy",
+    roles: ["pharmacy"],
+  },
+  {
+    prefix: "/lab",
+    roles: ["lab"],
   },
   {
     prefix: "/patient",
-    roles: [
-      "admin",
-      "staff",
-      "doctor",
-      "patient",
-      "receptionist",
-      "nurse",
-      "pharmacy",
-      "lab",
-    ],
+    roles: ["patient"],
   },
 ]
 
