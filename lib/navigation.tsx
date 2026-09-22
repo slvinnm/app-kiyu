@@ -139,3 +139,109 @@ const navigation: Record<UserRole, NavItem[]> = {
 export function getNavigation(role: UserRole) {
   return navigation[role]
 }
+
+export type BreadcrumbItem = {
+  title: string
+  href?: string
+}
+
+const roleLabels: Record<string, string> = {
+  admin: "Admin",
+  receptionist: "Receptionist",
+  staff: "Staff",
+  doctor: "Doctor",
+  nurse: "Nurse",
+  pharmacy: "Pharmacy",
+  lab: "Lab",
+  patient: "Patient",
+}
+
+const roleDashboardPaths: Record<string, string> = {
+  admin: "/admin/dashboard",
+  receptionist: "/receptionist/dashboard",
+  staff: "/staff/dashboard",
+  patient: "/patient/dashboard",
+}
+
+function findNavigationPath(
+  items: NavItem[],
+  pathname: string
+): BreadcrumbItem[] | null {
+  for (const item of items) {
+    if (!item.url) {
+      continue
+    }
+
+    const isMatch = pathname === item.url || pathname.startsWith(`${item.url}/`)
+
+    if (!isMatch) {
+      continue
+    }
+
+    if (item.items?.length) {
+      const childPath = findNavigationPath(item.items, pathname)
+
+      if (childPath) {
+        return [
+          {
+            title: item.title,
+            href: item.url,
+          },
+          ...childPath,
+        ]
+      }
+    }
+
+    return [
+      {
+        title: item.title,
+      },
+    ]
+  }
+
+  return null
+}
+
+function formatPathSegment(segment: string) {
+  return segment
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ")
+}
+
+export function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
+  const segments = pathname.split("/").filter(Boolean)
+  const role = segments[0]
+
+  const roleLabel = roleLabels[role]
+  const dashboardPath = roleDashboardPaths[role]
+
+  let routePath: BreadcrumbItem[] | null = null
+
+  for (const items of Object.values(navigation)) {
+    routePath = findNavigationPath(items, pathname)
+
+    if (routePath) {
+      break
+    }
+  }
+
+  const breadcrumbs: BreadcrumbItem[] = []
+
+  if (roleLabel) {
+    breadcrumbs.push({
+      title: roleLabel,
+      href: dashboardPath,
+    })
+  }
+
+  if (routePath) {
+    breadcrumbs.push(...routePath)
+  } else if (segments.length > 0) {
+    breadcrumbs.push({
+      title: formatPathSegment(segments[segments.length - 1]),
+    })
+  }
+
+  return breadcrumbs
+}
