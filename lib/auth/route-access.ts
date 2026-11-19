@@ -17,10 +17,6 @@ export const routeRules: RouteRule[] = [
     roles: ["receptionist"],
   },
   {
-    prefix: "/staff",
-    roles: ["staff"],
-  },
-  {
     prefix: "/doctor",
     roles: ["doctor"],
   },

@@ -8,8 +8,6 @@ export function getRoleRedirect(role: unknown): string {
       return "/admin/dashboard"
     case "receptionist":
       return "/receptionist/dashboard"
-    case "staff":
-      return "/staff/dashboard"
     case "doctor":
       return "/doctor/dashboard"
     case "nurse":

@@ -3,11 +3,14 @@ import { normalizeRole } from "@/types/auth"
 import type { UserRole } from "@/types/auth"
 import {
   BugPlay,
+  CalendarPlus,
+  FileText,
   Headset,
   LayoutDashboardIcon,
   SearchIcon,
   UsersIcon,
   UserPlus,
+  UserRound,
   Ticket,
   Users,
 } from "lucide-react"
@@ -52,25 +55,6 @@ const navigation: Record<UserRole, NavItem[]> = {
       title: "Test Page",
       url: "/test",
       icon: <BugPlay />,
-    },
-  ],
-
-  staff: [
-    {
-      title: "Dashboard",
-      url: "/staff/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Search",
-      url: "/staff/search",
-      icon: <SearchIcon />,
-      items: [
-        {
-          title: "Patients",
-          url: "/staff/search/patients",
-        },
-      ],
     },
   ],
 
@@ -151,9 +135,24 @@ const navigation: Record<UserRole, NavItem[]> = {
 
   patient: [
     {
-      title: "Dashboard",
+      title: "Dasbor",
       url: "/patient/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Kunjungan",
+      url: "/patient/visits",
+      icon: <FileText />,
+    },
+    {
+      title: "Booking Online",
+      url: "/patient/booking",
+      icon: <CalendarPlus />,
+    },
+    {
+      title: "Profil",
+      url: "/patient/profile",
+      icon: <UserRound />,
     },
   ],
 }
@@ -176,18 +175,16 @@ export type BreadcrumbItem = {
 const roleLabels: Record<string, string> = {
   admin: "Admin",
   receptionist: "Resepsionis",
-  staff: "Staff",
   doctor: "Dokter",
   nurse: "Perawat",
   pharmacy: "Farmasi",
   lab: "Lab",
-  patient: "Patient",
+  patient: "Pasien",
 }
 
 const roleDashboardPaths: Record<string, string> = {
   admin: "/admin/dashboard",
   receptionist: "/receptionist/dashboard",
-  staff: "/staff/dashboard",
   doctor: "/doctor/dashboard",
   nurse: "/nurse/dashboard",
   pharmacy: "/pharmacy/dashboard",

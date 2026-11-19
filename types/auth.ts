@@ -1,6 +1,5 @@
 export const USER_ROLES = [
   "admin",
-  "staff",
   "doctor",
   "patient",
   "receptionist",
