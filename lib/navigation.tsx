@@ -92,6 +92,11 @@ const navigation: Record<UserRole, NavItem[]> = {
       icon: <UserPlus />,
     },
     {
+      title: "Create Queue",
+      url: "/receptionist/create-queue",
+      icon: <Ticket />,
+    },
+    {
       title: "Queue",
       url: "/receptionist/queue",
       icon: <Ticket />,
