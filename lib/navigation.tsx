@@ -76,9 +76,14 @@ const navigation: Record<UserRole, NavItem[]> = {
 
   doctor: [
     {
-      title: "Dashboard",
-      url: "/staff/dashboard",
+      title: "Dasbor",
+      url: "/doctor/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Antrian",
+      url: "/doctor/queue",
+      icon: <Ticket />,
     },
   ],
 
@@ -107,9 +112,14 @@ const navigation: Record<UserRole, NavItem[]> = {
 
   nurse: [
     {
-      title: "Dashboard",
-      url: "/staff/dashboard",
+      title: "Dasbor",
+      url: "/nurse/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Antrian",
+      url: "/nurse/queue",
+      icon: <Ticket />,
     },
   ],
 
@@ -157,9 +167,9 @@ const roleLabels: Record<string, string> = {
   admin: "Admin",
   receptionist: "Resepsionis",
   staff: "Staff",
-  doctor: "Doctor",
-  nurse: "Nurse",
-  pharmacy: "Pharmacy",
+  doctor: "Dokter",
+  nurse: "Perawat",
+  pharmacy: "Farmasi",
   lab: "Lab",
   patient: "Patient",
 }
@@ -168,6 +178,10 @@ const roleDashboardPaths: Record<string, string> = {
   admin: "/admin/dashboard",
   receptionist: "/receptionist/dashboard",
   staff: "/staff/dashboard",
+  doctor: "/doctor/dashboard",
+  nurse: "/nurse/dashboard",
+  pharmacy: "/pharmacy/dashboard",
+  lab: "/lab/dashboard",
   patient: "/patient/dashboard",
 }
 

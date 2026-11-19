@@ -37,6 +37,15 @@ const CHANNEL_LABELS: Record<IntakeChannel, string> = {
   ONLINE: "Online",
 }
 
+const STATION_TYPE_LABELS: Record<string, string> = {
+  REGISTRATION: "Registrasi",
+  NURSE: "Perawat",
+  DOCTOR: "Dokter",
+  LABORATORY: "Laboratorium",
+  PHARMACY: "Farmasi",
+  BILLING: "Kasir",
+}
+
 export function priorityLabel(priority: Priority | number): string {
   return PRIORITY_LABELS[priority] ?? `Prioritas ${priority}`
 }
@@ -51,6 +60,14 @@ export function visitStatusLabel(status: VisitStatus): string {
 
 export function channelLabel(channel: IntakeChannel): string {
   return CHANNEL_LABELS[channel] ?? channel
+}
+
+export function stationTypeLabel(type: string | null | undefined): string {
+  if (!type) {
+    return "-"
+  }
+
+  return STATION_TYPE_LABELS[type] ?? type
 }
 
 export function genderLabel(gender: string | null | undefined): string {
