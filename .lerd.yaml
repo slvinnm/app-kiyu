@@ -1,0 +1,5 @@
+node_version: "26"
+secured: true
+proxy:
+  command: npm run dev
+  port: 3000
