@@ -47,23 +47,31 @@ mcp:
 api:                        # /api/plugins/notes/list
   - {path: list, methods: [GET], run: bin/list}
   - {path: wipe, methods: [POST], run: bin/wipe, loopback_only: true}
+schedules:                  # runs on its own once the user allows it
+  - {name: tidy, every: 1h, run: bin/tidy}
 requires: [jq]              # commands the scripts call beyond their interpreters
 ui:                         # only ui/ is served
   page: {title: Notes, icon: ui/icon.svg, entry: ui/index.html}
-  site_tab: {title: Notes, entry: ui/site.html}
+  site_tab: {title: Notes, entry: ui/site.html}   # add when: to show it only where it applies, see below
   overview_card: {title: Notes, entry: ui/card.html}
   page_script: ui/page.js
 ```
 
 Events: `site.linked`, `site.unlinked`, `site.secured`, `site.php_changed`, `worktree.added`, `worktree.removed`, `service.started`, `service.stopped`, `lerd.started`, `lerd.stopped`. Any other name refuses the plugin.
 
-Time limits: hooks and API 30s, MCP tools 2m, site commands 30m, CLI none. `timeout:` raises one entry up to 10m (API, MCP) or 1h (site commands).
+A command or site command that ends the way a tool did can list the exits that are the tool's answer, such as `expected_exits: [101]` for `cargo check` finding code that does not compile. They reach the user as usual but are not recorded as the plugin failing; any other non-zero exit still is.
+
+A site tab's `when` limits it to the sites it applies to: `database`, `framework:<name>` with `*` as a wildcard, and `framework:<name>@<major>` with `@12`, `@>=11`, `@<=12`, `@>10` or `@<13`, joined by `and`, `or`, `not` and parentheses, as in `when: database and framework:laravel@>=11`. The name is the framework definition's, as `lerd framework list` shows it with its versions, and a worktree is judged on its own checkout. lerd 1.39 knows only `database`, so a plugin using more declares the release that added it in `lerd:`. Never start the value with `!`, which YAML reads as a tag.
+
+Time limits: hooks and API 30s, MCP tools 2m, schedules 5m, site commands 30m, CLI none. `timeout:` raises one entry up to 10m (API, MCP, schedules) or 1h (site commands).
+
+For work no event marks, declare `schedules` rather than installing a cron job, systemd timer or launchd agent, which a plugin must never write. `every` is at least `1m`. lerd's dashboard service runs each one with `LERD_SCHEDULE` set, but only after the user allows the plugin to run on a schedule, which lerd asks at install and again whenever an update adds a schedule or changes one's interval or executable; `lerd plugin schedule <name>` shows when each last ran. To let the user pick how often, declare the shortest interval you offer and skip the runs you do not need, reading the setting from the data folder.
 
 ## What an executable gets
 
 | | |
 |---|---|
-| `LERD_SURFACE` | `cli`, `site_command`, `hook`, `mcp` or `api` |
+| `LERD_SURFACE` | `cli`, `site_command`, `hook`, `mcp`, `api` or `schedule` |
 | `LERD_PLUGIN_NAME`, `LERD_PLUGIN_DIR` | the plugin and its folder |
 | `LERD_PLUGIN_DATA` | its writable folder, kept across reinstalls; write nowhere else |
 | `LERD_SITE`, `LERD_SITE_PATH`, `LERD_DOMAIN`, `LERD_BRANCH` | the site, when the surface has one |
@@ -76,7 +84,7 @@ Time limits: hooks and API 30s, MCP tools 2m, site commands 30m, CLI none. `time
 - API endpoints: the body on stdin, `LERD_METHOD`, `LERD_QUERY`; a `site` query parameter hands over the site. Exit 0 answers 200 with stdout (as JSON when it parses), anything else 500 with stderr.
 - Hooks: `LERD_EVENT` and the payload, as JSON on stdin and as `LERD_<KEY>`. Output goes to `hooks.log` in the data folder and never fails the operation.
 
-`curl -fsS -H "X-Lerd-Plugin-Token: $LERD_API_TOKEN" "$LERD_API_URL/api/sites"` lists the sites; `/api/services`, `/api/status`, `/api/stats` and `/api/disk` are the dashboard's own data.
+`curl -fsS -H "X-Lerd-Plugin-Token: $LERD_API_TOKEN" "$LERD_API_URL/api/sites"` lists the sites, each with `has_database` and its `databases` as `{service, database}` pairs to pass to `lerd db:shell --service= --database=`; `/api/services`, `/api/status`, `/api/stats` and `/api/disk` are the dashboard's own data.
 
 To tell the user something, such as a command to run, declare `notifications: true` in plugin.yaml, then POST `{"title": "...", "body": "...", "url": "#sites/<site>", "tag": "..."}` to `$LERD_API_URL/api/notifications/plugin` with the token: only `title` is required (100 characters, `body` 300), `url` must start with `#`, a repeated `tag` replaces the earlier browser notification (desktop notifications show each), unknown fields are refused, and each plugin gets ten a minute. It reaches the user as a notification titled with the plugin's name, and only once they allowed it: lerd asks them at install, or at the update that adds the key, and answers `403` until then or after they switch it off, so treat a `403` as the user's choice and fall back to stderr. Never use it to report progress, and fall back to stderr when it fails, since older lerd answers 404.
 
@@ -86,7 +94,7 @@ To tell the user something, such as a command to run, declare `notifications: tr
 - Write portable shell when `platforms` lists macos: no `sed -i`, `tac`, `\|` in sed, `readlink -f` or `date -d`.
 - Mark `loopback_only: true` on every endpoint that runs code, changes files or restarts anything, so a dashboard on the LAN never reaches it.
 - A page gets the dashboard's language as `lerd.context.lang` (`en`, `ro`, `zh-TW`...). English is enough; a plugin that adds translations picks its strings by it and falls back to English.
-- Pages run in a sandboxed frame. Load the boilerplate's `ui/lerd.js` and call `lerd.api('<path>', {method, body})`; it reaches only this plugin's endpoints and resolves with the response text. A site tab or Overview card reads the site from `lerd.context.site`, and `domain` and `branch` beside it.
+- Pages run in a sandboxed frame. Load the boilerplate's `ui/lerd.js` and call `lerd.api('<path>', {method, body})`; it reaches only this plugin's endpoints and resolves with the response text. A site tab or Overview card reads the site from `lerd.context.site`, and `domain` and `branch` beside it. `lerd.diff({path, original, modified, before, after})` opens the dashboard's own diff on two versions of a file, for a page that compares them, and `lerd.view({path, content, label})` shows one file read only; older lerd ignores both. `await lerd.edit({path, content, label})` opens a file in the dashboard's editor and resolves with the saved text, or null on cancel; it rejects on a lerd without the editor, so offer a plain textarea then.
 - An Overview card is a short summary, not a page: it grows to its content up to 800px, so keep it to a row or two and leave the detail to a site tab. It shows only on sites where the user ran `lerd plugin card <name> on` or switched it on in the site's header.
 - Treat every value from the API, a site or a file as untrusted in a page: set `textContent`, or escape it before it goes into `innerHTML`.
 - A page script shares the site's page with the app: draw inside a closed shadow root, as the boilerplate's `ui/page.js` does, and fetch only `/_lerd/plugins/<name>/api/...`. It is off until the user runs `lerd plugin page <name> on` in the project.
@@ -100,6 +108,7 @@ To tell the user something, such as a command to run, declare `notifications: tr
 - MCP tools: call them; lerd lists them as `<name>_<tool>` once the plugin loads, though the client may need its tool list refreshed.
 - API: `curl -fsS http://127.0.0.1:7073/api/plugins/<name>/<path>?site=<site>`.
 - Hooks: cause the event (`lerd service start <svc>`, `lerd link`) and read `hooks.log` in the data folder.
+- Schedules: `lerd plugin schedule <name> on`, wait for the next minute, then read `schedule.log` in the data folder and `lerd plugin schedule <name>`.
 - Pages, tabs and cards: open the dashboard and check the frame shows real data with no console errors; for a card, `lerd plugin card <name> on` in the project first; for a page script, `lerd plugin page <name> on` and load the site.
 - Failures from any surface show on the plugin's card on the dashboard's Plugins page and in `plugin` `list`.
 
