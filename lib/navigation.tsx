@@ -125,17 +125,27 @@ const navigation: Record<UserRole, NavItem[]> = {
 
   pharmacy: [
     {
-      title: "Dashboard",
-      url: "/staff/dashboard",
+      title: "Dasbor",
+      url: "/pharmacy/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Antrian",
+      url: "/pharmacy/queue",
+      icon: <Ticket />,
     },
   ],
 
   lab: [
     {
-      title: "Dashboard",
-      url: "/staff/dashboard",
+      title: "Dasbor",
+      url: "/lab/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Antrian",
+      url: "/lab/queue",
+      icon: <Ticket />,
     },
   ],
 

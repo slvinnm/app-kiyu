@@ -136,7 +136,9 @@ export function ClinicalQueueWorkspace({
         ? "Dokter"
         : role === "pharmacy"
           ? "Farmasi"
-          : role
+          : role === "lab"
+            ? "Laboratorium"
+            : role
 
   const focusedCalled =
     called.find((ticket) => ticket.id === focusedCalledId) ?? null
