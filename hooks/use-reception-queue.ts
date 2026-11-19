@@ -1,0 +1,190 @@
+"use client"
+
+import { useCallback, useEffect, useRef, useState } from "react"
+
+import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
+import { getReceptionQueue } from "@/lib/api/reception"
+
+import type { ReceptionQueueSnapshot } from "@/types/reception"
+
+const POLL_INTERVAL_MS = 15_000
+
+/**
+ * Loads the reception queue for a department and keeps it fresh while the tab
+ * is visible. Polling pauses when a dialog is open (`paused`) so the list does
+ * not change under the user's cursor.
+ */
+export function useReceptionQueue(
+  departmentId: number | null,
+  options?: { paused?: boolean }
+) {
+  const paused = options?.paused ?? false
+
+  const [snapshot, setSnapshot] = useState<ReceptionQueueSnapshot | null>(null)
+  const [loading, setLoading] = useState(departmentId !== null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [invalidWorkflow, setInvalidWorkflow] = useState(false)
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
+
+  const mountedRef = useRef(true)
+  const departmentRef = useRef(departmentId)
+  const pausedRef = useRef(paused)
+  const invalidWorkflowRef = useRef(false)
+  const inFlightRef = useRef(false)
+  const abortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    departmentRef.current = departmentId
+  }, [departmentId])
+
+  useEffect(() => {
+    pausedRef.current = paused
+  }, [paused])
+
+  useEffect(() => {
+    invalidWorkflowRef.current = invalidWorkflow
+  }, [invalidWorkflow])
+
+  useEffect(() => {
+    mountedRef.current = true
+
+    return () => {
+      mountedRef.current = false
+      abortRef.current?.abort()
+    }
+  }, [])
+
+  const fetchQueue = useCallback(async () => {
+    if (departmentId === null || inFlightRef.current) {
+      return
+    }
+
+    const requestedDepartment = departmentId
+
+    inFlightRef.current = true
+    abortRef.current?.abort()
+
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    try {
+      const response = await getReceptionQueue(
+        requestedDepartment,
+        controller.signal
+      )
+
+      if (
+        !mountedRef.current ||
+        controller.signal.aborted ||
+        departmentRef.current !== requestedDepartment
+      ) {
+        return
+      }
+
+      setSnapshot(response.data)
+      setError(null)
+      setInvalidWorkflow(false)
+      setLastUpdatedAt(new Date())
+    } catch (cause) {
+      if (
+        !mountedRef.current ||
+        controller.signal.aborted ||
+        departmentRef.current !== requestedDepartment
+      ) {
+        return
+      }
+
+      if (getApiErrorType(cause) === "INVALID_WORKFLOW") {
+        setInvalidWorkflow(true)
+        setSnapshot(null)
+      }
+
+      setError(getApiErrorMessage(cause, "Gagal memuat antrian reception."))
+    } finally {
+      inFlightRef.current = false
+
+      if (mountedRef.current && departmentRef.current === requestedDepartment) {
+        setLoading(false)
+      }
+    }
+  }, [departmentId])
+
+  useEffect(() => {
+    if (departmentId === null) {
+      setSnapshot(null)
+      setLoading(false)
+      setError(null)
+      setInvalidWorkflow(false)
+      setLastUpdatedAt(null)
+      return
+    }
+
+    setLoading(true)
+    setSnapshot(null)
+    setError(null)
+    setInvalidWorkflow(false)
+
+    void fetchQueue()
+
+    const interval = window.setInterval(() => {
+      if (document.visibilityState !== "visible") {
+        return
+      }
+
+      if (pausedRef.current || invalidWorkflowRef.current) {
+        return
+      }
+
+      void fetchQueue()
+    }, POLL_INTERVAL_MS)
+
+    function handleVisibilityChange() {
+      if (document.visibilityState !== "visible") {
+        return
+      }
+
+      if (pausedRef.current || invalidWorkflowRef.current) {
+        return
+      }
+
+      void fetchQueue()
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      abortRef.current?.abort()
+    }
+  }, [departmentId, fetchQueue])
+
+  const refresh = useCallback(async () => {
+    if (departmentId === null) {
+      return
+    }
+
+    if (mountedRef.current) {
+      setRefreshing(true)
+    }
+
+    try {
+      await fetchQueue()
+    } finally {
+      if (mountedRef.current) {
+        setRefreshing(false)
+      }
+    }
+  }, [departmentId, fetchQueue])
+
+  return {
+    snapshot,
+    loading,
+    refreshing,
+    error,
+    invalidWorkflow,
+    lastUpdatedAt,
+    refresh,
+  }
+}

@@ -27,9 +27,22 @@ function isSameOrigin(request: NextRequest) {
     return true
   }
 
-  const expectedOrigin = request.nextUrl.origin
+  let originHost: string
 
-  return origin === expectedOrigin
+  try {
+    originHost = new URL(origin).host
+  } catch {
+    return false
+  }
+
+  // Behind a reverse proxy (nginx) `nextUrl.origin` is the internal address,
+  // so compare the request host the browser actually used instead.
+  const host =
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host") ??
+    request.nextUrl.host
+
+  return originHost === host
 }
 
 async function proxy(request: NextRequest) {

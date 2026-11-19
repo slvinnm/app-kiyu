@@ -84,28 +84,23 @@ const navigation: Record<UserRole, NavItem[]> = {
 
   receptionist: [
     {
-      title: "Dashboard",
+      title: "Dasbor",
       url: "/receptionist/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Registration",
+      title: "Registrasi",
       url: "/receptionist/registration",
       icon: <UserPlus />,
     },
     {
-      title: "Create Queue",
-      url: "/receptionist/create-queue",
-      icon: <Ticket />,
-    },
-    {
-      title: "Queue",
+      title: "Antrian",
       url: "/receptionist/queue",
       icon: <Ticket />,
     },
     {
-      title: "Patient",
-      url: "/receptionist/patient",
+      title: "Pasien",
+      url: "/receptionist/patients",
       icon: <Users />,
     },
   ],
@@ -160,7 +155,7 @@ export type BreadcrumbItem = {
 
 const roleLabels: Record<string, string> = {
   admin: "Admin",
-  receptionist: "Receptionist",
+  receptionist: "Resepsionis",
   staff: "Staff",
   doctor: "Doctor",
   nurse: "Nurse",

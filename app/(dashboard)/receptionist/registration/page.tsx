@@ -1,30 +1,59 @@
-import {
-  ClipboardPlusIcon,
-  ScanLineIcon,
-  UserRoundPlusIcon,
-} from "lucide-react"
+import { ClipboardPlusIcon } from "lucide-react"
+import { redirect } from "next/navigation"
 
-import { RegistrationKiosk } from "@/components/receptionist/registration-kiosk"
-import { RegistrationWalkIn } from "@/components/receptionist/registration-walk-in"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export default function Page() {
+import { ManualIntakeForm } from "@/components/receptionist/registration/manual-intake-form"
+
+import { getApiErrorMessage } from "@/lib/api/error"
+import { getActiveDepartmentsServer } from "@/lib/api/reception-server"
+import { getSession } from "@/lib/auth/session"
+import { resolveDepartmentId } from "@/lib/reception/department"
+
+import type { Department } from "@/types/reception"
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ department_id?: string | string[] }>
+}) {
+  const session = await getSession()
+
+  if (!session?.user?.role) {
+    redirect("/login")
+  }
+
+  const params = await searchParams
+
+  let departments: Department[] = []
+  let loadError: string | null = null
+
+  try {
+    departments = await getActiveDepartmentsServer()
+  } catch (cause) {
+    loadError = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
+  }
+
+  const departmentId = resolveDepartmentId(
+    params.department_id,
+    session.user.department_id,
+    departments
+  )
+
   return (
     <div className="mx-auto w-full p-4 md:p-6 lg:p-8">
       <div className="mb-6 flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <Badge variant="outline">Reception</Badge>
 
-          <span className="text-xs text-muted-foreground">
-            Patient Registration
-          </span>
+          <span className="text-xs text-muted-foreground">Patient Intake</span>
         </div>
 
         <div className="flex items-start gap-3">
@@ -33,48 +62,38 @@ export default function Page() {
           </div>
 
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Registrasi
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Registrasi</h1>
 
             <p className="text-sm text-muted-foreground">
-              Daftarkan pasien walk-in atau proses pasien dari kiosk.
+              Buat intake manual walk-in. Data pasien dilengkapi saat registrasi
+              di meja reception.
             </p>
           </div>
         </div>
       </div>
 
-      <Card className="overflow-hidden">
-        <Tabs defaultValue="walk-in" className="w-full">
-          <CardHeader className="border-b">
-            <TabsList className="grid h-11 w-full max-w-md grid-cols-2">
-              <TabsTrigger value="walk-in" className="gap-2">
-                <UserRoundPlusIcon className="size-4" />
-                Walk-in
-              </TabsTrigger>
+      {loadError ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Daftar poli tidak tersedia</CardTitle>
 
-              <TabsTrigger value="kiosk" className="gap-2">
-                <ScanLineIcon className="size-4" />
-                Kiosk
-              </TabsTrigger>
-            </TabsList>
-
-            <CardDescription>
-              Pilih alur registrasi sesuai sumber pasien.
-            </CardDescription>
+            <CardDescription>{loadError}</CardDescription>
           </CardHeader>
 
-          <CardContent className="p-0">
-            <TabsContent value="walk-in" className="m-0">
-              <RegistrationWalkIn />
-            </TabsContent>
-
-            <TabsContent value="kiosk" className="m-0">
-              <RegistrationKiosk />
-            </TabsContent>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Muat ulang halaman atau hubungi administrator jika masalah
+              berlanjut.
+            </p>
           </CardContent>
-        </Tabs>
-      </Card>
+        </Card>
+      ) : (
+        <ManualIntakeForm
+          departments={departments}
+          defaultDepartmentId={departmentId}
+          actorEmail={session.user.email}
+        />
+      )}
     </div>
   )
 }
