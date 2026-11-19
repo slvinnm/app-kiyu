@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
 
-const API_BASE_URL = process.env.API_BASE_URL
+const API_BASE_URL = process.env.API_BASE_URL ?? ""
 
-if (!API_BASE_URL) {
+if (API_BASE_URL.length === 0) {
   throw new Error("API_BASE_URL is not configured.")
 }
 

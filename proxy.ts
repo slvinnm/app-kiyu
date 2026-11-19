@@ -1,37 +1,41 @@
-import { auth } from "@/auth"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
+import { readSessionFromRequest } from "@/lib/auth/session-core"
 import { getRouteRule, isRoleAllowed } from "@/lib/auth/route-access"
 
-export default auth((request) => {
-  const pathname = request.nextUrl.pathname
-  const user = request.auth?.user
+export default function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl
+
+  // Signed HttpOnly session cookie; tampered or absent cookies are rejected.
+  const session = readSessionFromRequest(request)
 
   const isAuthPage = pathname === "/login" || pathname === "/signup"
 
-  if (isAuthPage && user) {
-    return Response.redirect(new URL("/dashboard", request.url))
+  if (isAuthPage && session) {
+    return NextResponse.redirect(new URL("/redirect", request.url))
   }
 
   const rule = getRouteRule(pathname)
 
   if (!rule) {
-    return
+    return NextResponse.next()
   }
 
-  if (!user) {
+  if (!session) {
     const loginUrl = new URL("/login", request.url)
 
-    loginUrl.searchParams.set("callbackUrl", pathname)
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`)
 
-    return Response.redirect(loginUrl)
+    return NextResponse.redirect(loginUrl)
   }
 
-  if (!isRoleAllowed(user.role, rule.roles)) {
-    return Response.redirect(new URL("/unauthorized", request.url))
+  if (!isRoleAllowed(session.user.role, rule.roles)) {
+    return NextResponse.redirect(new URL("/unauthorized", request.url))
   }
 
-  return
-})
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [

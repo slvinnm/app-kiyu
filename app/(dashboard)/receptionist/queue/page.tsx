@@ -327,11 +327,19 @@ export default function Page() {
     setLastAction(`${queue.queue_number} belum dapat dipanggil secara manual.`)
   }
 
-  const currentStatusLabel = {
+  const statusLabels: Partial<Record<QueueStatus, string>> = {
+    CREATED: "Menunggu",
     CALLED: "Dipanggil",
     IN_PROGRESS: "Sedang Dilayani",
     ON_HOLD: "Ditahan",
-  }[currentQueue?.status ?? "CALLED"]
+    COMPLETED: "Selesai",
+    SKIPPED: "Dilewati",
+    NO_SHOW: "Tidak Hadir",
+    CANCELLED: "Dibatalkan",
+  }
+
+  const currentStatusLabel =
+    statusLabels[currentQueue?.status ?? "CALLED"] ?? "Menunggu"
 
   return (
     <div className="flex flex-1 flex-col">

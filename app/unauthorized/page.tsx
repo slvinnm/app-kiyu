@@ -1,7 +1,15 @@
-import { auth } from "@/auth"
+import { getSession } from "@/lib/auth/session"
 
 export default async function UnauthorizedPage() {
-  const session = await auth()
+  const session = await getSession()
+
+  const user = session?.user
+    ? {
+        name: session.user.name,
+        email: session.user.email,
+        role: session.user.role,
+      }
+    : null
 
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
@@ -12,9 +20,11 @@ export default async function UnauthorizedPage() {
           Anda tidak memiliki akses ke halaman ini.
         </p>
 
-        <pre className="mt-6 overflow-auto rounded-lg bg-muted p-4 text-left text-sm">
-          {JSON.stringify(session, null, 2)}
-        </pre>
+        {user && (
+          <pre className="mt-6 overflow-auto rounded-lg bg-muted p-4 text-left text-sm">
+            {JSON.stringify(user, null, 2)}
+          </pre>
+        )}
       </div>
     </main>
   )

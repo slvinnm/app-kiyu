@@ -1,5 +1,7 @@
 node_version: "26"
 secured: true
 proxy:
-  command: npm run dev
+  # --use-system-ca lets the Next.js server trust the local mkcert CA when it
+  # calls the Laravel backend (https://kiyu.test) server-side.
+  command: NODE_OPTIONS=--use-system-ca npm run dev
   port: 3000

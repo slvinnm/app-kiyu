@@ -1,7 +1,9 @@
-import type { UserRole } from "@/types/auth"
+import { normalizeRole } from "@/types/auth"
 
-export function getRoleRedirect(role: UserRole): string {
-  switch (role) {
+export function getRoleRedirect(role: unknown): string {
+  const normalizedRole = normalizeRole(role)
+
+  switch (normalizedRole) {
     case "admin":
       return "/admin/dashboard"
     case "receptionist":

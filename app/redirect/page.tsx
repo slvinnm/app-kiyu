@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation"
-import { auth } from "@/auth"
+
+import { getSession } from "@/lib/auth/session"
 import { getRoleRedirect } from "@/lib/auth/redirect"
 
 export default async function DashboardPage() {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session?.user?.role) {
     redirect("/login")

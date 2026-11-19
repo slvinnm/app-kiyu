@@ -1,21 +1,25 @@
-import type { QueueAcquisition } from "@/types/kiosk"
+import type { KioskIntakeResult } from "@/types/kiosk"
 
 import { CheckCircle2, Clock3, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
 export function SuccessScreen({
-  acquisition,
+  result,
   message,
   onReset,
   secondsRemaining,
 }: {
-  acquisition: QueueAcquisition
+  result: KioskIntakeResult
   message: string
   onReset: () => void
   secondsRemaining: number
 }) {
-  const acquiredAt = new Date(acquisition.acquired_at)
+  const createdAt = result.ticket.created_at
+    ? new Date(result.ticket.created_at)
+    : new Date()
+
+  const displayTime = Number.isNaN(createdAt.getTime()) ? null : createdAt
 
   return (
     <div className="flex w-full max-w-3xl items-center justify-center">
@@ -42,11 +46,13 @@ export function SuccessScreen({
 
             <div className="mt-2 rounded-2xl border bg-muted/30 px-6 py-5">
               <p className="text-6xl leading-none font-black tracking-tight tabular-nums md:text-7xl">
-                {acquisition.queue_ticket.queue_number}
+                {result.ticket.queue_number}
               </p>
             </div>
 
-            <p className="mt-4 font-semibold">{acquisition.department.name}</p>
+            <p className="mt-4 font-semibold">
+              {result.visit.department?.name ?? "-"}
+            </p>
 
             <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           </div>
@@ -56,7 +62,7 @@ export function SuccessScreen({
               <p className="text-xs text-muted-foreground">Kunjungan</p>
 
               <p className="mt-1 font-mono text-sm font-semibold">
-                {acquisition.visit.visit_number}
+                {result.visit.visit_number}
               </p>
             </div>
 
@@ -64,11 +70,13 @@ export function SuccessScreen({
               <p className="text-xs text-muted-foreground">Waktu</p>
 
               <p className="mt-1 text-sm font-semibold tabular-nums">
-                {new Intl.DateTimeFormat("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(acquiredAt)}
+                {displayTime
+                  ? new Intl.DateTimeFormat("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    }).format(displayTime)
+                  : "-"}
               </p>
             </div>
 
@@ -76,7 +84,7 @@ export function SuccessScreen({
               <p className="text-xs text-muted-foreground">Status</p>
 
               <p className="mt-1 font-mono text-sm font-semibold">
-                {acquisition.queue_ticket.status}
+                {result.ticket.status}
               </p>
             </div>
           </div>

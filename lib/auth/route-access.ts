@@ -1,3 +1,5 @@
+import { normalizeRole } from "@/types/auth"
+
 import type { UserRole } from "@/types/auth"
 
 type RouteRule = {
@@ -50,9 +52,8 @@ export function getRouteRule(pathname: string): RouteRule | null {
   )
 }
 
-export function isRoleAllowed(
-  role: unknown,
-  roles: UserRole[]
-): role is UserRole {
-  return typeof role === "string" && roles.includes(role as UserRole)
+export function isRoleAllowed(role: unknown, roles: UserRole[]): boolean {
+  const normalizedRole = normalizeRole(role)
+
+  return normalizedRole !== null && roles.includes(normalizedRole)
 }

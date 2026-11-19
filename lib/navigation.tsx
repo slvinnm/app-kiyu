@@ -1,3 +1,5 @@
+import { normalizeRole } from "@/types/auth"
+
 import type { UserRole } from "@/types/auth"
 import {
   BugPlay,
@@ -141,8 +143,14 @@ const navigation: Record<UserRole, NavItem[]> = {
   ],
 }
 
-export function getNavigation(role: UserRole) {
-  return navigation[role]
+export function getNavigation(role: unknown): NavItem[] {
+  const normalizedRole = normalizeRole(role)
+
+  if (!normalizedRole) {
+    return []
+  }
+
+  return navigation[normalizedRole]
 }
 
 export type BreadcrumbItem = {

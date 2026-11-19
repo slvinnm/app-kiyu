@@ -44,7 +44,11 @@ export function DepartmentSelect({
         <div className="space-y-2">
           <Label>Poli / Department</Label>
 
-          <Select value={value} onValueChange={onChange} disabled={loading}>
+          <Select
+            value={value}
+            onValueChange={(selected) => onChange(selected ?? "")}
+            disabled={loading}
+          >
             <SelectTrigger className="w-full">
               {loading ? (
                 <div className="flex items-center gap-2">

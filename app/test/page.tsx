@@ -56,12 +56,14 @@ export default function TestApiPage() {
         return result
       })
 
-      const result = await toast.promise(request, {
-        loading: "Mengirim request...",
-        success: (result) => result.message || "Request berhasil.",
-        error: (error) =>
-          error instanceof Error ? error.message : "Request gagal.",
-      })
+      const result = await toast
+        .promise(request, {
+          loading: "Mengirim request...",
+          success: (result) => result.message || "Request berhasil.",
+          error: (error) =>
+            error instanceof Error ? error.message : "Request gagal.",
+        })
+        .unwrap()
 
       setResponseData(result)
     } catch (error) {

@@ -8,9 +8,9 @@ import type { FlashData } from "@/types/flash"
 export const FLASH_COOKIE_NAME = "kiyu_flash"
 
 const FLASH_MAX_BYTES = 3000
-const AUTH_SECRET = process.env.AUTH_SECRET
+const AUTH_SECRET = process.env.AUTH_SECRET ?? ""
 
-if (!AUTH_SECRET) {
+if (AUTH_SECRET.length === 0) {
   throw new Error("AUTH_SECRET is not configured.")
 }
 

@@ -115,12 +115,12 @@ export function KioskClient() {
       })
 
       try {
-        const acquisition = await acquireQueue(department.code, idempotencyKey)
+        const intake = await acquireQueue(department.id, idempotencyKey)
 
         setState({
           type: "success",
-          acquisition: acquisition.data,
-          message: acquisition.message,
+          result: intake.data,
+          message: intake.message ?? "Nomor antrean berhasil diambil.",
         })
 
         setSecondsRemaining(SUCCESS_RESET_DELAY)
@@ -159,7 +159,7 @@ export function KioskClient() {
         <section className="flex flex-1 items-center justify-center">
           {state.type === "success" ? (
             <SuccessScreen
-              acquisition={state.acquisition}
+              result={state.result}
               message={state.message}
               secondsRemaining={secondsRemaining}
               onReset={resetKiosk}

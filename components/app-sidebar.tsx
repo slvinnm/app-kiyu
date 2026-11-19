@@ -1,6 +1,6 @@
-import { auth } from "@/auth"
-
+import { getSession } from "@/lib/auth/session"
 import { getNavigation } from "@/lib/navigation"
+import { normalizeRole } from "@/types/auth"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -18,13 +18,14 @@ import { CommandIcon } from "lucide-react"
 export async function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const session = await auth()
+  const session = await getSession()
+  const role = normalizeRole(session?.user?.role)
 
-  if (!session?.user?.role) {
+  if (!session?.user || !role) {
     return null
   }
 
-  const items = getNavigation(session.user.role)
+  const items = getNavigation(role)
 
   const user = {
     name: session.user.name ?? "",

@@ -977,7 +977,7 @@ export default function Page() {
                                 <Select
                                   value={newPatient.gender}
                                   onValueChange={(value) =>
-                                    handleNewPatientChange("gender", value)
+                                    handleNewPatientChange("gender", value ?? "")
                                   }
                                 >
                                   <SelectTrigger className="w-full">

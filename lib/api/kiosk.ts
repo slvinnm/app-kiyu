@@ -1,4 +1,8 @@
-import type { ApiResponse, Department, QueueAcquisition } from "@/types/kiosk"
+import type {
+  ApiResponse,
+  Department,
+  KioskIntakeResult,
+} from "@/types/kiosk"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -35,11 +39,15 @@ async function request<T>(
       throw new Error(payload?.message ?? "Terjadi kesalahan pada server.")
     }
 
-    if (!payload?.success) {
-      throw new Error(payload?.message ?? "Permintaan tidak berhasil diproses.")
+    if (
+      payload === null ||
+      typeof payload !== "object" ||
+      !("data" in payload)
+    ) {
+      throw new Error(payload?.message ?? "Respons server tidak valid.")
     }
 
-    return payload
+    return payload as ApiResponse<T>
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("Server tidak merespons. Silakan coba lagi.")
@@ -61,26 +69,27 @@ export const SUCCESS_RESET_DELAY = 10
 
 export async function getDepartments(): Promise<Department[]> {
   const response = await request<Department[]>(
-    `${API_BASE_URL}/kiosk/departments`,
+    `${API_BASE_URL}/departments/active`,
     {
       method: "GET",
     }
   )
 
-  return response.data
+  return Array.isArray(response.data) ? response.data : []
 }
 
 export async function acquireQueue(
-  departmentCode: string,
+  departmentId: number,
   idempotencyKey: string
-): Promise<ApiResponse<QueueAcquisition>> {
-  return request<QueueAcquisition>(`${API_BASE_URL}/kiosk/queue-acquisitions`, {
+): Promise<ApiResponse<KioskIntakeResult>> {
+  return request<KioskIntakeResult>(`${API_BASE_URL}/intake/kiosk`, {
     method: "POST",
     headers: {
       "Idempotency-Key": idempotencyKey,
     },
     body: JSON.stringify({
-      department_code: departmentCode,
+      department_id: departmentId,
+      idempotency_key: idempotencyKey,
     }),
   })
 }
