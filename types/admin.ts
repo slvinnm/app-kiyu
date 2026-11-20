@@ -61,10 +61,13 @@ export type PublicQueueStation = {
   station_name: string
   station_code: string
   station_type: string
+  department_id: number
   department_name: string
+  department_code: string
   current_calling: {
     queue_number: string
     status: string
+    called_at?: string | null
   } | null
   waiting_count: number
   upcoming_queue_numbers: string[]
