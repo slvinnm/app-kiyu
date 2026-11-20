@@ -159,5 +159,80 @@ export type TicketFilters = {
   per_page?: number
 }
 
+export type AdminUser = {
+  id: number
+  name: string
+  email: string
+  role: string
+  department_id: number | null
+  station_id: number | null
+  created_at?: string
+  updated_at?: string
+  department?: Department | null
+  station?: AdminStation | null
+}
+
+export type UserPayload = {
+  name: string
+  email: string
+  password?: string
+  role: string
+  department_id?: number | null
+  station_id?: number | null
+}
+
+export type UserFilters = {
+  search?: string
+  role?: string
+  department_id?: number
+  station_id?: number
+  page?: number
+  per_page?: number
+}
+
+export type ReferralStatus = "PENDING" | "ACCEPTED" | "COMPLETED" | "CANCELLED"
+
+export type Referral = {
+  id: number
+  source_visit_id: number
+  target_department_id: number
+  target_visit_id: number | null
+  referred_by_user_id: string | null
+  status: ReferralStatus
+  priority: Priority
+  reason: string | null
+  created_at?: string
+  updated_at?: string
+  source_visit?: (Visit & { patient?: Patient | null }) | null
+  target_department?: Department | null
+  target_visit?: Visit | null
+}
+
+export type ReferralDetail = Referral & {
+  target_visit?: (Visit & { queue_tickets?: QueueTicket[] }) | null
+}
+
+export type ReferralFilters = {
+  source_visit_id?: number
+  target_department_id?: number
+  status?: string
+  page?: number
+  per_page?: number
+}
+
+export type CreateReferralPayload = {
+  source_visit_id: number
+  target_department_id: number
+  priority?: Priority
+  reason?: string
+  referred_by?: string
+}
+
+export type CreateReferralResult = {
+  referral: Referral
+  target_visit: Visit
+  target_ticket: QueueTicket
+}
+
 export type AdminPage<T> = Paginated<T>
 export type { Patient, Visit }

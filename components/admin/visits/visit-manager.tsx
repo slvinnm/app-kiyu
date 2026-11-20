@@ -314,6 +314,7 @@ export function VisitManager({
       <VisitDetailSheet
         visitId={selectedVisitId}
         actorEmail={actorEmail}
+        departments={departments}
         open={selectedVisitId !== null}
         onOpenChange={(open) => {
           if (!open) {

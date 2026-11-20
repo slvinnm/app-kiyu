@@ -16,6 +16,8 @@ export function getRoleRedirect(role: unknown): string {
       return "/pharmacy/dashboard"
     case "lab":
       return "/lab/dashboard"
+    case "billing":
+      return "/billing/dashboard"
     case "patient":
       return "/patient/dashboard"
     default:

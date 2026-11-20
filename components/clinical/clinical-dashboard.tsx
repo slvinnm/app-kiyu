@@ -36,6 +36,7 @@ function roleLabel(role: string): string {
   if (role === "doctor") return "Dokter"
   if (role === "pharmacy") return "Farmasi"
   if (role === "lab") return "Laboratorium"
+  if (role === "billing") return "Kasir"
   return role
 }
 

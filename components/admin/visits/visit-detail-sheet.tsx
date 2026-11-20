@@ -52,7 +52,10 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
+import { ReferralDialog } from "@/components/admin/visits/referral-dialog"
+
 import type { AdminVisitDetail } from "@/types/admin"
+import type { Department } from "@/types/reception"
 
 const PRIORITIES = [
   { value: "1", label: "Normal" },
@@ -63,12 +66,14 @@ const PRIORITIES = [
 export function VisitDetailSheet({
   visitId,
   actorEmail,
+  departments,
   open,
   onOpenChange,
   onChanged,
 }: {
   visitId: number | null
   actorEmail: string
+  departments: Department[]
   open: boolean
   onOpenChange: (open: boolean) => void
   onChanged: () => void
@@ -82,6 +87,7 @@ export function VisitDetailSheet({
   const [cancelReason, setCancelReason] = useState("")
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelProcessing, setCancelProcessing] = useState(false)
+  const [referralOpen, setReferralOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (visitId === null) {
@@ -309,6 +315,22 @@ export function VisitDetailSheet({
                       </Button>
                     </div>
                   )}
+
+                  <div className="space-y-2 border-t pt-3">
+                    <Label>Referral</Label>
+
+                    <p className="text-xs text-muted-foreground">
+                      Rujuk pasien ke poli lain; kunjungan dan tiket tujuan
+                      dibuat otomatis.
+                    </p>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setReferralOpen(true)}
+                    >
+                      Buat Referral
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -399,6 +421,22 @@ export function VisitDetailSheet({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {visit && (
+        <ReferralDialog
+          open={referralOpen}
+          onOpenChange={setReferralOpen}
+          visit={visit}
+          departments={departments}
+          actorEmail={actorEmail}
+          onCreated={() => {
+            setReferralOpen(false)
+            void load()
+            onChanged()
+            router.refresh()
+          }}
+        />
+      )}
     </Sheet>
   )
 }

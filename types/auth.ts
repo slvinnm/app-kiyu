@@ -6,6 +6,7 @@ export const USER_ROLES = [
   "nurse",
   "pharmacy",
   "lab",
+  "billing",
 ] as const
 
 export type UserRole = (typeof USER_ROLES)[number]

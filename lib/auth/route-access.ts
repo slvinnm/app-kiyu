@@ -33,6 +33,10 @@ export const routeRules: RouteRule[] = [
     roles: ["lab"],
   },
   {
+    prefix: "/billing",
+    roles: ["billing"],
+  },
+  {
     prefix: "/patient",
     roles: ["patient"],
   },

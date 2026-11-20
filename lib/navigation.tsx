@@ -2,6 +2,7 @@ import { normalizeRole } from "@/types/auth"
 
 import type { UserRole } from "@/types/auth"
 import {
+  ArrowRightLeft,
   Building2,
   CalendarClock,
   CalendarPlus,
@@ -11,6 +12,7 @@ import {
   ListOrdered,
   MapPin,
   ScrollText,
+  UserCog,
   UserPlus,
   UserRound,
   Ticket,
@@ -50,6 +52,11 @@ const navigation: Record<UserRole, NavItem[]> = {
           url: "/admin/workflows",
           icon: <GitBranch />,
         },
+        {
+          title: "Staff",
+          url: "/admin/users",
+          icon: <UserCog />,
+        },
       ],
     },
     {
@@ -60,6 +67,11 @@ const navigation: Record<UserRole, NavItem[]> = {
           title: "Kunjungan",
           url: "/admin/visits",
           icon: <CalendarClock />,
+        },
+        {
+          title: "Referral",
+          url: "/admin/referrals",
+          icon: <ArrowRightLeft />,
         },
         {
           title: "Antrian",
@@ -155,6 +167,19 @@ const navigation: Record<UserRole, NavItem[]> = {
     },
   ],
 
+  billing: [
+    {
+      title: "Dasbor",
+      url: "/billing/dashboard",
+      icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Antrian",
+      url: "/billing/queue",
+      icon: <Ticket />,
+    },
+  ],
+
   patient: [
     {
       title: "Dasbor",
@@ -201,6 +226,7 @@ const roleLabels: Record<string, string> = {
   nurse: "Perawat",
   pharmacy: "Farmasi",
   lab: "Lab",
+  billing: "Kasir",
   patient: "Pasien",
 }
 
@@ -211,6 +237,7 @@ const roleDashboardPaths: Record<string, string> = {
   nurse: "/nurse/dashboard",
   pharmacy: "/pharmacy/dashboard",
   lab: "/lab/dashboard",
+  billing: "/billing/dashboard",
   patient: "/patient/dashboard",
 }
 

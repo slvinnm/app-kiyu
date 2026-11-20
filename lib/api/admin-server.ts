@@ -11,12 +11,17 @@ import type {
 } from "@/types/reception"
 import type {
   AdminStation,
+  AdminUser,
   AdminVisitDetail,
   AuditFilters,
   AuditLog,
   PatientFilters,
   PublicQueueStation,
+  Referral,
+  ReferralDetail,
+  ReferralFilters,
   TicketFilters,
+  UserFilters,
   VisitFilters,
   Workflow,
 } from "@/types/admin"
@@ -117,6 +122,31 @@ export async function getPublicQueueServer(
 ): Promise<PublicQueueStation[]> {
   const response = await serverApiFetch<{ data: PublicQueueStation[] }>(
     `/public/queue${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getUsersServer(
+  filters: UserFilters = {}
+): Promise<Paginated<AdminUser>> {
+  const response = await serverApiFetch<{ data: Paginated<AdminUser> }>(
+    `/users${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getReferralsServer(
+  filters: ReferralFilters = {}
+): Promise<Paginated<Referral>> {
+  const response = await serverApiFetch<{ data: Paginated<Referral> }>(
+    `/referrals${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getReferralServer(id: number): Promise<ReferralDetail> {
+  const response = await serverApiFetch<{ data: ReferralDetail }>(
+    `/referrals/${id}`
   )
   return response.data
 }

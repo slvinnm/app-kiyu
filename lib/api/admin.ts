@@ -9,15 +9,23 @@ import type {
 } from "@/types/reception"
 import type {
   AdminStation,
+  AdminUser,
   AdminVisitDetail,
   AuditFilters,
   AuditLog,
+  CreateReferralPayload,
+  CreateReferralResult,
   DepartmentPayload,
   PatientFilters,
   PatientPayload,
   PublicQueueStation,
+  Referral,
+  ReferralDetail,
+  ReferralFilters,
   StationPayload,
   TicketFilters,
+  UserFilters,
+  UserPayload,
   VisitFilters,
   Workflow,
   WorkflowPayload,
@@ -269,5 +277,65 @@ export function getAuditLogs(
   return apiFetch<{ data: Paginated<AuditLog> }>(
     `/audit-logs${toQuery(filters)}`,
     { signal }
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Staff users                                                                */
+/* -------------------------------------------------------------------------- */
+
+export function getUsers(
+  filters: UserFilters = {},
+  signal?: AbortSignal
+) {
+  return apiFetch<{ data: Paginated<AdminUser> }>(
+    `/users${toQuery(filters)}`,
+    { signal }
+  )
+}
+
+export function createUser(payload: UserPayload) {
+  return sendJson<{ message: string; data: AdminUser }>(
+    "/users",
+    "POST",
+    payload
+  )
+}
+
+export function updateUser(id: number, payload: UserPayload) {
+  return sendJson<{ message: string; data: AdminUser }>(
+    `/users/${id}`,
+    "PUT",
+    payload
+  )
+}
+
+export function deleteUser(id: number) {
+  return sendJson<{ message: string }>(`/users/${id}`, "DELETE")
+}
+
+/* -------------------------------------------------------------------------- */
+/* Referrals                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export function getReferrals(
+  filters: ReferralFilters = {},
+  signal?: AbortSignal
+) {
+  return apiFetch<{ data: Paginated<Referral> }>(
+    `/referrals${toQuery(filters)}`,
+    { signal }
+  )
+}
+
+export function getReferral(id: number, signal?: AbortSignal) {
+  return apiFetch<{ data: ReferralDetail }>(`/referrals/${id}`, { signal })
+}
+
+export function createReferral(payload: CreateReferralPayload) {
+  return sendJson<{ message: string; data: CreateReferralResult }>(
+    "/referrals",
+    "POST",
+    payload
   )
 }
