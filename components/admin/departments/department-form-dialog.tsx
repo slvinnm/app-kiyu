@@ -46,6 +46,7 @@ export function DepartmentFormDialog({
   const [code, setCode] = useState("")
   const [name, setName] = useState("")
   const [isActive, setIsActive] = useState("1")
+  const [displayInKiosk, setDisplayInKiosk] = useState("1")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -58,6 +59,7 @@ export function DepartmentFormDialog({
     setCode(department?.code ?? "")
     setName(department?.name ?? "")
     setIsActive(department?.is_active === false ? "0" : "1")
+    setDisplayInKiosk(department?.display_in_kiosk === false ? "0" : "1")
     setError(null)
     setErrors({})
     setSubmitting(false)
@@ -86,6 +88,7 @@ export function DepartmentFormDialog({
       code: code.trim().toUpperCase(),
       name: name.trim(),
       is_active: isActive === "1",
+      display_in_kiosk: displayInKiosk === "1",
     }
 
     try {
@@ -179,6 +182,31 @@ export function DepartmentFormDialog({
                 <SelectItem value="0">Nonaktif</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tampil di Kiosk</Label>
+
+            <Select
+              value={displayInKiosk}
+              onValueChange={(v) => setDisplayInKiosk(v ?? "1")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="1">Ya — tampil di mesin anjungan</SelectItem>
+                <SelectItem value="0">
+                  Tidak — hanya untuk internal
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <p className="text-xs text-muted-foreground">
+              Unit internal seperti Apotek, Laboratorium, dan Kasir sebaiknya
+              tidak ditampilkan di kiosk.
+            </p>
           </div>
 
           {error && (

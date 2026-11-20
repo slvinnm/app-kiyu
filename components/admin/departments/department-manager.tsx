@@ -106,6 +106,8 @@ export function DepartmentManager({
 
                 <TableHead>Status</TableHead>
 
+                <TableHead>Kiosk</TableHead>
+
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -114,7 +116,7 @@ export function DepartmentManager({
               {filtered.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="p-8 text-center text-sm text-muted-foreground"
                   >
                     Poli tidak ditemukan.
@@ -140,6 +142,20 @@ export function DepartmentManager({
                         variant={department.is_active ? "default" : "outline"}
                       >
                         {department.is_active ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant={
+                          department.display_in_kiosk === false
+                            ? "outline"
+                            : "secondary"
+                        }
+                      >
+                        {department.display_in_kiosk === false
+                          ? "Internal"
+                          : "Tampil"}
                       </Badge>
                     </TableCell>
 

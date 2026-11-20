@@ -71,6 +71,7 @@ export type Department = {
   code: string
   name: string
   is_active: boolean
+  display_in_kiosk?: boolean
   stations?: Station[]
 }
 

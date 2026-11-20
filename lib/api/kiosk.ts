@@ -1,7 +1,9 @@
 import type {
   ApiResponse,
   Department,
+  KioskCheckinResult,
   KioskIntakeResult,
+  OnlineBookingLookup,
 } from "@/types/kiosk"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -90,6 +92,28 @@ export async function acquireQueue(
     body: JSON.stringify({
       department_id: departmentId,
       idempotency_key: idempotencyKey,
+    }),
+  })
+}
+
+export async function lookupOnlineBooking(
+  identifier: string
+): Promise<ApiResponse<OnlineBookingLookup>> {
+  return request<OnlineBookingLookup>(
+    `${API_BASE_URL}/intake/online-lookup/${encodeURIComponent(identifier)}`,
+    {
+      method: "GET",
+    }
+  )
+}
+
+export async function checkinOnlineBooking(
+  identifier: string
+): Promise<ApiResponse<KioskCheckinResult>> {
+  return request<KioskCheckinResult>(`${API_BASE_URL}/intake/online-checkin`, {
+    method: "POST",
+    body: JSON.stringify({
+      booking_identifier: identifier,
     }),
   })
 }

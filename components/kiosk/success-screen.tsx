@@ -1,4 +1,4 @@
-import type { KioskIntakeResult } from "@/types/kiosk"
+import type { KioskCheckinResult, KioskIntakeResult } from "@/types/kiosk"
 
 import { CheckCircle2, Clock3, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ export function SuccessScreen({
   onReset,
   secondsRemaining,
 }: {
-  result: KioskIntakeResult
+  result: KioskIntakeResult | KioskCheckinResult
   message: string
   onReset: () => void
   secondsRemaining: number

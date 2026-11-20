@@ -1,20 +1,25 @@
 "use client"
 
-import type { Department, KioskState } from "@/types/kiosk"
+import type { Department, KioskCheckinResult, KioskState } from "@/types/kiosk"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { acquireQueue, getDepartments } from "@/lib/api/kiosk"
 import { KioskHeader } from "@/components/kiosk/kiosk-header"
 import { DepartmentGrid } from "@/components/kiosk/department-grid"
 import { KioskInformation } from "@/components/kiosk/kiosk-information"
+import { OnlineCheckinPanel } from "@/components/kiosk/online-checkin-panel"
 import { SuccessScreen } from "@/components/kiosk/success-screen"
 import { ErrorScreen } from "@/components/kiosk/error-screen"
 import { SUCCESS_RESET_DELAY } from "@/lib/api/kiosk"
+
+type KioskMode = "walk-in" | "online"
 
 export function KioskClient() {
   const [departments, setDepartments] = useState<Department[]>([])
   const [loadingDepartments, setLoadingDepartments] = useState(true)
   const [departmentError, setDepartmentError] = useState<string | null>(null)
+
+  const [mode, setMode] = useState<KioskMode>("walk-in")
 
   const [state, setState] = useState<KioskState>({
     type: "idle",
@@ -40,6 +45,7 @@ export function KioskClient() {
     activeIdempotencyKey.current = null
 
     setSecondsRemaining(SUCCESS_RESET_DELAY)
+    setMode("walk-in")
     setState({ type: "idle" })
   }, [clearResetTimer])
 
@@ -119,7 +125,7 @@ export function KioskClient() {
 
         setState({
           type: "success",
-          result: intake.data,
+          result: { visit: intake.data.visit, ticket: intake.data.ticket },
           message: intake.message ?? "Nomor antrean berhasil diambil.",
         })
 
@@ -140,6 +146,25 @@ export function KioskClient() {
           departmentCode: department.code,
         })
       }
+    },
+    [clearResetTimer, resetKiosk]
+  )
+
+  const handleCheckedIn = useCallback(
+    (result: KioskCheckinResult, message?: string) => {
+      setState({
+        type: "success",
+        result: { visit: result.visit, ticket: result.ticket },
+        message: message ?? "Check-in berhasil. Silakan menunggu panggilan.",
+      })
+
+      setSecondsRemaining(SUCCESS_RESET_DELAY)
+
+      clearResetTimer()
+
+      resetTimer.current = window.setTimeout(() => {
+        resetKiosk()
+      }, SUCCESS_RESET_DELAY * 1000)
     },
     [clearResetTimer, resetKiosk]
   )
@@ -178,17 +203,41 @@ export function KioskClient() {
               }}
               onReset={resetKiosk}
             />
-          ) : (
-            <DepartmentGrid
-              departments={departments}
-              loading={loadingDepartments}
-              error={departmentError}
-              state={state}
-              onRetry={loadDepartments}
-              onSelect={(department) => {
-                void handleAcquireQueue(department)
-              }}
+          ) : mode === "online" ? (
+            <OnlineCheckinPanel
+              onBack={() => setMode("walk-in")}
+              onCheckedIn={handleCheckedIn}
             />
+          ) : (
+            <div className="w-full space-y-6">
+              <DepartmentGrid
+                departments={departments}
+                loading={loadingDepartments}
+                error={departmentError}
+                state={state}
+                onRetry={loadDepartments}
+                onSelect={(department) => {
+                  void handleAcquireQueue(department)
+                }}
+              />
+
+              <div className="mx-auto max-w-xl">
+                <button
+                  type="button"
+                  onClick={() => setMode("online")}
+                  className="w-full rounded-2xl border border-dashed bg-card p-5 text-center transition-colors hover:border-primary/50 hover:bg-muted/50"
+                >
+                  <p className="text-sm font-semibold">
+                    Sudah melakukan booking online?
+                  </p>
+
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Check-in di sini dengan kode booking Anda untuk masuk
+                    antrean reception.
+                  </p>
+                </button>
+              </div>
+            </div>
           )}
         </section>
 

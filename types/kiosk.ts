@@ -19,6 +19,7 @@ export type Department = {
   code: string
   name: string
   is_active?: boolean
+  display_in_kiosk?: boolean
   stations?: Station[]
 }
 
@@ -86,6 +87,28 @@ export type KioskIntakeResult = {
   ticket: QueueTicket
 }
 
+/**
+ * Result of an online self check-in. The backend returns the visit and the
+ * newly created reception ticket (no acquisition payload).
+ */
+export type KioskCheckinResult = {
+  visit: Visit
+  ticket: QueueTicket
+}
+
+export type OnlineBookingLookup = {
+  visit_number: string
+  booking_identifier: string | null
+  patient_preview: {
+    masked_name: string
+    mrn: string
+  }
+  department_name: string
+  priority: number
+  status: string
+  is_eligible_checkin: boolean
+}
+
 export type KioskState =
   | {
       type: "idle"
@@ -96,7 +119,10 @@ export type KioskState =
     }
   | {
       type: "success"
-      result: KioskIntakeResult
+      result: {
+        visit: Visit
+        ticket: QueueTicket
+      }
       message: string
     }
   | {
