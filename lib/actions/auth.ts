@@ -4,7 +4,6 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { clearSession, createSession, getSession } from "@/lib/auth/session"
-import { flash } from "@/lib/flash"
 
 import { toSessionUser } from "@/types/auth"
 
@@ -120,7 +119,6 @@ export async function authenticate(
     return errorState("Terjadi kesalahan saat login.")
   }
 
-  await flash("success-login", "Berhasil login")
   await createSession(credentials.token, toSessionUser(credentials.user))
 
   redirect(safeCallback(callbackUrl))
@@ -176,7 +174,6 @@ export async function register(
     redirect("/redirect")
   }
 
-  await flash("success-login", "Akun berhasil dibuat. Silakan login.")
   redirect("/login")
 }
 
@@ -198,7 +195,6 @@ export async function logout(): Promise<void> {
     }
   }
 
-  await flash("success-logout", "Berhasil logout")
   await clearSession()
 
   redirect("/login")
