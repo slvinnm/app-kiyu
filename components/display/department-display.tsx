@@ -7,6 +7,7 @@ import { ArrowLeftIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
+import { CallPopup } from "@/components/display/call-popup"
 import { DisplayShell } from "@/components/display/display-shell"
 
 import { usePublicQueue } from "@/hooks/use-public-queue"
@@ -15,7 +16,8 @@ import { stationTypeLabel } from "@/lib/reception/format"
 
 export function DepartmentDisplay({ departmentCode }: { departmentCode: string }) {
   const router = useRouter()
-  const { stations, loading, error, lastUpdatedAt } = usePublicQueue()
+  const { stations, loading, error, lastUpdatedAt, calledEvent, dismissCalled } =
+    usePublicQueue()
 
   const filtered = useMemo(
     () =>
@@ -34,6 +36,7 @@ export function DepartmentDisplay({ departmentCode }: { departmentCode: string }
   )
 
   return (
+    <>
     <DisplayShell
       title={departmentName}
       subtitle="Status dan ringkasan antrian departemen"
@@ -144,5 +147,12 @@ export function DepartmentDisplay({ departmentCode }: { departmentCode: string }
         </div>
       )}
     </DisplayShell>
+
+    <CallPopup
+      event={calledEvent}
+      onDismiss={dismissCalled}
+      onlyDepartmentCode={departmentCode}
+    />
+    </>
   )
 }

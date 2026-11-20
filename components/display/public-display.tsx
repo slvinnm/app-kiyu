@@ -4,6 +4,7 @@ import { useMemo } from "react"
 
 import { Badge } from "@/components/ui/badge"
 
+import { CallPopup } from "@/components/display/call-popup"
 import { DisplayShell } from "@/components/display/display-shell"
 
 import { usePublicQueue } from "@/hooks/use-public-queue"
@@ -47,11 +48,13 @@ function summarize(stations: PublicQueueStation[]): DepartmentSummary[] {
 }
 
 export function PublicDisplay() {
-  const { stations, loading, error, lastUpdatedAt } = usePublicQueue()
+  const { stations, loading, error, lastUpdatedAt, calledEvent, dismissCalled } =
+    usePublicQueue()
 
   const departments = useMemo(() => summarize(stations), [stations])
 
   return (
+    <>
     <DisplayShell
       title="Antrian Layanan"
       subtitle="Ringkasan antrian seluruh departemen"
@@ -148,5 +151,8 @@ export function PublicDisplay() {
         </div>
       )}
     </DisplayShell>
+
+    <CallPopup event={calledEvent} onDismiss={dismissCalled} />
+    </>
   )
 }
