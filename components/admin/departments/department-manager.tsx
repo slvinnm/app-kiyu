@@ -15,19 +15,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
+import { Input } from "@/components/ui/input"
 
 import { DepartmentFormDialog } from "@/components/admin/departments/department-form-dialog"
 
 import type { Department } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<Department>()
 
 export function DepartmentManager({
   departments,
@@ -52,6 +50,79 @@ export function DepartmentManager({
         department.code.toLowerCase().includes(keyword)
     )
   }, [departments, query])
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("code", {
+          header: "Kode",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">{row.original.code}</span>
+          ),
+        }),
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <span className="font-medium">{row.original.name}</span>
+          ),
+        }),
+        columnHelper.display({
+          id: "stations",
+          header: "Station",
+          cell: ({ row }) => row.original.stations?.length ?? 0,
+        }),
+        columnHelper.accessor("is_active", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant={row.original.is_active ? "default" : "outline"}>
+              {row.original.is_active ? "Aktif" : "Nonaktif"}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "kiosk",
+          header: "Kiosk",
+          cell: ({ row }) => (
+            <Badge
+              variant={
+                row.original.display_in_kiosk === false
+                  ? "outline"
+                  : "secondary"
+              }
+            >
+              {row.original.display_in_kiosk === false ? "Internal" : "Tampil"}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="flex justify-end gap-2">
+              <Link
+                href={`/admin/stations?department_id=${row.original.id}`}
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "sm",
+                })}
+              >
+                Station
+              </Link>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openEdit(row.original)}
+              >
+                <PencilIcon />
+                Edit
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    []
+  )
 
   function openCreate() {
     setEditing(null)
@@ -95,97 +166,12 @@ export function DepartmentManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kode</TableHead>
-
-                <TableHead>Nama</TableHead>
-
-                <TableHead>Station</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead>Kiosk</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Poli tidak ditemukan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((department) => (
-                  <TableRow key={department.id}>
-                    <TableCell className="font-mono text-xs">
-                      {department.code}
-                    </TableCell>
-
-                    <TableCell className="font-medium">
-                      {department.name}
-                    </TableCell>
-
-                    <TableCell>
-                      {department.stations?.length ?? 0}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={department.is_active ? "default" : "outline"}
-                      >
-                        {department.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={
-                          department.display_in_kiosk === false
-                            ? "outline"
-                            : "secondary"
-                        }
-                      >
-                        {department.display_in_kiosk === false
-                          ? "Internal"
-                          : "Tampil"}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link
-                          href={`/admin/stations?department_id=${department.id}`}
-                          className={buttonVariants({
-                            variant: "outline",
-                            size: "sm",
-                          })}
-                        >
-                          Station
-                        </Link>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEdit(department)}
-                        >
-                          <PencilIcon />
-                          Edit
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={filtered}
+            getRowId={(department) => String(department.id)}
+            emptyMessage="Poli tidak ditemukan."
+          />
         </CardContent>
       </Card>
 

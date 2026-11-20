@@ -88,7 +88,13 @@ export function useClinicalQueue(
 
       setError(getApiErrorMessage(cause, "Gagal memuat antrian station."))
     } finally {
-      inFlightRef.current = false
+      // Only the latest request owns the in-flight flag. Without this guard a
+      // StrictMode cleanup (which aborts the first request) can leave the flag
+      // stuck and block the real fetch until the user refreshes.
+      if (abortRef.current === controller) {
+        abortRef.current = null
+        inFlightRef.current = false
+      }
 
       if (mountedRef.current && stationRef.current === requestedStation) {
         setLoading(false)
@@ -141,7 +147,11 @@ export function useClinicalQueue(
     return () => {
       window.clearInterval(interval)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
+      // Release the in-flight guard before aborting so the next mount (or the
+      // re-run triggered by StrictMode) can fetch immediately.
+      inFlightRef.current = false
       abortRef.current?.abort()
+      abortRef.current = null
     }
   }, [stationId, fetchQueue])
 

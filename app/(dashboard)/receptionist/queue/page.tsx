@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { ReceptionQueueWorkspace } from "@/components/receptionist/queue/reception-queue-workspace"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getActiveDepartmentsServer } from "@/lib/api/reception-server"
+import { getAllDepartmentsServer } from "@/lib/api/reception-server"
 import { getSession } from "@/lib/auth/session"
 import { resolveDepartmentId } from "@/lib/reception/department"
 
@@ -28,7 +28,7 @@ export default async function Page({
   let loadError: string | null = null
 
   try {
-    departments = await getActiveDepartmentsServer()
+    departments = await getAllDepartmentsServer()
   } catch (cause) {
     loadError = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
   }

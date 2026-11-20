@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
@@ -22,15 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 
-import { AdminPaginationLinks } from "@/components/admin/admin-pagination"
 import { VisitDetailSheet } from "@/components/admin/visits/visit-detail-sheet"
 
 import {
@@ -40,12 +35,9 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type {
-  Department,
-  Paginated,
-  Visit,
-  VisitStatus,
-} from "@/types/reception"
+import type { Department, Visit, VisitStatus } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<Visit>()
 
 const STATUS_OPTIONS: VisitStatus[] = [
   "AWAITING_CHECKIN",
@@ -92,13 +84,11 @@ function buildQuery(
 
 export function VisitManager({
   visits,
-  pagination,
   departments,
   filters,
   actorEmail,
 }: {
   visits: Visit[]
-  pagination: Paginated<Visit>
   departments: Department[]
   filters: VisitFilters
   actorEmail: string
@@ -134,6 +124,80 @@ export function VisitManager({
   function resetFilters() {
     router.push("/admin/visits")
   }
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("visit_number", {
+          header: "Kunjungan",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.visit_number}
+            </span>
+          ),
+        }),
+        columnHelper.display({
+          id: "patient",
+          header: "Pasien",
+          cell: ({ row }) => (
+            <div>
+              <p className="font-medium">
+                {row.original.patient?.name ?? "-"}
+              </p>
+
+              <p className="text-xs text-muted-foreground">
+                {row.original.patient?.mrn ?? "-"}
+              </p>
+            </div>
+          ),
+        }),
+        columnHelper.display({
+          id: "department",
+          header: "Poli",
+          cell: ({ row }) => row.original.department?.name ?? "-",
+        }),
+        columnHelper.accessor("intake_channel", {
+          header: "Channel",
+          cell: ({ row }) => channelLabel(row.original.intake_channel),
+        }),
+        columnHelper.accessor("priority", {
+          header: "Prioritas",
+          cell: ({ row }) => priorityLabel(row.original.priority),
+        }),
+        columnHelper.accessor("status", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant="outline">
+              {visitStatusLabel(row.original.status)}
+            </Badge>
+          ),
+        }),
+        columnHelper.accessor("created_at", {
+          header: "Dibuat",
+          cell: ({ row }) => (
+            <span className="text-xs">
+              {formatDateTime(row.original.created_at)}
+            </span>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedVisitId(row.original.id)}
+              >
+                Detail
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    []
+  )
 
   return (
     <>
@@ -213,103 +277,14 @@ export function VisitManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kunjungan</TableHead>
-
-                <TableHead>Pasien</TableHead>
-
-                <TableHead>Poli</TableHead>
-
-                <TableHead>Channel</TableHead>
-
-                <TableHead>Prioritas</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead>Dibuat</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {visits.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Tidak ada kunjungan untuk filter ini.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                visits.map((visit) => (
-                  <TableRow key={visit.id}>
-                    <TableCell className="font-mono text-xs">
-                      {visit.visit_number}
-                    </TableCell>
-
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {visit.patient?.name ?? "-"}
-                        </p>
-
-                        <p className="text-xs text-muted-foreground">
-                          {visit.patient?.mrn ?? "-"}
-                        </p>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      {visit.department?.name ?? "-"}
-                    </TableCell>
-
-                    <TableCell>
-                      {channelLabel(visit.intake_channel)}
-                    </TableCell>
-
-                    <TableCell>
-                      {priorityLabel(visit.priority)}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="outline">
-                        {visitStatusLabel(visit.status)}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-xs">
-                      {formatDateTime(visit.created_at)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedVisitId(visit.id)}
-                      >
-                        Detail
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={visits}
+            getRowId={(row) => String(row.id)}
+            emptyMessage="Tidak ada kunjungan untuk filter ini."
+          />
         </CardContent>
       </Card>
-
-      <AdminPaginationLinks
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        hrefFor={(page) =>
-          buildQuery({ ...filters, page })
-        }
-      />
 
       <VisitDetailSheet
         visitId={selectedVisitId}

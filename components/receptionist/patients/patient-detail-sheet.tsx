@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -76,17 +76,17 @@ export function PatientDetailSheet({
   }, [open, patientId])
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>{patient?.name ?? "Detail Pasien"}</SheetTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{patient?.name ?? "Detail Pasien"}</DialogTitle>
 
-          <SheetDescription>
+          <DialogDescription>
             {patient?.mrn ? `No. RM ${patient.mrn}` : "Memuat data pasien..."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-5 overflow-y-auto px-4 pb-6">
+        <div className="space-y-5 pb-2">
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Spinner />
@@ -209,7 +209,7 @@ export function PatientDetailSheet({
             </>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

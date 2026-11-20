@@ -51,7 +51,7 @@ export default async function Page({
 
   try {
     ;[visits, departments] = await Promise.all([
-      getVisitsServer({ ...filters, per_page: 20 }),
+      getVisitsServer({ ...filters, per_page: 200 }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -77,7 +77,6 @@ export default async function Page({
       ) : (
         <VisitManager
           visits={visits.data}
-          pagination={visits}
           departments={departments}
           filters={filters}
           actorEmail={session.user.email}

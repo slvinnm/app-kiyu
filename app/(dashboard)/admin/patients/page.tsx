@@ -41,7 +41,7 @@ export default async function Page({
     patients = await getPatientsServer({
       search: search || undefined,
       page,
-      per_page: 20,
+      per_page: 200,
     })
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat data pasien.")
@@ -64,11 +64,7 @@ export default async function Page({
           </AlertDescription>
         </Alert>
       ) : (
-        <PatientManager
-          patients={patients.data}
-          pagination={patients}
-          search={search}
-        />
+        <PatientManager patients={patients.data} search={search} />
       )}
     </div>
   )

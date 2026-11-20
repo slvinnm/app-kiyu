@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -31,13 +31,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 
 import { WorkflowStepFormDialog } from "@/components/admin/workflows/workflow-step-form-dialog"
 
@@ -45,6 +41,8 @@ import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteWorkflowStep } from "@/lib/api/admin"
 
 import type { AdminStation, Workflow, WorkflowStep } from "@/types/admin"
+
+const columnHelper = createDataTableColumnHelper<WorkflowStep>()
 
 export function WorkflowDetail({
   workflow,
@@ -96,6 +94,98 @@ export function WorkflowDetail({
     }
   }
 
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("sequence", {
+          header: "Seq",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">{row.original.sequence}</span>
+          ),
+        }),
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <span className="font-medium">{row.original.name}</span>
+          ),
+        }),
+        columnHelper.display({
+          id: "station",
+          header: "Station",
+          cell: ({ row }) =>
+            row.original.station?.name ??
+            stations.find((station) => station.id === row.original.station_id)
+              ?.name ??
+            "-",
+        }),
+        columnHelper.display({
+          id: "attributes",
+          header: "Atribut",
+          cell: ({ row }) => (
+            <div className="flex flex-wrap gap-1">
+              {row.original.is_optional && (
+                <Badge variant="outline" className="text-[10px]">
+                  Opsional
+                </Badge>
+              )}
+
+              {row.original.is_repeatable && (
+                <Badge variant="outline" className="text-[10px]">
+                  Repeatable
+                </Badge>
+              )}
+
+              {row.original.can_skip && (
+                <Badge variant="outline" className="text-[10px]">
+                  Bisa Skip
+                </Badge>
+              )}
+
+              {!row.original.is_optional &&
+                !row.original.is_repeatable &&
+                !row.original.can_skip && (
+                  <span className="text-xs text-muted-foreground">-</span>
+                )}
+            </div>
+          ),
+        }),
+        columnHelper.accessor("is_active", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant={row.original.is_active ? "default" : "outline"}>
+              {row.original.is_active ? "Aktif" : "Nonaktif"}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openEdit(row.original)}
+              >
+                <PencilIcon />
+                Edit
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteTarget(row.original)}
+              >
+                <Trash2Icon />
+                Hapus
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    [stations]
+  )
+
   return (
     <>
       <div className="mb-4">
@@ -128,117 +218,12 @@ export function WorkflowDetail({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Seq</TableHead>
-
-                <TableHead>Nama</TableHead>
-
-                <TableHead>Station</TableHead>
-
-                <TableHead>Atribut</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {steps.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Workflow belum memiliki langkah. Tambahkan langkah pertama
-                    untuk mengaktifkan alur.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                steps.map((step) => (
-                  <TableRow key={step.id}>
-                    <TableCell className="font-mono text-xs">
-                      {step.sequence}
-                    </TableCell>
-
-                    <TableCell className="font-medium">
-                      {step.name}
-                    </TableCell>
-
-                    <TableCell>
-                      {step.station?.name ??
-                        stations.find(
-                          (station) => station.id === step.station_id
-                        )?.name ??
-                        "-"}
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {step.is_optional && (
-                          <Badge variant="outline" className="text-[10px]">
-                            Opsional
-                          </Badge>
-                        )}
-
-                        {step.is_repeatable && (
-                          <Badge variant="outline" className="text-[10px]">
-                            Repeatable
-                          </Badge>
-                        )}
-
-                        {step.can_skip && (
-                          <Badge variant="outline" className="text-[10px]">
-                            Bisa Skip
-                          </Badge>
-                        )}
-
-                        {!step.is_optional &&
-                          !step.is_repeatable &&
-                          !step.can_skip && (
-                            <span className="text-xs text-muted-foreground">
-                              -
-                            </span>
-                          )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={step.is_active ? "default" : "outline"}
-                      >
-                        {step.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEdit(step)}
-                        >
-                          <PencilIcon />
-                          Edit
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeleteTarget(step)}
-                        >
-                          <Trash2Icon />
-                          Hapus
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={steps}
+            getRowId={(step) => String(step.id)}
+            emptyMessage="Workflow belum memiliki langkah. Tambahkan langkah pertama untuk mengaktifkan alur."
+          />
         </CardContent>
       </Card>
 

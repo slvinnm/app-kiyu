@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   PencilIcon,
@@ -38,15 +38,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 
-import { AdminPaginationLinks } from "@/components/admin/admin-pagination"
 import { UserFormDialog } from "@/components/admin/users/user-form-dialog"
 
 import {
@@ -57,7 +52,9 @@ import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteUser } from "@/lib/api/admin"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
-import type { Department, Paginated } from "@/types/reception"
+import type { Department } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<AdminUser>()
 
 type UserFilters = {
   search?: string
@@ -83,14 +80,12 @@ function buildQuery(
 
 export function UserManager({
   users,
-  pagination,
   departments,
   stations,
   filters,
   currentUserId,
 }: {
   users: AdminUser[]
-  pagination: Paginated<AdminUser>
   departments: Department[]
   stations: AdminStation[]
   filters: UserFilters
@@ -133,11 +128,6 @@ export function UserManager({
     setDialogOpen(true)
   }
 
-  function openEdit(user: AdminUser) {
-    setEditing(user)
-    setDialogOpen(true)
-  }
-
   async function handleDelete() {
     if (!deleteTarget) {
       return
@@ -156,6 +146,71 @@ export function UserManager({
       router.refresh()
     }
   }
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <div>
+              <p className="font-medium">{row.original.name}</p>
+
+              <p className="text-xs text-muted-foreground">
+                {row.original.email}
+              </p>
+            </div>
+          ),
+        }),
+        columnHelper.accessor("role", {
+          header: "Role",
+          cell: ({ row }) => (
+            <Badge variant="outline">{staffRoleLabel(row.original.role)}</Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "department",
+          header: "Department",
+          cell: ({ row }) => row.original.department?.name ?? "-",
+        }),
+        columnHelper.display({
+          id: "station",
+          header: "Station",
+          cell: ({ row }) => row.original.station?.name ?? "-",
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="flex justify-end gap-2 text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setEditing(row.original)
+                  setDialogOpen(true)
+                }}
+              >
+                <PencilIcon />
+                Edit
+              </Button>
+
+              {row.original.id !== currentUserId && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeleteTarget(row.original)}
+                >
+                  <Trash2Icon />
+                  Hapus
+                </Button>
+              )}
+            </div>
+          ),
+        }),
+      ]),
+    [currentUserId]
+  )
 
   return (
     <>
@@ -222,93 +277,14 @@ export function UserManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead>
-
-                <TableHead>Role</TableHead>
-
-                <TableHead>Department</TableHead>
-
-                <TableHead>Station</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {users.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Pengguna tidak ditemukan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="outline">
-                        {staffRoleLabel(user.role)}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {user.department?.name ?? "-"}
-                    </TableCell>
-
-                    <TableCell>{user.station?.name ?? "-"}</TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEdit(user)}
-                        >
-                          <PencilIcon />
-                          Edit
-                        </Button>
-
-                        {user.id !== currentUserId && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setDeleteTarget(user)}
-                          >
-                            <Trash2Icon />
-                            Hapus
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={users}
+            getRowId={(row) => String(row.id)}
+            emptyMessage="Pengguna tidak ditemukan."
+          />
         </CardContent>
       </Card>
-
-      <AdminPaginationLinks
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        hrefFor={(page) => buildQuery({ ...filters, page })}
-      />
 
       <UserFormDialog
         open={dialogOpen}

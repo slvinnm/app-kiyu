@@ -102,7 +102,13 @@ export function useReceptionQueue(
 
       setError(getApiErrorMessage(cause, "Gagal memuat antrian reception."))
     } finally {
-      inFlightRef.current = false
+      // Only the latest request owns the in-flight flag. A StrictMode cleanup
+      // aborts the first request; without this guard the flag stays stuck and
+      // blocks the real fetch until the user refreshes.
+      if (abortRef.current === controller) {
+        abortRef.current = null
+        inFlightRef.current = false
+      }
 
       if (mountedRef.current && departmentRef.current === requestedDepartment) {
         setLoading(false)
@@ -156,7 +162,11 @@ export function useReceptionQueue(
     return () => {
       window.clearInterval(interval)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
+      // Release the guard before aborting so a StrictMode re-run or a quick
+      // remount can fetch without waiting for a manual refresh.
+      inFlightRef.current = false
       abortRef.current?.abort()
+      abortRef.current = null
     }
   }, [departmentId, fetchQueue])
 

@@ -98,5 +98,11 @@ export function usePatientSearch(
     }
   }, [query, enabled, page, perPage, enableEmptyQuery, refreshKey])
 
-  return { results, pagination, searching, error }
+  return {
+    results,
+    pagination,
+    total: pagination?.total ?? results.length,
+    searching,
+    error,
+  }
 }

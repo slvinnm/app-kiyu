@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -83,19 +83,19 @@ export function PatientVisitDetailSheet({
   const active = activeTickets(tickets)
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
             {visit?.department?.name ?? "Detail Kunjungan"}
-          </SheetTitle>
+          </DialogTitle>
 
-          <SheetDescription>
+          <DialogDescription>
             {visit?.visit_number ?? "Memuat detail kunjungan..."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-5 overflow-y-auto px-4 pb-6">
+        <div className="space-y-5 pb-2">
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Spinner />
@@ -140,6 +140,22 @@ export function PatientVisitDetailSheet({
                   </p>
                 </div>
               </div>
+
+              {visit.intake_channel === "ONLINE" && (
+                <div className="rounded-xl border bg-muted/40 p-4">
+                  <p className="text-xs text-muted-foreground">Kode Booking</p>
+
+                  <p className="mt-1 font-mono text-sm font-semibold break-all">
+                    {visit.online_active_key ?? "-"}
+                  </p>
+
+                  {visit.status === "AWAITING_CHECKIN" && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Tunjukkan kode ini di kiosk untuk check-in.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <Separator />
 
@@ -228,7 +244,7 @@ export function PatientVisitDetailSheet({
             </>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

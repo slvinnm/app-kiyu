@@ -51,7 +51,7 @@ export default async function Page({
         search: search || undefined,
         role: role || undefined,
         page,
-        per_page: 20,
+        per_page: 200,
       }),
       getDepartmentsServer(),
       getStationsServer(),
@@ -79,7 +79,6 @@ export default async function Page({
       ) : (
         <UserManager
           users={users.data}
-          pagination={users}
           departments={departments}
           stations={stations}
           filters={{

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRightLeft } from "lucide-react"
 
@@ -22,22 +22,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 
-import { AdminPaginationLinks } from "@/components/admin/admin-pagination"
 import { ReferralDetailSheet } from "@/components/admin/referrals/referral-detail-sheet"
 
 import { referralStatusLabel } from "@/lib/admin/referrals"
 import { formatDateTime, priorityLabel } from "@/lib/reception/format"
 
 import type { Referral } from "@/types/admin"
-import type { Department, Paginated } from "@/types/reception"
+import type { Department } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<Referral>()
 
 const STATUS_OPTIONS = ["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED"]
 
@@ -68,12 +65,10 @@ function buildQuery(
 
 export function ReferralManager({
   referrals,
-  pagination,
   departments,
   filters,
 }: {
   referrals: Referral[]
-  pagination: Paginated<Referral>
   departments: Department[]
   filters: ReferralFilters
 }) {
@@ -111,6 +106,84 @@ export function ReferralManager({
   function resetFilters() {
     router.push("/admin/referrals")
   }
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("id", {
+          header: "Referral",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">#{row.original.id}</span>
+          ),
+        }),
+        columnHelper.display({
+          id: "source",
+          header: "Sumber",
+          cell: ({ row }) => (
+            <div>
+              <p className="font-medium">
+                {row.original.source_visit?.patient?.name ?? "-"}
+              </p>
+
+              <p className="font-mono text-xs text-muted-foreground">
+                {row.original.source_visit?.visit_number ?? "-"}
+              </p>
+            </div>
+          ),
+        }),
+        columnHelper.display({
+          id: "target",
+          header: "Tujuan",
+          cell: ({ row }) => row.original.target_department?.name ?? "-",
+        }),
+        columnHelper.accessor("status", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant="outline">
+              {referralStatusLabel(row.original.status)}
+            </Badge>
+          ),
+        }),
+        columnHelper.accessor("priority", {
+          header: "Prioritas",
+          cell: ({ row }) => priorityLabel(row.original.priority),
+        }),
+        columnHelper.display({
+          id: "target_visit",
+          header: "Kunjungan Tujuan",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.target_visit?.visit_number ?? "-"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("created_at", {
+          header: "Dibuat",
+          cell: ({ row }) => (
+            <span className="text-xs">
+              {formatDateTime(row.original.created_at)}
+            </span>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedReferralId(row.original.id)}
+              >
+                <ArrowRightLeft />
+                Detail
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    []
+  )
 
   return (
     <>
@@ -188,104 +261,14 @@ export function ReferralManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Referral</TableHead>
-
-                <TableHead>Sumber</TableHead>
-
-                <TableHead>Tujuan</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead>Prioritas</TableHead>
-
-                <TableHead>Kunjungan Tujuan</TableHead>
-
-                <TableHead>Dibuat</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {referrals.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Tidak ada referral untuk filter ini.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                referrals.map((referral) => (
-                  <TableRow key={referral.id}>
-                    <TableCell className="font-mono text-xs">
-                      #{referral.id}
-                    </TableCell>
-
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {referral.source_visit?.patient?.name ?? "-"}
-                        </p>
-
-                        <p className="font-mono text-xs text-muted-foreground">
-                          {referral.source_visit?.visit_number ?? "-"}
-                        </p>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      {referral.target_department?.name ?? "-"}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="outline">
-                        {referralStatusLabel(referral.status)}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {priorityLabel(referral.priority)}
-                    </TableCell>
-
-                    <TableCell className="font-mono text-xs">
-                      {referral.target_visit?.visit_number ?? "-"}
-                    </TableCell>
-
-                    <TableCell className="text-xs">
-                      {formatDateTime(referral.created_at)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setSelectedReferralId(referral.id)
-                        }
-                      >
-                        <ArrowRightLeft />
-                        Detail
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={referrals}
+            getRowId={(row) => String(row.id)}
+            emptyMessage="Tidak ada referral untuk filter ini."
+          />
         </CardContent>
       </Card>
-
-      <AdminPaginationLinks
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        hrefFor={(page) => buildQuery({ ...filters, page })}
-      />
 
       <ReferralDetailSheet
         referralId={selectedReferralId}

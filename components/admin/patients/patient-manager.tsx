@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PencilIcon, PlusIcon, SearchIcon } from "lucide-react"
 
@@ -14,28 +14,23 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 
-import { AdminPaginationLinks } from "@/components/admin/admin-pagination"
 import { PatientFormDialog } from "@/components/admin/patients/patient-form-dialog"
 
 import { formatDate, genderLabel } from "@/lib/reception/format"
 
-import type { Paginated, Patient } from "@/types/reception"
+import type { Patient } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<Patient>()
 
 export function PatientManager({
   patients,
-  pagination,
   search,
 }: {
   patients: Patient[]
-  pagination: Paginated<Patient>
   search: string
 }) {
   const router = useRouter()
@@ -62,21 +57,65 @@ export function PatientManager({
     setDialogOpen(true)
   }
 
-  function openEdit(patient: Patient) {
-    setEditing(patient)
-    setDialogOpen(true)
-  }
-
-  function hrefFor(page: number): string {
-    const params = new URLSearchParams()
-
-    if (search) params.set("search", search)
-    if (page > 1) params.set("page", String(page))
-
-    const text = params.toString()
-
-    return text ? `/admin/patients?${text}` : "/admin/patients"
-  }
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <span className="font-medium">{row.original.name}</span>
+          ),
+        }),
+        columnHelper.accessor("mrn", {
+          header: "MRN",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.mrn ?? "-"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("nik", {
+          header: "NIK",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.nik ?? "-"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("date_of_birth", {
+          header: "Tanggal Lahir",
+          cell: ({ row }) => formatDate(row.original.date_of_birth),
+        }),
+        columnHelper.accessor("gender", {
+          header: "Gender",
+          cell: ({ row }) => genderLabel(row.original.gender),
+        }),
+        columnHelper.accessor("phone", {
+          header: "Telepon",
+          cell: ({ row }) => row.original.phone ?? "-",
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setEditing(row.original)
+                  setDialogOpen(true)
+                }}
+              >
+                <PencilIcon />
+                Edit
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    []
+  )
 
   return (
     <>
@@ -124,82 +163,14 @@ export function PatientManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead>
-
-                <TableHead>MRN</TableHead>
-
-                <TableHead>NIK</TableHead>
-
-                <TableHead>Tanggal Lahir</TableHead>
-
-                <TableHead>Gender</TableHead>
-
-                <TableHead>Telepon</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {patients.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Pasien tidak ditemukan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                patients.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell className="font-medium">
-                      {patient.name}
-                    </TableCell>
-
-                    <TableCell className="font-mono text-xs">
-                      {patient.mrn ?? "-"}
-                    </TableCell>
-
-                    <TableCell className="font-mono text-xs">
-                      {patient.nik ?? "-"}
-                    </TableCell>
-
-                    <TableCell>
-                      {formatDate(patient.date_of_birth)}
-                    </TableCell>
-
-                    <TableCell>{genderLabel(patient.gender)}</TableCell>
-
-                    <TableCell>{patient.phone ?? "-"}</TableCell>
-
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEdit(patient)}
-                      >
-                        <PencilIcon />
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={patients}
+            getRowId={(row) => String(row.id)}
+            emptyMessage="Pasien tidak ditemukan."
+          />
         </CardContent>
       </Card>
-
-      <AdminPaginationLinks
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        hrefFor={hrefFor}
-      />
 
       <PatientFormDialog
         open={dialogOpen}

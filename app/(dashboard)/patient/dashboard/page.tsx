@@ -19,10 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import {
-  PatientLoadError,
-  ProfileRequired,
-} from "@/components/patient/patient-notices"
+import { PatientLoadError } from "@/components/patient/patient-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import {
@@ -74,11 +71,7 @@ export default async function Page() {
   }
 
   if (!current.profile) {
-    return (
-      <PageShell>
-        <ProfileRequired />
-      </PageShell>
-    )
+    redirect("/patient/onboarding")
   }
 
   const profile = current.profile

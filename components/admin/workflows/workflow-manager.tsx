@@ -14,6 +14,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -22,19 +26,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
 import { WorkflowFormDialog } from "@/components/admin/workflows/workflow-form-dialog"
 
 import type { Workflow } from "@/types/admin"
 import type { Department } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<Workflow>()
 
 export function WorkflowManager({
   workflows,
@@ -71,6 +69,59 @@ export function WorkflowManager({
       return workflow.name.toLowerCase().includes(keyword)
     })
   }, [workflows, query, departmentFilter])
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <span className="font-medium">{row.original.name}</span>
+          ),
+        }),
+        columnHelper.display({
+          id: "department",
+          header: "Poli",
+          cell: ({ row }) =>
+            row.original.department?.name ??
+            departments.find((d) => d.id === row.original.department_id)
+              ?.name ??
+            "-",
+        }),
+        columnHelper.display({
+          id: "steps",
+          header: "Langkah",
+          cell: ({ row }) => row.original.steps?.length ?? 0,
+        }),
+        columnHelper.accessor("is_active", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant={row.original.is_active ? "default" : "outline"}>
+              {row.original.is_active ? "Aktif" : "Nonaktif"}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Link
+                href={`/admin/workflows/${row.original.id}`}
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "sm",
+                })}
+              >
+                Kelola Langkah
+                <ArrowRightIcon />
+              </Link>
+            </div>
+          ),
+        }),
+      ]),
+    [departments]
+  )
 
   return (
     <>
@@ -130,74 +181,12 @@ export function WorkflowManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead>
-
-                <TableHead>Poli</TableHead>
-
-                <TableHead>Langkah</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Workflow tidak ditemukan. Poli tanpa workflow tidak dapat
-                    menerima kunjungan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((workflow) => (
-                  <TableRow key={workflow.id}>
-                    <TableCell className="font-medium">
-                      {workflow.name}
-                    </TableCell>
-
-                    <TableCell>
-                      {workflow.department?.name ??
-                        departments.find(
-                          (d) => d.id === workflow.department_id
-                        )?.name ??
-                        "-"}
-                    </TableCell>
-
-                    <TableCell>{workflow.steps?.length ?? 0}</TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={workflow.is_active ? "default" : "outline"}
-                      >
-                        {workflow.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <Link
-                        href={`/admin/workflows/${workflow.id}`}
-                        className={buttonVariants({
-                          variant: "outline",
-                          size: "sm",
-                        })}
-                      >
-                        Kelola Langkah
-                        <ArrowRightIcon />
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={filtered}
+            getRowId={(workflow) => String(workflow.id)}
+            emptyMessage="Workflow tidak ditemukan. Poli tanpa workflow tidak dapat menerima kunjungan."
+          />
         </CardContent>
       </Card>
 

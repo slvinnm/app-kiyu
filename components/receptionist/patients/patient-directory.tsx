@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { SearchIcon, XIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -12,17 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
 import { PatientDetailSheet } from "@/components/receptionist/patients/patient-detail-sheet"
 
@@ -30,26 +26,28 @@ import { usePatientSearch } from "@/hooks/use-patient-search"
 
 import { formatDate, genderLabel } from "@/lib/reception/format"
 
-const PER_PAGE = 20
+import type { Patient } from "@/types/reception"
+
+// Client-side pagination needs the full result set for the current search.
+const PER_PAGE = 200
+
+const columnHelper = createDataTableColumnHelper<Patient>()
 
 export function PatientDirectory() {
   const [query, setQuery] = useState("")
-  const [page, setPage] = useState(1)
   const [refreshKey, setRefreshKey] = useState(0)
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
     null
   )
 
-  const { results, pagination, searching, error } = usePatientSearch(query, {
+  const { results, total, searching, error } = usePatientSearch(query, {
     enableEmptyQuery: true,
-    page,
     perPage: PER_PAGE,
     refreshKey,
   })
 
   function handleQueryChange(value: string) {
     setQuery(value)
-    setPage(1)
   }
 
   function retry() {
@@ -57,6 +55,60 @@ export function PatientDirectory() {
   }
 
   const showSkeleton = searching && results.length === 0
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("name", {
+          header: "Pasien",
+          cell: ({ row }) => (
+            <div>
+              <p className="font-medium">{row.original.name}</p>
+
+              <p className="text-xs text-muted-foreground">
+                {row.original.mrn ?? "Tanpa MRN"}
+              </p>
+            </div>
+          ),
+        }),
+        columnHelper.accessor("nik", {
+          header: "NIK",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.nik ?? "-"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("date_of_birth", {
+          header: "Tanggal Lahir",
+          cell: ({ row }) => formatDate(row.original.date_of_birth),
+        }),
+        columnHelper.accessor("gender", {
+          header: "Jenis Kelamin",
+          cell: ({ row }) => genderLabel(row.original.gender),
+        }),
+        columnHelper.accessor("phone", {
+          header: "Telepon",
+          cell: ({ row }) => row.original.phone ?? "-",
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedPatientId(row.original.id)}
+              >
+                Detail
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    []
+  )
 
   return (
     <>
@@ -71,9 +123,7 @@ export function PatientDirectory() {
               </CardDescription>
             </div>
 
-            <Badge variant="outline">
-              {pagination?.total ?? 0} pasien
-            </Badge>
+            <Badge variant="outline">{total} pasien</Badge>
           </div>
 
           <div className="relative mt-3 max-w-lg">
@@ -131,97 +181,17 @@ export function PatientDirectory() {
               </p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Pasien</TableHead>
-
-                  <TableHead>NIK</TableHead>
-
-                  <TableHead>Tanggal Lahir</TableHead>
-
-                  <TableHead>Jenis Kelamin</TableHead>
-
-                  <TableHead>Telepon</TableHead>
-
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {results.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{patient.name}</p>
-
-                        <p className="text-xs text-muted-foreground">
-                          {patient.mrn ?? "Tanpa MRN"}
-                        </p>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="font-mono text-xs">
-                      {patient.nik ?? "-"}
-                    </TableCell>
-
-                    <TableCell>{formatDate(patient.date_of_birth)}</TableCell>
-
-                    <TableCell>{genderLabel(patient.gender)}</TableCell>
-
-                    <TableCell>{patient.phone ?? "-"}</TableCell>
-
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedPatientId(patient.id)}
-                      >
-                        Detail
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="p-0">
+              <DataTable
+                columns={columns}
+                data={results}
+                getRowId={(row) => String(row.id)}
+                emptyMessage="Pasien tidak ditemukan."
+              />
+            </div>
           )}
         </CardContent>
       </Card>
-
-      {pagination && pagination.last_page > 1 && (
-        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
-            Halaman {pagination.current_page} dari {pagination.last_page} ·{" "}
-            {pagination.total} pasien
-          </p>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              disabled={pagination.current_page <= 1 || searching}
-            >
-              Sebelumnya
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setPage((current) =>
-                  Math.min(pagination.last_page, current + 1)
-                )
-              }
-              disabled={
-                pagination.current_page >= pagination.last_page || searching
-              }
-            >
-              Berikutnya
-            </Button>
-          </div>
-        </div>
-      )}
 
       <PatientDetailSheet
         patientId={selectedPatientId}

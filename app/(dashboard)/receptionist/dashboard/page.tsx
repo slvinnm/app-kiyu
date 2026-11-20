@@ -23,7 +23,7 @@ import { QueueStatCards } from "@/components/receptionist/queue/queue-stat-cards
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import {
-  getActiveDepartmentsServer,
+  getAllDepartmentsServer,
   getPatientCountServer,
   getReceptionQueueServer,
 } from "@/lib/api/reception-server"
@@ -54,7 +54,7 @@ export default async function Page({
   let departmentsError: string | null = null
 
   try {
-    departments = await getActiveDepartmentsServer()
+    departments = await getAllDepartmentsServer()
   } catch (cause) {
     departmentsError = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
   }

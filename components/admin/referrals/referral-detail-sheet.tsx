@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { referralStatusLabel } from "@/lib/admin/referrals"
@@ -72,19 +72,19 @@ export function ReferralDetailSheet({
   const targetTickets = referral?.target_visit?.queue_tickets ?? []
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
             Referral #{referral?.id ?? "-"}
-          </SheetTitle>
+          </DialogTitle>
 
-          <SheetDescription>
+          <DialogDescription>
             {referral?.source_visit?.visit_number ?? "Memuat referral..."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-5 overflow-y-auto px-4 pb-6">
+        <div className="space-y-5 pb-2">
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Spinner />
@@ -227,7 +227,7 @@ export function ReferralDetailSheet({
             </>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

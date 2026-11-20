@@ -69,9 +69,15 @@ function normalizeGender(
 export function PatientProfileForm({
   userId,
   profile,
+  defaultName = "",
+  defaultEmail = "",
+  redirectTo,
 }: {
   userId: number
   profile: PatientProfile | null
+  defaultName?: string
+  defaultEmail?: string
+  redirectTo?: string
 }) {
   const router = useRouter()
 
@@ -86,7 +92,11 @@ export function PatientProfileForm({
           email: profile.email ?? "",
           address: profile.address ?? "",
         }
-      : emptyProfile
+      : {
+          ...emptyProfile,
+          name: defaultName,
+          email: defaultEmail,
+        }
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -146,6 +156,13 @@ export function PatientProfileForm({
       } else {
         await createPatientProfile({ ...payload, user_id: userId })
         toast.success("Profil pasien berhasil dibuat.")
+      }
+
+      if (redirectTo) {
+        router.push(redirectTo)
+        router.refresh()
+
+        return
       }
 
       router.refresh()

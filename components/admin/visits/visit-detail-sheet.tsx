@@ -17,6 +17,13 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -25,13 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -180,17 +180,17 @@ export function VisitDetailSheet({
     visit.status !== "CANCELLED"
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>{visit?.visit_number ?? "Detail Kunjungan"}</SheetTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{visit?.visit_number ?? "Detail Kunjungan"}</DialogTitle>
 
-          <SheetDescription>
+          <DialogDescription>
             {visit?.department?.name ?? "Memuat detail kunjungan..."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-5 overflow-y-auto px-4 pb-6">
+        <div className="space-y-5 pb-2">
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Spinner />
@@ -393,7 +393,7 @@ export function VisitDetailSheet({
             </>
           )}
         </div>
-      </SheetContent>
+      </DialogContent>
 
       <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
         <AlertDialogContent>
@@ -437,6 +437,6 @@ export function VisitDetailSheet({
           }}
         />
       )}
-    </Sheet>
+    </Dialog>
   )
 }

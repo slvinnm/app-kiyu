@@ -18,6 +18,16 @@ export async function getActiveDepartmentsServer(): Promise<Department[]> {
   return response.data
 }
 
+/**
+ * All departments (including internal units hidden from the kiosk). Staff
+ * workspaces must show every department they can operate.
+ */
+export async function getAllDepartmentsServer(): Promise<Department[]> {
+  const response = await serverApiFetch<{ data: Department[] }>("/departments")
+
+  return response.data
+}
+
 export async function getReceptionQueueServer(
   departmentId: number
 ): Promise<ReceptionQueueSnapshot> {

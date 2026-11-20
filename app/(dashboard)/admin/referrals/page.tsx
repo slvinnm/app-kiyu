@@ -51,7 +51,7 @@ export default async function Page({
 
   try {
     ;[referrals, departments] = await Promise.all([
-      getReferralsServer({ ...filters, per_page: 20 }),
+      getReferralsServer({ ...filters, per_page: 200 }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -77,7 +77,6 @@ export default async function Page({
       ) : (
         <ReferralManager
           referrals={referrals.data}
-          pagination={referrals}
           departments={departments}
           filters={filters}
         />

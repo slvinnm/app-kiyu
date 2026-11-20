@@ -5,7 +5,73 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "cn"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-const Select = SelectPrimitive.Root
+type SelectItemDescriptor = { value: string; label: React.ReactNode }
+
+/**
+ * Walks the JSX tree to collect `<SelectItem>` descriptors so `Select.Value`
+ * can render the human-readable label instead of the raw value.
+ */
+function collectSelectItems(
+  children: React.ReactNode,
+  acc: SelectItemDescriptor[]
+): void {
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return
+    }
+
+    const props = child.props as {
+      children?: React.ReactNode
+      value?: unknown
+    }
+
+    if (child.type === SelectItem && props.value !== undefined) {
+      acc.push({ value: String(props.value), label: props.children })
+
+      return
+    }
+
+    if (props.children !== undefined) {
+      collectSelectItems(props.children, acc)
+    }
+  })
+}
+
+/**
+ * Base UI's `Select.Value` renders the raw value unless `items` is provided.
+ * This wrapper derives `items` from the `<SelectItem>` children so labels are
+ * always shown, while still allowing an explicit `items` override.
+ *
+ * It stays generic over `Value` so `onValueChange` keeps its precise type.
+ */
+function Select<Value, Multiple extends boolean | undefined = false>({
+  children,
+  items,
+  ...props
+}: SelectPrimitive.Root.Props<Value, Multiple>) {
+  const derivedItems = React.useMemo(() => {
+    if (items) {
+      return items
+    }
+
+    const acc: SelectItemDescriptor[] = []
+
+    collectSelectItems(children, acc)
+
+    return acc.length > 0 ? acc : undefined
+  }, [children, items])
+
+  return (
+    <SelectPrimitive.Root
+      items={
+        derivedItems as SelectPrimitive.Root.Props<Value, Multiple>["items"]
+      }
+      {...props}
+    >
+      {children}
+    </SelectPrimitive.Root>
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

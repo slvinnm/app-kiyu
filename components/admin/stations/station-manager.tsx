@@ -13,6 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  DataTable,
+  createDataTableColumnHelper,
+} from "@/components/ui/data-table"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -21,14 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
 import { StationFormDialog } from "@/components/admin/stations/station-form-dialog"
 
@@ -36,6 +32,8 @@ import { stationTypeLabel } from "@/lib/reception/format"
 
 import type { AdminStation } from "@/types/admin"
 import type { Department } from "@/types/reception"
+
+const columnHelper = createDataTableColumnHelper<AdminStation>()
 
 export function StationManager({
   stations,
@@ -76,6 +74,74 @@ export function StationManager({
       )
     })
   }, [stations, query, departmentFilter])
+
+  const columns = useMemo(
+    () =>
+      columnHelper.columns([
+        columnHelper.accessor("code", {
+          header: "Kode",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">{row.original.code}</span>
+          ),
+        }),
+        columnHelper.accessor("name", {
+          header: "Nama",
+          cell: ({ row }) => (
+            <span className="font-medium">{row.original.name}</span>
+          ),
+        }),
+        columnHelper.accessor("type", {
+          header: "Tipe",
+          cell: ({ row }) => (
+            <Badge variant="outline">
+              {stationTypeLabel(row.original.type)}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "department",
+          header: "Poli",
+          cell: ({ row }) =>
+            row.original.department?.name ??
+            departments.find((d) => d.id === row.original.department_id)
+              ?.name ??
+            "-",
+        }),
+        columnHelper.accessor("queue_prefix", {
+          header: "Prefix",
+          cell: ({ row }) => (
+            <span className="font-mono text-xs">
+              {row.original.queue_prefix}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("is_active", {
+          header: "Status",
+          cell: ({ row }) => (
+            <Badge variant={row.original.is_active ? "default" : "outline"}>
+              {row.original.is_active ? "Aktif" : "Nonaktif"}
+            </Badge>
+          ),
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <span className="block text-right">Aksi</span>,
+          cell: ({ row }) => (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openEdit(row.original)}
+              >
+                <PencilIcon />
+                Edit
+              </Button>
+            </div>
+          ),
+        }),
+      ]),
+    [departments]
+  )
 
   function openCreate() {
     setEditing(null)
@@ -145,87 +211,12 @@ export function StationManager({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kode</TableHead>
-
-                <TableHead>Nama</TableHead>
-
-                <TableHead>Tipe</TableHead>
-
-                <TableHead>Poli</TableHead>
-
-                <TableHead>Prefix</TableHead>
-
-                <TableHead>Status</TableHead>
-
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="p-8 text-center text-sm text-muted-foreground"
-                  >
-                    Station tidak ditemukan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((station) => (
-                  <TableRow key={station.id}>
-                    <TableCell className="font-mono text-xs">
-                      {station.code}
-                    </TableCell>
-
-                    <TableCell className="font-medium">
-                      {station.name}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="outline">
-                        {stationTypeLabel(station.type)}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {station.department?.name ??
-                        departments.find(
-                          (d) => d.id === station.department_id
-                        )?.name ??
-                        "-"}
-                    </TableCell>
-
-                    <TableCell className="font-mono text-xs">
-                      {station.queue_prefix}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={station.is_active ? "default" : "outline"}
-                      >
-                        {station.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEdit(station)}
-                      >
-                        <PencilIcon />
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={filtered}
+            getRowId={(station) => String(station.id)}
+            emptyMessage="Station tidak ditemukan."
+          />
         </CardContent>
       </Card>
 
