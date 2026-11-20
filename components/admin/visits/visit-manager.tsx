@@ -141,9 +141,7 @@ export function VisitManager({
           header: "Pasien",
           cell: ({ row }) => (
             <div>
-              <p className="font-medium">
-                {row.original.patient?.name ?? "-"}
-              </p>
+              <p className="font-medium">{row.original.patient?.name ?? "-"}</p>
 
               <p className="text-xs text-muted-foreground">
                 {row.original.patient?.mrn ?? "-"}
@@ -215,7 +213,10 @@ export function VisitManager({
             <div className="space-y-2">
               <Label>Poli</Label>
 
-              <Select value={departmentId} onValueChange={(v) => setDepartmentId(v ?? "all")}>
+              <Select
+                value={departmentId}
+                onValueChange={(v) => setDepartmentId(v ?? "all")}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -238,7 +239,10 @@ export function VisitManager({
             <div className="space-y-2">
               <Label>Status</Label>
 
-              <Select value={status} onValueChange={(v) => setStatus(v ?? "all")}>
+              <Select
+                value={status}
+                onValueChange={(v) => setStatus(v ?? "all")}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>

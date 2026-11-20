@@ -65,9 +65,7 @@ export function PatientVisitsList({ visits }: { visits: PatientVisit[] }) {
                   </CardDescription>
                 </div>
 
-                <Badge
-                  variant={isActive(visit.status) ? "default" : "outline"}
-                >
+                <Badge variant={isActive(visit.status) ? "default" : "outline"}>
                   {visitStatusLabel(visit.status)}
                 </Badge>
               </div>

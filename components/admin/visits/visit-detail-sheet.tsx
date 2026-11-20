@@ -35,10 +35,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-import {
-  getApiErrorMessage,
-  getApiErrorType,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import {
   cancelVisit,
   getVisitDetail,
@@ -207,9 +204,7 @@ export function VisitDetailSheet({
                   {visitStatusLabel(visit.status)}
                 </Badge>
 
-                <Badge variant="outline">
-                  {priorityLabel(visit.priority)}
-                </Badge>
+                <Badge variant="outline">{priorityLabel(visit.priority)}</Badge>
 
                 <Badge variant="outline">
                   {channelLabel(visit.intake_channel)}
@@ -264,9 +259,7 @@ export function VisitDetailSheet({
                     <div className="flex gap-2">
                       <Select
                         value={priority}
-                        onValueChange={(value) =>
-                          setPriority(value ?? "1")
-                        }
+                        onValueChange={(value) => setPriority(value ?? "1")}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue />
@@ -349,9 +342,7 @@ export function VisitDetailSheet({
                         className="rounded-xl border p-4 text-sm"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-semibold">
-                            {ticket.queue_number}
-                          </p>
+                          <p className="font-semibold">{ticket.queue_number}</p>
 
                           <div className="flex gap-2">
                             <Badge variant="outline">

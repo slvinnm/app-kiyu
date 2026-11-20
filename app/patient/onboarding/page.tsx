@@ -58,9 +58,7 @@ export default async function OnboardingPage() {
               <ClipboardCheckIcon className="size-5" />
             </div>
 
-            <CardTitle className="mt-3 text-lg">
-              Lengkapi Data Pasien
-            </CardTitle>
+            <CardTitle className="mt-3 text-lg">Lengkapi Data Pasien</CardTitle>
 
             <CardDescription>
               Data ini diperlukan agar Anda dapat melakukan booking dan melihat

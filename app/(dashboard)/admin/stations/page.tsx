@@ -6,10 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { StationManager } from "@/components/admin/stations/station-manager"
 
-import {
-  getDepartmentsServer,
-  getStationsServer,
-} from "@/lib/api/admin-server"
+import { getDepartmentsServer, getStationsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 

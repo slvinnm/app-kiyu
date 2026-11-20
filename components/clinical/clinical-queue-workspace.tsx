@@ -103,9 +103,7 @@ export function ClinicalQueueWorkspace({
   role: string
 }) {
   const [notesAction, setNotesAction] = useState<NotesAction | null>(null)
-  const [transferTarget, setTransferTarget] = useState<QueueTicket | null>(
-    null
-  )
+  const [transferTarget, setTransferTarget] = useState<QueueTicket | null>(null)
   const [completeResult, setCompleteResult] =
     useState<CompleteTicketResult | null>(null)
   const [processing, setProcessing] = useState(false)
@@ -123,6 +121,7 @@ export function ClinicalQueueWorkspace({
     lastUpdatedAt,
     refresh,
   } = useClinicalQueue(stationId, {
+    actorEmail,
     paused:
       notesAction !== null ||
       transferTarget !== null ||
@@ -177,9 +176,7 @@ export function ClinicalQueueWorkspace({
       const response = await callNextClinical(stationId, actorEmail)
 
       if (!response.data) {
-        toast.info(
-          response.message ?? "Tidak ada antrian yang siap dipanggil."
-        )
+        toast.info(response.message ?? "Tidak ada antrian yang siap dipanggil.")
       } else {
         toast.success(
           response.message ??
@@ -261,14 +258,10 @@ export function ClinicalQueueWorkspace({
         </p>
       </div>
 
-      <Button
-        variant="outline"
-        onClick={() => void refresh()}
-        disabled={refreshing || processing || stationId === null}
-      >
-        {refreshing ? <Spinner /> : <RefreshCwIcon />}
-        Muat Ulang
-      </Button>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {refreshing && <Spinner className="size-3.5" />}
+        <span>Diperbarui otomatis secara langsung</span>
+      </div>
     </div>
   )
 
@@ -375,9 +368,7 @@ export function ClinicalQueueWorkspace({
                     startTicket(ticket.id, actorEmail)
                   )
                 }
-                onHold={(ticket) =>
-                  setNotesAction({ type: "hold", ticket })
-                }
+                onHold={(ticket) => setNotesAction({ type: "hold", ticket })}
                 onComplete={(ticket) =>
                   setNotesAction({ type: "complete", ticket })
                 }
@@ -386,9 +377,7 @@ export function ClinicalQueueWorkspace({
                     recallTicket(ticket.id, actorEmail)
                   )
                 }
-                onSkip={(ticket) =>
-                  setNotesAction({ type: "skip", ticket })
-                }
+                onSkip={(ticket) => setNotesAction({ type: "skip", ticket })}
                 onNoShow={(ticket) =>
                   setNotesAction({ type: "no-show", ticket })
                 }

@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createWorkflow } from "@/lib/api/admin"
 
 import type { Department } from "@/types/reception"
@@ -57,9 +54,7 @@ export function WorkflowFormDialog({
       return
     }
 
-    setDepartmentId(
-      defaultDepartmentId ? String(defaultDepartmentId) : ""
-    )
+    setDepartmentId(defaultDepartmentId ? String(defaultDepartmentId) : "")
     setName("")
     setIsActive("1")
     setError(null)
@@ -144,10 +139,7 @@ export function WorkflowFormDialog({
 
               <SelectContent>
                 {departments.map((department) => (
-                  <SelectItem
-                    key={department.id}
-                    value={String(department.id)}
-                  >
+                  <SelectItem key={department.id} value={String(department.id)}>
                     {department.name} ({department.code})
                   </SelectItem>
                 ))}
@@ -155,9 +147,7 @@ export function WorkflowFormDialog({
             </Select>
 
             {errors.department_id && (
-              <p className="text-xs text-destructive">
-                {errors.department_id}
-              </p>
+              <p className="text-xs text-destructive">{errors.department_id}</p>
             )}
           </div>
 

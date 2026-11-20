@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createStation, updateStation } from "@/lib/api/admin"
 import { stationTypeLabel } from "@/lib/reception/format"
 
@@ -180,10 +177,7 @@ export function StationFormDialog({
 
               <SelectContent>
                 {departments.map((department) => (
-                  <SelectItem
-                    key={department.id}
-                    value={String(department.id)}
-                  >
+                  <SelectItem key={department.id} value={String(department.id)}>
                     {department.name} ({department.code})
                   </SelectItem>
                 ))}
@@ -191,9 +185,7 @@ export function StationFormDialog({
             </Select>
 
             {errors.department_id && (
-              <p className="text-xs text-destructive">
-                {errors.department_id}
-              </p>
+              <p className="text-xs text-destructive">{errors.department_id}</p>
             )}
           </div>
 
@@ -253,7 +245,10 @@ export function StationFormDialog({
             <div className="space-y-2">
               <Label>Tipe</Label>
 
-              <Select value={type} onValueChange={(v) => setType(v ?? "REGISTRATION")}>
+              <Select
+                value={type}
+                onValueChange={(v) => setType(v ?? "REGISTRATION")}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>

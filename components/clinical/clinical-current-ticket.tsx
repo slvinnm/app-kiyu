@@ -246,9 +246,7 @@ export function ClinicalCurrentTicket({
 
                 <DropdownMenu>
                   <DropdownMenuTrigger
-                    render={
-                      <Button variant="outline" className="w-full" />
-                    }
+                    render={<Button variant="outline" className="w-full" />}
                     disabled={processing}
                   >
                     <EllipsisIcon />

@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createDepartment, updateDepartment } from "@/lib/api/admin"
 
 import type { Department } from "@/types/reception"
@@ -127,9 +124,7 @@ export function DepartmentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {department ? "Edit Poli" : "Tambah Poli"}
-          </DialogTitle>
+          <DialogTitle>{department ? "Edit Poli" : "Tambah Poli"}</DialogTitle>
 
           <DialogDescription>
             Poli adalah unit pelayanan yang memiliki station dan workflow.
@@ -172,7 +167,10 @@ export function DepartmentFormDialog({
           <div className="space-y-2">
             <Label>Status</Label>
 
-            <Select value={isActive} onValueChange={(v) => setIsActive(v ?? "1")}>
+            <Select
+              value={isActive}
+              onValueChange={(v) => setIsActive(v ?? "1")}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -197,9 +195,7 @@ export function DepartmentFormDialog({
 
               <SelectContent>
                 <SelectItem value="1">Ya — tampil di mesin anjungan</SelectItem>
-                <SelectItem value="0">
-                  Tidak — hanya untuk internal
-                </SelectItem>
+                <SelectItem value="0">Tidak — hanya untuk internal</SelectItem>
               </SelectContent>
             </Select>
 

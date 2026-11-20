@@ -28,7 +28,11 @@ import { ManualIntakeSuccess } from "@/components/receptionist/registration/manu
 import { getApiErrorMessage } from "@/lib/api/error"
 import { createManualIntake } from "@/lib/api/reception"
 
-import type { Department, ManualIntakeResult, Priority } from "@/types/reception"
+import type {
+  Department,
+  ManualIntakeResult,
+  Priority,
+} from "@/types/reception"
 
 export function ManualIntakeForm({
   departments,
@@ -97,10 +101,7 @@ export function ManualIntakeForm({
       setResult(response.data)
       toast.success(response.message ?? "Intake manual berhasil dibuat.")
     } catch (cause) {
-      const message = getApiErrorMessage(
-        cause,
-        "Gagal membuat intake manual."
-      )
+      const message = getApiErrorMessage(cause, "Gagal membuat intake manual.")
 
       setError(message)
       toast.error(message)

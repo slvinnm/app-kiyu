@@ -41,7 +41,12 @@ export function PatientSearch({
           patient={selected}
           action={
             onClear ? (
-              <Button type="button" variant="outline" size="sm" onClick={onClear}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onClear}
+              >
                 Ganti
               </Button>
             ) : null

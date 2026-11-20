@@ -75,9 +75,7 @@ export function ReferralDetailSheet({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            Referral #{referral?.id ?? "-"}
-          </DialogTitle>
+          <DialogTitle>Referral #{referral?.id ?? "-"}</DialogTitle>
 
           <DialogDescription>
             {referral?.source_visit?.visit_number ?? "Memuat referral..."}
@@ -108,9 +106,7 @@ export function ReferralDetailSheet({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    Pasien Sumber
-                  </p>
+                  <p className="text-xs text-muted-foreground">Pasien Sumber</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {referral.source_visit?.patient?.name ?? "-"}

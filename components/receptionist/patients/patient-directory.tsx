@@ -74,9 +74,7 @@ export function PatientDirectory() {
         columnHelper.accessor("nik", {
           header: "NIK",
           cell: ({ row }) => (
-            <span className="font-mono text-xs">
-              {row.original.nik ?? "-"}
-            </span>
+            <span className="font-mono text-xs">{row.original.nik ?? "-"}</span>
           ),
         }),
         columnHelper.accessor("date_of_birth", {

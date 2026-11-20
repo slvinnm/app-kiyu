@@ -50,9 +50,7 @@ export function ClinicalCompleteSuccess({
           <div>
             <p className="text-xs text-muted-foreground">Status Kunjungan</p>
 
-            <p className="mt-1 font-medium">
-              {visitStatusLabel(visit.status)}
-            </p>
+            <p className="mt-1 font-medium">{visitStatusLabel(visit.status)}</p>
           </div>
         </div>
       </div>

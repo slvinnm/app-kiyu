@@ -50,11 +50,7 @@ export type QueueTicketStatus =
   | "TRANSFERRED"
 
 export type VisitStatus =
-  | "AWAITING_CHECKIN"
-  | "WAITING"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED"
+  "AWAITING_CHECKIN" | "WAITING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
 
 export type Station = {
   id: number

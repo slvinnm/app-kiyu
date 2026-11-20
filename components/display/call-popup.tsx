@@ -45,7 +45,7 @@ export function CallPopup({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
       onClick={onDismiss}
     >
-      <div className="w-full max-w-3xl rounded-3xl border border-emerald-400/40 bg-neutral-900 p-10 text-center text-neutral-100 shadow-2xl ring-1 ring-emerald-400/20 animate-in fade-in zoom-in-95 duration-300">
+      <div className="w-full max-w-3xl animate-in rounded-3xl border border-emerald-400/40 bg-neutral-900 p-10 text-center text-neutral-100 shadow-2xl ring-1 ring-emerald-400/20 duration-300 zoom-in-95 fade-in">
         <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-500 text-neutral-950">
           <BellRingIcon className="size-8" />
         </div>

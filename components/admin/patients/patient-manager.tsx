@@ -69,17 +69,13 @@ export function PatientManager({
         columnHelper.accessor("mrn", {
           header: "MRN",
           cell: ({ row }) => (
-            <span className="font-mono text-xs">
-              {row.original.mrn ?? "-"}
-            </span>
+            <span className="font-mono text-xs">{row.original.mrn ?? "-"}</span>
           ),
         }),
         columnHelper.accessor("nik", {
           header: "NIK",
           cell: ({ row }) => (
-            <span className="font-mono text-xs">
-              {row.original.nik ?? "-"}
-            </span>
+            <span className="font-mono text-xs">{row.original.nik ?? "-"}</span>
           ),
         }),
         columnHelper.accessor("date_of_birth", {

@@ -123,10 +123,7 @@ export function CompleteRegistrationDialog({
 
   const existingPatient = ticket?.visit?.patient ?? null
   const searchEnabled =
-    open &&
-    !existingPatient &&
-    mode === "existing" &&
-    search.trim().length >= 2
+    open && !existingPatient && mode === "existing" && search.trim().length >= 2
 
   const {
     results,
@@ -319,15 +316,26 @@ export function CompleteRegistrationDialog({
     onOpenChange(false)
   }
 
+  function handleDialogOpenChange(nextOpen: boolean) {
+    if (!nextOpen && result) {
+      handleDone()
+      return
+    }
+
+    onOpenChange(nextOpen)
+  }
+
   const canSubmit =
     acquisition !== null &&
     !loadingAcquisition &&
     !submitting &&
     (existingPatient !== null ||
-      (mode === "existing" ? selectedPatient !== null : newPatient.name.trim() !== ""))
+      (mode === "existing"
+        ? selectedPatient !== null
+        : newPatient.name.trim() !== ""))
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-3xl">
         {result ? (
           <CompleteRegistrationSuccessView
@@ -525,4 +533,3 @@ export function CompleteRegistrationDialog({
     </Dialog>
   )
 }
-

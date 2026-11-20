@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import { getReceptionQueue } from "@/lib/api/reception"
+import { bindEchoConnectionState, getEcho } from "@/lib/echo"
 
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 
@@ -33,6 +34,7 @@ export function useReceptionQueue(
   const invalidWorkflowRef = useRef(false)
   const inFlightRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
+  const connectedRef = useRef(false)
 
   useEffect(() => {
     departmentRef.current = departmentId
@@ -116,6 +118,49 @@ export function useReceptionQueue(
     }
   }, [departmentId])
 
+  // Live updates: refetch whenever anyone changes the queue at this station
+  // (call, start, complete, hold, transfer, new ticket, ...).
+  useEffect(() => {
+    if (departmentId === null) {
+      return
+    }
+
+    const echo = getEcho()
+
+    if (!echo) {
+      return
+    }
+
+    const channels = [`department.${departmentId}`]
+
+    const handler = () => {
+      if (!pausedRef.current) {
+        void fetchQueue()
+      }
+    }
+
+    for (const name of channels) {
+      echo.channel(name).listen(".queue.updated", handler)
+    }
+
+    const unbind = bindEchoConnectionState(echo, (connected) => {
+      const wasConnected = connectedRef.current
+      connectedRef.current = connected
+
+      if (connected && !wasConnected) {
+        void fetchQueue()
+      }
+    })
+
+    return () => {
+      for (const name of channels) {
+        echo.channel(name).stopListening(".queue.updated", handler)
+      }
+
+      unbind()
+    }
+  }, [departmentId, fetchQueue])
+
   useEffect(() => {
     if (departmentId === null) {
       setSnapshot(null)
@@ -135,6 +180,12 @@ export function useReceptionQueue(
 
     const interval = window.setInterval(() => {
       if (document.visibilityState !== "visible") {
+        return
+      }
+
+      // Live WebSocket updates are the primary source; polling is only a
+      // safety net while the socket is down.
+      if (connectedRef.current) {
         return
       }
 

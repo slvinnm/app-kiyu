@@ -78,10 +78,7 @@ export function createManualIntake(payload: ManualIntakePayload) {
 /* Reception queue                                                            */
 /* -------------------------------------------------------------------------- */
 
-export function getReceptionQueue(
-  departmentId: number,
-  signal?: AbortSignal
-) {
+export function getReceptionQueue(departmentId: number, signal?: AbortSignal) {
   return apiFetch<ApiResponse<ReceptionQueueSnapshot>>(
     `/reception/queue${toQuery({ department_id: departmentId })}`,
     { signal }
@@ -112,10 +109,9 @@ export function skipTicket(
 }
 
 export function noShowTicket(ticketId: number, userId?: string) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/reception/${ticketId}/no-show`,
-    { user_id: userId }
-  )
+  return postJson<ApiResponse<QueueTicket>>(`/reception/${ticketId}/no-show`, {
+    user_id: userId,
+  })
 }
 
 /* -------------------------------------------------------------------------- */
@@ -178,10 +174,9 @@ export function searchPatients(
   params: PatientSearchParams = {},
   signal?: AbortSignal
 ) {
-  return apiFetch<PaginatedResponse<Patient>>(
-    `/patients${toQuery(params)}`,
-    { signal }
-  )
+  return apiFetch<PaginatedResponse<Patient>>(`/patients${toQuery(params)}`, {
+    signal,
+  })
 }
 
 export function getPatient(patientId: number, signal?: AbortSignal) {

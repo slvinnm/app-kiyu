@@ -16,10 +16,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { getPublicQueueServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
-import {
-  stationTypeLabel,
-  ticketStatusLabel,
-} from "@/lib/reception/format"
+import { stationTypeLabel, ticketStatusLabel } from "@/lib/reception/format"
 
 import type { PublicQueueStation } from "@/types/admin"
 import type { QueueTicketStatus } from "@/types/reception"
@@ -59,9 +56,7 @@ export default async function Page() {
           <CardContent className="flex min-h-52 flex-col items-center justify-center text-center">
             <ListOrdered className="size-7 text-muted-foreground" />
 
-            <p className="mt-3 text-sm font-medium">
-              Belum ada station aktif
-            </p>
+            <p className="mt-3 text-sm font-medium">Belum ada station aktif</p>
 
             <p className="mt-1 text-xs text-muted-foreground">
               Antrian akan muncul setelah station aktif memiliki tiket.
@@ -104,8 +99,7 @@ export default async function Page() {
 
                       <p className="mt-1 text-xs text-muted-foreground">
                         {ticketStatusLabel(
-                          station.current_calling
-                            .status as QueueTicketStatus
+                          station.current_calling.status as QueueTicketStatus
                         )}
                       </p>
                     </>

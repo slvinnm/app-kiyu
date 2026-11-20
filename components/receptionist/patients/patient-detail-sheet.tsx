@@ -108,9 +108,7 @@ export function PatientDetailSheet({
                 </div>
 
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    Tanggal Lahir
-                  </p>
+                  <p className="text-xs text-muted-foreground">Tanggal Lahir</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {formatDate(patient.date_of_birth)}
@@ -118,9 +116,7 @@ export function PatientDetailSheet({
                 </div>
 
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    Jenis Kelamin
-                  </p>
+                  <p className="text-xs text-muted-foreground">Jenis Kelamin</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {genderLabel(patient.gender)}

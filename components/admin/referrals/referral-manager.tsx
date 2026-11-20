@@ -74,9 +74,7 @@ export function ReferralManager({
 }) {
   const router = useRouter()
   const [departmentId, setDepartmentId] = useState(
-    filters.target_department_id
-      ? String(filters.target_department_id)
-      : "all"
+    filters.target_department_id ? String(filters.target_department_id) : "all"
   )
   const [status, setStatus] = useState(filters.status ?? "all")
   const [selectedReferralId, setSelectedReferralId] = useState<number | null>(
@@ -204,9 +202,7 @@ export function ReferralManager({
 
               <Select
                 value={departmentId}
-                onValueChange={(value) =>
-                  setDepartmentId(value ?? "all")
-                }
+                onValueChange={(value) => setDepartmentId(value ?? "all")}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />

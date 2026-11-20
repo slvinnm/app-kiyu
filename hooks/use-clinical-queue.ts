@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { getStationQueue } from "@/lib/api/clinical"
 import { getApiErrorMessage } from "@/lib/api/error"
+import { bindEchoConnectionState, getEcho } from "@/lib/echo"
 
 import type { QueueTicket, Station } from "@/types/reception"
 
@@ -15,9 +16,10 @@ const POLL_INTERVAL_MS = 15_000
  */
 export function useClinicalQueue(
   stationId: number | null,
-  options?: { paused?: boolean }
+  options?: { paused?: boolean; actorEmail?: string | null }
 ) {
   const paused = options?.paused ?? false
+  const actorEmail = options?.actorEmail ?? null
 
   const [station, setStation] = useState<Station | null>(null)
   const [tickets, setTickets] = useState<QueueTicket[]>([])
@@ -31,6 +33,7 @@ export function useClinicalQueue(
   const pausedRef = useRef(paused)
   const inFlightRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
+  const connectedRef = useRef(false)
 
   useEffect(() => {
     stationRef.current = stationId
@@ -63,7 +66,10 @@ export function useClinicalQueue(
     abortRef.current = controller
 
     try {
-      const response = await getStationQueue(requestedStation, controller.signal)
+      const response = await getStationQueue(
+        requestedStation,
+        controller.signal
+      )
 
       if (
         !mountedRef.current ||
@@ -102,6 +108,48 @@ export function useClinicalQueue(
     }
   }, [stationId])
 
+  // Live updates: any change at this station (or its department) refetches.
+  useEffect(() => {
+    if (stationId === null) {
+      return
+    }
+
+    const echo = getEcho()
+
+    if (!echo) {
+      return
+    }
+
+    const channels = [`station.${stationId}`]
+
+    const handler = () => {
+      if (!pausedRef.current) {
+        void fetchQueue()
+      }
+    }
+
+    for (const name of channels) {
+      echo.channel(name).listen(".queue.updated", handler)
+    }
+
+    const unbind = bindEchoConnectionState(echo, (connected) => {
+      const wasConnected = connectedRef.current
+      connectedRef.current = connected
+
+      if (connected && !wasConnected) {
+        void fetchQueue()
+      }
+    })
+
+    return () => {
+      for (const name of channels) {
+        echo.channel(name).stopListening(".queue.updated", handler)
+      }
+
+      unbind()
+    }
+  }, [stationId, fetchQueue])
+
   useEffect(() => {
     if (stationId === null) {
       setStation(null)
@@ -120,6 +168,11 @@ export function useClinicalQueue(
 
     const interval = window.setInterval(() => {
       if (document.visibilityState !== "visible") {
+        return
+      }
+
+      // WebSocket drives live updates; polling only covers a dropped socket.
+      if (connectedRef.current) {
         return
       }
 
@@ -178,7 +231,17 @@ export function useClinicalQueue(
   const waiting = tickets.filter((ticket) => ticket.status === "CREATED")
   const onHold = tickets.filter((ticket) => ticket.status === "ON_HOLD")
 
-  const currentTicket = inProgress[0] ?? called[0] ?? null
+  // "Current" patient is the one this operator is handling. If nobody is
+  // assigned (e.g. legacy rows) fall back to the first station ticket.
+  const mine = (ticket: QueueTicket) =>
+    actorEmail === null || ticket.assigned_to === actorEmail
+
+  const currentTicket =
+    inProgress.find(mine) ??
+    called.find(mine) ??
+    (inProgress.length > 0 ? inProgress[0] : null) ??
+    called[0] ??
+    null
 
   return {
     station,

@@ -25,10 +25,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createPatient, updatePatient } from "@/lib/api/admin"
 import { formatDateInput } from "@/lib/reception/format"
 
@@ -160,9 +157,7 @@ export function PatientFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {patient ? "Edit Pasien" : "Tambah Pasien"}
-          </DialogTitle>
+          <DialogTitle>{patient ? "Edit Pasien" : "Tambah Pasien"}</DialogTitle>
 
           <DialogDescription>
             Data identitas pasien. MRN dibuat otomatis jika dikosongkan.

@@ -76,8 +76,7 @@ export function ClinicalTransferDialog({
         if (!active) return
 
         const candidates = response.data.filter(
-          (station) =>
-            station.is_active && station.id !== currentStationId
+          (station) => station.is_active && station.id !== currentStationId
         )
 
         setStations(candidates)
@@ -115,8 +114,7 @@ export function ClinicalTransferDialog({
       })
 
       toast.success(
-        response.message ??
-          `Tiket ${ticket.queue_number} berhasil ditransfer.`
+        response.message ?? `Tiket ${ticket.queue_number} berhasil ditransfer.`
       )
 
       onOpenChange(false)
@@ -162,9 +160,7 @@ export function ClinicalTransferDialog({
 
               <Select
                 value={targetStationId}
-                onValueChange={(value) =>
-                  setTargetStationId(value ?? "")
-                }
+                onValueChange={(value) => setTargetStationId(value ?? "")}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pilih station tujuan" />
@@ -214,10 +210,7 @@ export function ClinicalTransferDialog({
           <Button
             onClick={handleSubmit}
             disabled={
-              submitting ||
-              loading ||
-              !targetStationId ||
-              stations.length === 0
+              submitting || loading || !targetStationId || stations.length === 0
             }
           >
             {submitting ? (

@@ -24,10 +24,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-import {
-  getApiErrorMessage,
-  getApiErrorType,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import { createReferral } from "@/lib/api/admin"
 
 import type { AdminVisitDetail } from "@/types/admin"
@@ -112,10 +109,7 @@ export function ReferralDialog({
       onOpenChange(false)
       onCreated()
     } catch (cause) {
-      const message = getApiErrorMessage(
-        cause,
-        "Gagal membuat referral."
-      )
+      const message = getApiErrorMessage(cause, "Gagal membuat referral.")
       const type = getApiErrorType(cause)
 
       setError(
@@ -157,9 +151,7 @@ export function ReferralDialog({
 
                 <Select
                   value={targetDepartmentId}
-                  onValueChange={(value) =>
-                    setTargetDepartmentId(value ?? "")
-                  }
+                  onValueChange={(value) => setTargetDepartmentId(value ?? "")}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Pilih poli tujuan" />
@@ -200,9 +192,7 @@ export function ReferralDialog({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="referral-reason">
-                  Alasan (opsional)
-                </Label>
+                <Label htmlFor="referral-reason">Alasan (opsional)</Label>
 
                 <Textarea
                   id="referral-reason"

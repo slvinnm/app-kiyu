@@ -95,10 +95,9 @@ export function getStations(
   filters: { department_id?: number; type?: string } = {},
   signal?: AbortSignal
 ) {
-  return apiFetch<{ data: AdminStation[] }>(
-    `/stations${toQuery(filters)}`,
-    { signal }
-  )
+  return apiFetch<{ data: AdminStation[] }>(`/stations${toQuery(filters)}`, {
+    signal,
+  })
 }
 
 export function createStation(payload: StationPayload) {
@@ -125,10 +124,9 @@ export function getWorkflows(
   filters: { department_id?: number } = {},
   signal?: AbortSignal
 ) {
-  return apiFetch<{ data: Workflow[] }>(
-    `/workflows${toQuery(filters)}`,
-    { signal }
-  )
+  return apiFetch<{ data: Workflow[] }>(`/workflows${toQuery(filters)}`, {
+    signal,
+  })
 }
 
 export function createWorkflow(payload: WorkflowPayload) {
@@ -166,10 +164,7 @@ export function updateWorkflowStep(
 }
 
 export function deleteWorkflowStep(stepId: number) {
-  return sendJson<{ message: string }>(
-    `/workflow-steps/${stepId}`,
-    "DELETE"
-  )
+  return sendJson<{ message: string }>(`/workflow-steps/${stepId}`, "DELETE")
 }
 
 /* -------------------------------------------------------------------------- */
@@ -206,14 +201,10 @@ export function updatePatient(id: number, payload: PatientPayload) {
 /* Visits                                                                     */
 /* -------------------------------------------------------------------------- */
 
-export function getVisits(
-  filters: VisitFilters = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: Paginated<Visit> }>(
-    `/visits${toQuery(filters)}`,
-    { signal }
-  )
+export function getVisits(filters: VisitFilters = {}, signal?: AbortSignal) {
+  return apiFetch<{ data: Paginated<Visit> }>(`/visits${toQuery(filters)}`, {
+    signal,
+  })
 }
 
 export function getVisitDetail(id: number, signal?: AbortSignal) {
@@ -246,10 +237,7 @@ export function cancelVisit(
 /* Tickets & queues                                                           */
 /* -------------------------------------------------------------------------- */
 
-export function getTickets(
-  filters: TicketFilters = {},
-  signal?: AbortSignal
-) {
+export function getTickets(filters: TicketFilters = {}, signal?: AbortSignal) {
   return apiFetch<{ data: Paginated<QueueTicket> }>(
     `/tickets${toQuery(filters)}`,
     { signal }
@@ -270,10 +258,7 @@ export function getPublicQueue(
 /* Audit logs                                                                 */
 /* -------------------------------------------------------------------------- */
 
-export function getAuditLogs(
-  filters: AuditFilters = {},
-  signal?: AbortSignal
-) {
+export function getAuditLogs(filters: AuditFilters = {}, signal?: AbortSignal) {
   return apiFetch<{ data: Paginated<AuditLog> }>(
     `/audit-logs${toQuery(filters)}`,
     { signal }
@@ -284,14 +269,10 @@ export function getAuditLogs(
 /* Staff users                                                                */
 /* -------------------------------------------------------------------------- */
 
-export function getUsers(
-  filters: UserFilters = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: Paginated<AdminUser> }>(
-    `/users${toQuery(filters)}`,
-    { signal }
-  )
+export function getUsers(filters: UserFilters = {}, signal?: AbortSignal) {
+  return apiFetch<{ data: Paginated<AdminUser> }>(`/users${toQuery(filters)}`, {
+    signal,
+  })
 }
 
 export function createUser(payload: UserPayload) {

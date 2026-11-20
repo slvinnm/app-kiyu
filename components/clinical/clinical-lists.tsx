@@ -142,11 +142,7 @@ export function ClinicalLists({
           {waiting.length > 0 ? (
             <div>
               {waiting.map((ticket, index) => (
-                <TicketRow
-                  key={ticket.id}
-                  ticket={ticket}
-                  index={index}
-                />
+                <TicketRow key={ticket.id} ticket={ticket} index={index} />
               ))}
             </div>
           ) : (

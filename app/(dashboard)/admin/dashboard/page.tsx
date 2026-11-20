@@ -37,10 +37,7 @@ import { todayJakarta } from "@/lib/admin/date"
 import { getSession } from "@/lib/auth/session"
 import { formatDateTime } from "@/lib/reception/format"
 
-import type {
-  AuditLog,
-  Workflow,
-} from "@/types/admin"
+import type { AuditLog, Workflow } from "@/types/admin"
 import type {
   Department,
   Paginated,

@@ -42,12 +42,7 @@ import type { Visit } from "@/types/reception"
 
 const ACTIVE_VISIT_STATUSES = ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"]
 
-const ACTIVE_TICKET_STATUSES = [
-  "CREATED",
-  "CALLED",
-  "IN_PROGRESS",
-  "ON_HOLD",
-]
+const ACTIVE_TICKET_STATUSES = ["CREATED", "CALLED", "IN_PROGRESS", "ON_HOLD"]
 
 export default async function Page() {
   const session = await getSession()
@@ -160,10 +155,7 @@ export default async function Page() {
             {activeTickets.length > 0 ? (
               <div className="space-y-3">
                 {activeTickets.map(({ ticket, visit }) => (
-                  <div
-                    key={ticket.id}
-                    className="rounded-xl border p-4"
-                  >
+                  <div key={ticket.id} className="rounded-xl border p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <p className="text-3xl font-black tracking-tight tabular-nums">
@@ -183,9 +175,7 @@ export default async function Page() {
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span>{visit.department?.name ?? "-"}</span>
 
-                      <span className="font-mono">
-                        {visit.visit_number}
-                      </span>
+                      <span className="font-mono">{visit.visit_number}</span>
 
                       <span>{ticket.workflow_step?.name ?? "-"}</span>
                     </div>
@@ -292,9 +282,7 @@ export default async function Page() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    Tanggal Lahir
-                  </p>
+                  <p className="text-xs text-muted-foreground">Tanggal Lahir</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {formatDate(profile.date_of_birth)}

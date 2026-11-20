@@ -3,12 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import {
-  ArrowLeftIcon,
-  PencilIcon,
-  PlusIcon,
-  Trash2Icon,
-} from "lucide-react"
+import { ArrowLeftIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -54,9 +49,7 @@ export function WorkflowDetail({
   const router = useRouter()
   const steps = workflow.steps ?? []
   const nextSequence =
-    steps.length > 0
-      ? Math.max(...steps.map((step) => step.sequence)) + 1
-      : 1
+    steps.length > 0 ? Math.max(...steps.map((step) => step.sequence)) + 1 : 1
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<WorkflowStep | null>(null)

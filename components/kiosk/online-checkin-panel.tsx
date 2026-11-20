@@ -228,7 +228,9 @@ function PreviewContent({
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground">Pasien</p>
 
-          <p className="text-lg font-semibold">{booking.patient_preview.masked_name}</p>
+          <p className="text-lg font-semibold">
+            {booking.patient_preview.masked_name}
+          </p>
 
           <p className="text-sm text-muted-foreground">
             {booking.patient_preview.mrn}

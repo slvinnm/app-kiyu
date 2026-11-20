@@ -156,9 +156,7 @@ export function WorkflowManager({
 
             <Select
               value={departmentFilter}
-              onValueChange={(value) =>
-                setDepartmentFilter(value ?? "all")
-              }
+              onValueChange={(value) => setDepartmentFilter(value ?? "all")}
             >
               <SelectTrigger className="w-full sm:w-[220px]">
                 <SelectValue />
@@ -168,10 +166,7 @@ export function WorkflowManager({
                 <SelectItem value="all">Semua Poli</SelectItem>
 
                 {departments.map((department) => (
-                  <SelectItem
-                    key={department.id}
-                    value={String(department.id)}
-                  >
+                  <SelectItem key={department.id} value={String(department.id)}>
                     {department.name}
                   </SelectItem>
                 ))}

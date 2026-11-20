@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { WorkflowDetail } from "@/components/admin/workflows/workflow-detail"
 
-import {
-  getStationsServer,
-  getWorkflowServer,
-} from "@/lib/api/admin-server"
+import { getStationsServer, getWorkflowServer } from "@/lib/api/admin-server"
 import { ApiError, getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 
@@ -78,9 +75,7 @@ export default async function Page({
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <div className="mb-3 flex items-center gap-2">
-        <Badge variant="outline">
-          {workflow.department?.code ?? "Poli"}
-        </Badge>
+        <Badge variant="outline">{workflow.department?.code ?? "Poli"}</Badge>
 
         <Badge variant={workflow.is_active ? "default" : "outline"}>
           {workflow.is_active ? "Aktif" : "Nonaktif"}

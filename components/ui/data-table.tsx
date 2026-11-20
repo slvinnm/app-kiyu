@@ -165,7 +165,8 @@ export function DataTable<TData extends RowData>({
     setClientPageIndex(0)
   }
 
-  const showToolbar = toolbar !== undefined || table.getAllLeafColumns().length > 0
+  const showToolbar =
+    toolbar !== undefined || table.getAllLeafColumns().length > 0
 
   return (
     <div className={className}>

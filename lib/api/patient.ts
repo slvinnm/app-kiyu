@@ -1,10 +1,7 @@
 import { apiFetch } from "@/lib/api/client"
 
 import type { ApiResponse, Patient } from "@/types/reception"
-import type {
-  OnlineBookingResult,
-  PatientVisitDetail,
-} from "@/types/patient"
+import type { OnlineBookingResult, PatientVisitDetail } from "@/types/patient"
 
 function postJson<T>(path: string, body: unknown): Promise<T> {
   return apiFetch<T>(path, {

@@ -25,10 +25,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import {
   createPatientProfile,
   updatePatientProfile,
@@ -277,10 +274,7 @@ export function PatientProfileForm({
               <div className="space-y-2">
                 <Label>Jenis Kelamin</Label>
 
-                <Select
-                  value={form.gender}
-                  onValueChange={handleGenderChange}
-                >
+                <Select value={form.gender} onValueChange={handleGenderChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Pilih jenis kelamin" />
                   </SelectTrigger>
@@ -319,9 +313,7 @@ export function PatientProfileForm({
                 <Textarea
                   id="profile-address"
                   value={form.address}
-                  onChange={(event) =>
-                    update({ address: event.target.value })
-                  }
+                  onChange={(event) => update({ address: event.target.value })}
                   placeholder="Masukkan alamat"
                   rows={3}
                 />

@@ -22,6 +22,7 @@ import { ClinicalStats } from "@/components/clinical/clinical-stats"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getStationQueueServer } from "@/lib/api/clinical-server"
+import { LiveRefresh } from "@/components/realtime/live-refresh"
 import { getSession } from "@/lib/auth/session"
 import {
   priorityLabel,
@@ -109,15 +110,30 @@ export async function ClinicalDashboard({ role }: { role: string }) {
   }
 
   const { station, tickets } = snapshot
+  const actor = session.user.email
+  const mine = (ticket: { assigned_to: string | null }) =>
+    ticket.assigned_to === actor
+
   const inProgress = tickets.filter((t) => t.status === "IN_PROGRESS")
   const called = tickets.filter((t) => t.status === "CALLED")
   const waiting = tickets.filter((t) => t.status === "CREATED")
   const onHold = tickets.filter((t) => t.status === "ON_HOLD")
-  const current = inProgress[0] ?? called[0] ?? null
+
+  // Prefer the ticket this operator is handling, not a colleague's.
+  const current =
+    inProgress.find(mine) ??
+    called.find(mine) ??
+    (inProgress.length > 0 ? inProgress[0] : null) ??
+    called[0] ??
+    null
   const waitingPreview = waiting.slice(0, 5)
 
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
+      <LiveRefresh
+        departmentId={session.user.department_id ?? null}
+        stationId={stationId}
+      />
       <DashboardHeader
         label={label}
         stationCode={station.code}
@@ -130,8 +146,8 @@ export async function ClinicalDashboard({ role }: { role: string }) {
             <AlertTitle>Station tidak aktif</AlertTitle>
 
             <AlertDescription>
-              Station ini dinonaktifkan. Hubungi administrator sebelum
-              memproses antrian.
+              Station ini dinonaktifkan. Hubungi administrator sebelum memproses
+              antrian.
             </AlertDescription>
           </Alert>
         )}
@@ -195,9 +211,7 @@ export async function ClinicalDashboard({ role }: { role: string }) {
                 <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
                   <BellRingIcon className="size-6 text-muted-foreground" />
 
-                  <p className="text-sm font-medium">
-                    Tidak ada pasien aktif
-                  </p>
+                  <p className="text-sm font-medium">Tidak ada pasien aktif</p>
 
                   <Link href={queuePath} className={buttonVariants()}>
                     Buka Antrian

@@ -49,7 +49,9 @@ function TicketRow({
 
           <span>{ticket.workflow_step?.name ?? "-"}</span>
 
-          {ticket.visit && <span>{channelLabel(ticket.visit.intake_channel)}</span>}
+          {ticket.visit && (
+            <span>{channelLabel(ticket.visit.intake_channel)}</span>
+          )}
         </div>
       </div>
 

@@ -24,15 +24,9 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createUser, updateUser } from "@/lib/api/admin"
-import {
-  STAFF_ROLE_OPTIONS,
-  normalizeStaffRole,
-} from "@/lib/admin/roles"
+import { STAFF_ROLE_OPTIONS, normalizeStaffRole } from "@/lib/admin/roles"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
 import type { Department } from "@/types/reception"
@@ -71,9 +65,7 @@ export function UserFormDialog({
     setEmail(user?.email ?? "")
     setPassword("")
     setRole(normalizeStaffRole(user?.role ?? "receptionist"))
-    setDepartmentId(
-      user?.department_id ? String(user.department_id) : "none"
-    )
+    setDepartmentId(user?.department_id ? String(user.department_id) : "none")
     setStationId(user?.station_id ? String(user.station_id) : "none")
     setError(null)
     setErrors({})
@@ -116,9 +108,7 @@ export function UserFormDialog({
     setStationId(next)
 
     if (next !== "none" && departmentId === "none") {
-      const station = stations.find(
-        (item) => item.id === Number(next)
-      )
+      const station = stations.find((item) => item.id === Number(next))
 
       if (station) {
         setDepartmentId(String(station.department_id))
@@ -157,8 +147,7 @@ export function UserFormDialog({
       name: name.trim(),
       email: email.trim(),
       role,
-      department_id:
-        departmentId === "none" ? null : Number(departmentId),
+      department_id: departmentId === "none" ? null : Number(departmentId),
       station_id: stationId === "none" ? null : Number(stationId),
       ...(password ? { password } : {}),
     }
@@ -243,8 +232,7 @@ export function UserFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="user-password">
-              Password{" "}
-              {!user && <span className="text-destructive">*</span>}
+              Password {!user && <span className="text-destructive">*</span>}
             </Label>
 
             <Input
@@ -253,9 +241,7 @@ export function UserFormDialog({
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder={
-                user
-                  ? "Kosongkan jika tidak diubah"
-                  : "Minimal 8 karakter"
+                user ? "Kosongkan jika tidak diubah" : "Minimal 8 karakter"
               }
               autoComplete="new-password"
             />
@@ -268,7 +254,10 @@ export function UserFormDialog({
           <div className="space-y-2">
             <Label>Role</Label>
 
-            <Select value={role} onValueChange={(v) => setRole(v ?? "receptionist")}>
+            <Select
+              value={role}
+              onValueChange={(v) => setRole(v ?? "receptionist")}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -332,10 +321,7 @@ export function UserFormDialog({
                   <SelectItem value="none">Tidak ada</SelectItem>
 
                   {stationOptions.map((station) => (
-                    <SelectItem
-                      key={station.id}
-                      value={String(station.id)}
-                    >
+                    <SelectItem key={station.id} value={String(station.id)}>
                       {station.name} ({station.code})
                     </SelectItem>
                   ))}
@@ -343,9 +329,7 @@ export function UserFormDialog({
               </Select>
 
               {errors.station_id && (
-                <p className="text-xs text-destructive">
-                  {errors.station_id}
-                </p>
+                <p className="text-xs text-destructive">{errors.station_id}</p>
               )}
             </div>
           </div>

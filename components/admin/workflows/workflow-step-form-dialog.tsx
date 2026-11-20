@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import {
-  getApiErrorMessage,
-  getApiValidationErrors,
-} from "@/lib/api/error"
+import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { addWorkflowStep, updateWorkflowStep } from "@/lib/api/admin"
 
 import type { AdminStation, WorkflowStep } from "@/types/admin"
@@ -101,8 +98,7 @@ export function WorkflowStepFormDialog({
     } else {
       const duplicate = existingSteps.some(
         (existing) =>
-          existing.sequence === parsedSequence &&
-          existing.id !== step?.id
+          existing.sequence === parsedSequence && existing.id !== step?.id
       )
 
       if (duplicate) {
@@ -166,9 +162,7 @@ export function WorkflowStepFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {step ? "Edit Langkah" : "Tambah Langkah"}
-          </DialogTitle>
+          <DialogTitle>{step ? "Edit Langkah" : "Tambah Langkah"}</DialogTitle>
 
           <DialogDescription>
             Setiap langkah terhubung ke satu station dan memiliki urutan unik.
@@ -189,10 +183,7 @@ export function WorkflowStepFormDialog({
 
               <SelectContent>
                 {stations.map((station) => (
-                  <SelectItem
-                    key={station.id}
-                    value={String(station.id)}
-                  >
+                  <SelectItem key={station.id} value={String(station.id)}>
                     {station.name} ({station.code})
                   </SelectItem>
                 ))}
@@ -200,9 +191,7 @@ export function WorkflowStepFormDialog({
             </Select>
 
             {errors.station_id && (
-              <p className="text-xs text-destructive">
-                {errors.station_id}
-              </p>
+              <p className="text-xs text-destructive">{errors.station_id}</p>
             )}
           </div>
 

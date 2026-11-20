@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { RefreshCwIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -28,7 +27,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-import { DepartmentSwitcher } from "@/components/receptionist/department-switcher"
 import { CompleteRegistrationDialog } from "@/components/receptionist/queue/complete-registration-dialog"
 import { CurrentTicketCard } from "@/components/receptionist/queue/current-ticket-card"
 import { QueueStatCards } from "@/components/receptionist/queue/queue-stat-cards"
@@ -45,15 +43,13 @@ import {
 } from "@/lib/api/reception"
 import { formatTime } from "@/lib/reception/format"
 
-import type { Department, QueueTicket } from "@/types/reception"
+import type { QueueTicket } from "@/types/reception"
 
 export function ReceptionQueueWorkspace({
   departmentId,
-  departments,
   actorEmail,
 }: {
   departmentId: number | null
-  departments: Department[]
   actorEmail: string
 }) {
   const [selectedTicket, setSelectedTicket] = useState<QueueTicket | null>(null)
@@ -81,9 +77,7 @@ export function ReceptionQueueWorkspace({
     refresh,
   } = useReceptionQueue(departmentId, {
     paused:
-      selectedTicket !== null ||
-      skipTarget !== null ||
-      noShowTarget !== null,
+      selectedTicket !== null || skipTarget !== null || noShowTarget !== null,
   })
 
   async function handleCallNext() {
@@ -97,9 +91,7 @@ export function ReceptionQueueWorkspace({
       const response = await callNext(departmentId, actorEmail)
 
       if (!response.data) {
-        toast.info(
-          response.message ?? "Tidak ada antrian yang siap dipanggil."
-        )
+        toast.info(response.message ?? "Tidak ada antrian yang siap dipanggil.")
       } else {
         toast.success(
           response.message ??
@@ -197,26 +189,13 @@ export function ReceptionQueueWorkspace({
         <h1 className="text-2xl font-semibold tracking-tight">Antrian</h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Panggil pasien, selesaikan registrasi, dan teruskan ke layanan
-          klinis.
+          Panggil pasien, selesaikan registrasi, dan teruskan ke layanan klinis.
         </p>
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <DepartmentSwitcher
-          departments={departments}
-          value={departmentId}
-          disabled={processing}
-        />
-
-        <Button
-          variant="outline"
-          onClick={() => void refresh()}
-          disabled={refreshing || processing || departmentId === null}
-        >
-          {refreshing ? <Spinner /> : <RefreshCwIcon />}
-          Muat Ulang
-        </Button>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {refreshing && <Spinner className="size-3.5" />}
+        <span>Diperbarui otomatis secara langsung</span>
       </div>
     </div>
   )
@@ -229,19 +208,13 @@ export function ReceptionQueueWorkspace({
         <Card className="mt-6">
           <CardContent className="flex min-h-64 flex-col items-center justify-center gap-4 text-center">
             <div>
-              <CardTitle>Pilih poli terlebih dahulu</CardTitle>
+              <CardTitle>Akun belum ditugaskan ke poli</CardTitle>
 
               <CardDescription className="mt-2">
-                Antrian reception ditampilkan per poli. Pilih poli tempat Anda
-                bertugas.
+                Hubungi administrator untuk mengatur department dan station
+                kerja pada akun Anda.
               </CardDescription>
             </div>
-
-            <DepartmentSwitcher
-              departments={departments}
-              value={departmentId}
-              disabled={processing}
-            />
           </CardContent>
         </Card>
       </div>
@@ -286,7 +259,7 @@ export function ReceptionQueueWorkspace({
               </div>
 
               <Button onClick={() => void refresh()} disabled={refreshing}>
-                {refreshing ? <Spinner /> : <RefreshCwIcon />}
+                {refreshing ? <Spinner /> : null}
                 Coba Lagi
               </Button>
             </CardContent>

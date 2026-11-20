@@ -18,52 +18,28 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { DepartmentSwitcher } from "@/components/receptionist/department-switcher"
 import { QueueStatCards } from "@/components/receptionist/queue/queue-stat-cards"
+import { LiveRefresh } from "@/components/realtime/live-refresh"
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import {
-  getAllDepartmentsServer,
   getPatientCountServer,
   getReceptionQueueServer,
 } from "@/lib/api/reception-server"
 import { getSession } from "@/lib/auth/session"
-import { resolveDepartmentId } from "@/lib/reception/department"
-import {
-  channelLabel,
-  formatTime,
-  priorityLabel,
-} from "@/lib/reception/format"
+import { channelLabel, formatTime, priorityLabel } from "@/lib/reception/format"
 
-import type { Department, ReceptionQueueSnapshot } from "@/types/reception"
+import type { ReceptionQueueSnapshot } from "@/types/reception"
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ department_id?: string | string[] }>
-}) {
+export default async function Page() {
   const session = await getSession()
 
   if (!session?.user?.role) {
     redirect("/login")
   }
 
-  const params = await searchParams
-
-  let departments: Department[] = []
-  let departmentsError: string | null = null
-
-  try {
-    departments = await getAllDepartmentsServer()
-  } catch (cause) {
-    departmentsError = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
-  }
-
-  const departmentId = resolveDepartmentId(
-    params.department_id,
-    session.user.department_id,
-    departments
-  )
+  // Department comes from the signed-in operator's assignment.
+  const departmentId = session.user.department_id ?? null
 
   let snapshot: ReceptionQueueSnapshot | null = null
   let queueError: string | null = null
@@ -86,13 +62,7 @@ export default async function Page({
     patientCount = null
   }
 
-  const selectedDepartment =
-    departments.find((department) => department.id === departmentId) ?? null
-
-  const queueHref =
-    departmentId !== null
-      ? `/receptionist/queue?department_id=${departmentId}`
-      : "/receptionist/queue"
+  const queueHref = "/receptionist/queue"
 
   const registrationHref =
     departmentId !== null
@@ -103,15 +73,14 @@ export default async function Page({
 
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
+      <LiveRefresh departmentId={departmentId} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Badge variant="outline">Reception</Badge>
 
             <span className="text-xs text-muted-foreground">
-              {snapshot?.station.name ??
-                selectedDepartment?.name ??
-                "Meja registrasi"}
+              {snapshot?.station.name ?? "Meja registrasi"}
             </span>
           </div>
 
@@ -130,36 +99,22 @@ export default async function Page({
           </div>
         </div>
 
-        <DepartmentSwitcher
-          departments={departments}
-          value={departmentId}
-        />
+        <div className="text-xs text-muted-foreground">
+          Diperbarui otomatis secara langsung
+        </div>
       </div>
 
-      {departmentsError && (
-        <Alert variant="destructive" className="mt-6">
-          <AlertTitle>Daftar poli tidak tersedia</AlertTitle>
-
-          <AlertDescription>{departmentsError}</AlertDescription>
-        </Alert>
-      )}
-
-      {!departmentsError && departmentId === null && (
+      {departmentId === null && (
         <Card className="mt-6">
           <CardContent className="flex min-h-52 flex-col items-center justify-center gap-4 text-center">
             <div>
-              <CardTitle>Pilih poli terlebih dahulu</CardTitle>
+              <CardTitle>Akun belum ditugaskan ke poli</CardTitle>
 
               <CardDescription className="mt-2">
-                Dasbor reception ditampilkan per poli. Pilih poli tempat Anda
-                bertugas.
+                Hubungi administrator untuk mengatur department dan station
+                kerja pada akun Anda.
               </CardDescription>
             </div>
-
-            <DepartmentSwitcher
-              departments={departments}
-              value={departmentId}
-            />
           </CardContent>
         </Card>
       )}

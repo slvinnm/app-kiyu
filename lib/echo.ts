@@ -44,3 +44,53 @@ export function getEcho(): EchoClient | null {
 }
 
 export const PUBLIC_QUEUE_CHANNEL = "public.queue"
+
+export function departmentChannel(departmentId: number): string {
+  return `department.${departmentId}`
+}
+
+export function stationChannel(stationId: number): string {
+  return `station.${stationId}`
+}
+
+/** Returns true only when the Echo/Pusher socket is currently connected. */
+export function isEchoConnected(echo: ReturnType<typeof getEcho>): boolean {
+  if (!echo) {
+    return false
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const connection = (echo as any)?.connector?.pusher?.connection
+
+  return connection?.state === "connected"
+}
+
+/** Binds to socket state changes; returns an unbind function. */
+export function bindEchoConnectionState(
+  echo: ReturnType<typeof getEcho>,
+  onChange: (connected: boolean) => void
+): () => void {
+  if (!echo) {
+    return () => {}
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const connection = (echo as any)?.connector?.pusher?.connection
+
+  if (!connection) {
+    onChange(false)
+    return () => {}
+  }
+
+  const handler = (states: { current?: string } | string) => {
+    const current = typeof states === "string" ? states : states?.current
+    onChange(current === "connected")
+  }
+
+  connection.bind?.("state_change", handler)
+  onChange(connection.state === "connected")
+
+  return () => {
+    connection.unbind?.("state_change", handler)
+  }
+}

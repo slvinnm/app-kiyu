@@ -41,9 +41,7 @@ export function AuditTable({ logs }: { logs: AuditLog[] }) {
         columnHelper.accessor("user_id", {
           header: "User",
           cell: ({ row }) => (
-            <span className="text-xs">
-              {row.original.user_id ?? "sistem"}
-            </span>
+            <span className="text-xs">{row.original.user_id ?? "sistem"}</span>
           ),
         }),
         columnHelper.accessor("action", {

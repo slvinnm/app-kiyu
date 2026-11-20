@@ -21,14 +21,10 @@ export function AdminStatCard({
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{label}</p>
 
-          <p className="text-xl font-semibold tabular-nums">
-            {value ?? "-"}
-          </p>
+          <p className="text-xl font-semibold tabular-nums">{value ?? "-"}</p>
 
           {hint && (
-            <p className="truncate text-[10px] text-muted-foreground">
-              {hint}
-            </p>
+            <p className="truncate text-[10px] text-muted-foreground">{hint}</p>
           )}
         </div>
       </CardContent>

@@ -62,7 +62,9 @@ export default async function Page({
           </div>
 
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Registrasi</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Registrasi
+            </h1>
 
             <p className="text-sm text-muted-foreground">
               Buat intake manual walk-in. Data pasien dilengkapi saat registrasi
@@ -75,7 +77,9 @@ export default async function Page({
       {loadError ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Daftar poli tidak tersedia</CardTitle>
+            <CardTitle className="text-base">
+              Daftar poli tidak tersedia
+            </CardTitle>
 
             <CardDescription>{loadError}</CardDescription>
           </CardHeader>

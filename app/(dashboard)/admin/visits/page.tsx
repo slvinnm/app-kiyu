@@ -6,10 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { VisitManager } from "@/components/admin/visits/visit-manager"
 
-import {
-  getDepartmentsServer,
-  getVisitsServer,
-} from "@/lib/api/admin-server"
+import { getDepartmentsServer, getVisitsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 

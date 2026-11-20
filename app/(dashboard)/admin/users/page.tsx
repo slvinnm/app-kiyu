@@ -37,8 +37,7 @@ export default async function Page({
   const role = first(params.role) ?? ""
   const rawPage = first(params.page)
   const parsedPage = rawPage ? Number(rawPage) : 1
-  const page =
-    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
+  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
 
   let users: Paginated<AdminUser> | null = null
   let departments: Department[] = []

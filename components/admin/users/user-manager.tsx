@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  PencilIcon,
-  PlusIcon,
-  SearchIcon,
-  Trash2Icon,
-} from "lucide-react"
+import { PencilIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -44,10 +39,7 @@ import {
 
 import { UserFormDialog } from "@/components/admin/users/user-form-dialog"
 
-import {
-  STAFF_ROLE_OPTIONS,
-  staffRoleLabel,
-} from "@/lib/admin/roles"
+import { STAFF_ROLE_OPTIONS, staffRoleLabel } from "@/lib/admin/roles"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteUser } from "@/lib/api/admin"
 

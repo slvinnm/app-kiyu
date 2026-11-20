@@ -14,9 +14,7 @@ export function AdminPaginationLinks({
   hrefFor: (page: number) => string
 }) {
   if (lastPage <= 1) {
-    return (
-      <p className="text-xs text-muted-foreground">{total} data</p>
-    )
+    return <p className="text-xs text-muted-foreground">{total} data</p>
   }
 
   return (

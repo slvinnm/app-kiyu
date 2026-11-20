@@ -206,9 +206,7 @@ export function PatientVisitDetailSheet({
                         className="rounded-xl border p-4 text-sm"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-semibold">
-                            {ticket.queue_number}
-                          </p>
+                          <p className="font-semibold">{ticket.queue_number}</p>
 
                           <Badge variant="outline">
                             {ticketStatusLabel(ticket.status)}

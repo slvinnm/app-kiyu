@@ -74,9 +74,7 @@ export function usePublicQueue() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
-  const [calledEvent, setCalledEvent] = useState<CalledTicketEvent | null>(
-    null
-  )
+  const [calledEvent, setCalledEvent] = useState<CalledTicketEvent | null>(null)
 
   const mountedRef = useRef(true)
   const inFlightRef = useRef(false)
@@ -238,10 +236,7 @@ export function usePublicQueue() {
     void load()
 
     const interval = window.setInterval(() => {
-      if (
-        document.visibilityState !== "visible" ||
-        connectedRef.current
-      ) {
+      if (document.visibilityState !== "visible" || connectedRef.current) {
         return
       }
 

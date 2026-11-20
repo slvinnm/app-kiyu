@@ -31,8 +31,7 @@ export default async function Page({
   const search = first(params.search) ?? ""
   const rawPage = first(params.page)
   const parsedPage = rawPage ? Number(rawPage) : 1
-  const page =
-    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
+  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
 
   let patients: Paginated<Patient> | null = null
   let error: string | null = null

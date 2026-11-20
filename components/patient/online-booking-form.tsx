@@ -81,10 +81,7 @@ export function OnlineBookingForm({
       setResult(response.data)
       toast.success(response.message ?? "Booking online berhasil dibuat.")
     } catch (cause) {
-      const message = getApiErrorMessage(
-        cause,
-        "Gagal membuat booking online."
-      )
+      const message = getApiErrorMessage(cause, "Gagal membuat booking online.")
 
       setError(message)
       toast.error(message)

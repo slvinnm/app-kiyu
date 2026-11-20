@@ -17,11 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import {
-  channelLabel,
-  formatTime,
-  priorityLabel,
-} from "@/lib/reception/format"
+import { channelLabel, formatTime, priorityLabel } from "@/lib/reception/format"
 
 import type { QueueTicket } from "@/types/reception"
 
