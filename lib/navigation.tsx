@@ -2,13 +2,15 @@ import { normalizeRole } from "@/types/auth"
 
 import type { UserRole } from "@/types/auth"
 import {
-  BugPlay,
+  Building2,
+  CalendarClock,
   CalendarPlus,
   FileText,
-  Headset,
+  GitBranch,
   LayoutDashboardIcon,
-  SearchIcon,
-  UsersIcon,
+  ListOrdered,
+  MapPin,
+  ScrollText,
   UserPlus,
   UserRound,
   Ticket,
@@ -25,36 +27,56 @@ export type NavItem = {
 const navigation: Record<UserRole, NavItem[]> = {
   admin: [
     {
-      title: "Dashboard",
+      title: "Dasbor",
       url: "/admin/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Caller",
-      url: "/admin/caller",
-      icon: <Headset />,
-    },
-    {
-      title: "Search",
-      url: "/admin/search",
-      icon: <SearchIcon />,
+      title: "Organisasi",
+      icon: <Building2 />,
       items: [
         {
-          title: "Patients",
-          url: "/admin/search/patients",
-          icon: <UsersIcon />,
+          title: "Poli",
+          url: "/admin/departments",
+          icon: <Building2 />,
         },
         {
-          title: "Users",
-          url: "/admin/search/users",
-          icon: <UsersIcon />,
+          title: "Station",
+          url: "/admin/stations",
+          icon: <MapPin />,
+        },
+        {
+          title: "Workflow",
+          url: "/admin/workflows",
+          icon: <GitBranch />,
         },
       ],
     },
     {
-      title: "Test Page",
-      url: "/test",
-      icon: <BugPlay />,
+      title: "Operasional",
+      icon: <CalendarClock />,
+      items: [
+        {
+          title: "Kunjungan",
+          url: "/admin/visits",
+          icon: <CalendarClock />,
+        },
+        {
+          title: "Antrian",
+          url: "/admin/queue",
+          icon: <ListOrdered />,
+        },
+      ],
+    },
+    {
+      title: "Pasien",
+      url: "/admin/patients",
+      icon: <Users />,
+    },
+    {
+      title: "Audit Log",
+      url: "/admin/audit-logs",
+      icon: <ScrollText />,
     },
   ],
 
