@@ -27,6 +27,7 @@ export function useClinicalQueue(
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
   const mountedRef = useRef(true)
   const stationRef = useRef(stationId)
@@ -111,12 +112,16 @@ export function useClinicalQueue(
   // Live updates: any change at this station (or its department) refetches.
   useEffect(() => {
     if (stationId === null) {
+      setIsConnected(false)
+      connectedRef.current = false
       return
     }
 
     const echo = getEcho()
 
     if (!echo) {
+      setIsConnected(false)
+      connectedRef.current = false
       return
     }
 
@@ -135,6 +140,7 @@ export function useClinicalQueue(
     const unbind = bindEchoConnectionState(echo, (connected) => {
       const wasConnected = connectedRef.current
       connectedRef.current = connected
+      setIsConnected(connected)
 
       if (connected && !wasConnected) {
         void fetchQueue()
@@ -255,6 +261,7 @@ export function useClinicalQueue(
     refreshing,
     error,
     lastUpdatedAt,
+    isConnected,
     refresh,
   }
 }

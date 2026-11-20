@@ -27,6 +27,7 @@ export function useReceptionQueue(
   const [error, setError] = useState<string | null>(null)
   const [invalidWorkflow, setInvalidWorkflow] = useState(false)
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
   const mountedRef = useRef(true)
   const departmentRef = useRef(departmentId)
@@ -122,12 +123,16 @@ export function useReceptionQueue(
   // (call, start, complete, hold, transfer, new ticket, ...).
   useEffect(() => {
     if (departmentId === null) {
+      setIsConnected(false)
+      connectedRef.current = false
       return
     }
 
     const echo = getEcho()
 
     if (!echo) {
+      setIsConnected(false)
+      connectedRef.current = false
       return
     }
 
@@ -146,6 +151,7 @@ export function useReceptionQueue(
     const unbind = bindEchoConnectionState(echo, (connected) => {
       const wasConnected = connectedRef.current
       connectedRef.current = connected
+      setIsConnected(connected)
 
       if (connected && !wasConnected) {
         void fetchQueue()
@@ -246,6 +252,7 @@ export function useReceptionQueue(
     error,
     invalidWorkflow,
     lastUpdatedAt,
+    isConnected,
     refresh,
   }
 }

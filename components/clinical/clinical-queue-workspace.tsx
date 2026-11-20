@@ -119,6 +119,7 @@ export function ClinicalQueueWorkspace({
     refreshing,
     error,
     lastUpdatedAt,
+    isConnected,
     refresh,
   } = useClinicalQueue(stationId, {
     actorEmail,
@@ -258,10 +259,12 @@ export function ClinicalQueueWorkspace({
         </p>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        {refreshing && <Spinner className="size-3.5" />}
-        <span>Diperbarui otomatis secara langsung</span>
-      </div>
+      {isConnected && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {refreshing && <Spinner className="size-3.5" />}
+          <span>Diperbarui otomatis secara langsung</span>
+        </div>
+      )}
     </div>
   )
 
@@ -346,11 +349,13 @@ export function ClinicalQueueWorkspace({
               onHold={onHold.length}
             />
 
-            <p className="text-xs text-muted-foreground">
-              Terakhir diperbarui{" "}
-              {lastUpdatedAt ? formatTime(lastUpdatedAt.toISOString()) : "-"} ·
-              diperbarui otomatis setiap 15 detik
-            </p>
+            {!isConnected && (
+              <p className="text-xs text-muted-foreground">
+                Terakhir diperbarui{" "}
+                {lastUpdatedAt ? formatTime(lastUpdatedAt.toISOString()) : "-"}{" "}
+                · diperbarui otomatis setiap 15 detik
+              </p>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_380px]">
               <ClinicalCurrentTicket

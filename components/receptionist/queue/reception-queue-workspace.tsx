@@ -74,6 +74,7 @@ export function ReceptionQueueWorkspace({
     error,
     invalidWorkflow,
     lastUpdatedAt,
+    isConnected,
     refresh,
   } = useReceptionQueue(departmentId, {
     paused:
@@ -193,10 +194,12 @@ export function ReceptionQueueWorkspace({
         </p>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        {refreshing && <Spinner className="size-3.5" />}
-        <span>Diperbarui otomatis secara langsung</span>
-      </div>
+      {isConnected && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {refreshing && <Spinner className="size-3.5" />}
+          <span>Diperbarui otomatis secara langsung</span>
+        </div>
+      )}
     </div>
   )
 
@@ -281,11 +284,13 @@ export function ReceptionQueueWorkspace({
               onHoldCount={snapshot.on_hold.length}
             />
 
-            <p className="text-xs text-muted-foreground">
-              Terakhir diperbarui{" "}
-              {lastUpdatedAt ? formatTime(lastUpdatedAt.toISOString()) : "-"} ·
-              diperbarui otomatis setiap 15 detik
-            </p>
+            {!isConnected && (
+              <p className="text-xs text-muted-foreground">
+                Terakhir diperbarui{" "}
+                {lastUpdatedAt ? formatTime(lastUpdatedAt.toISOString()) : "-"}{" "}
+                · diperbarui otomatis setiap 15 detik
+              </p>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_380px]">
               <CurrentTicketCard
