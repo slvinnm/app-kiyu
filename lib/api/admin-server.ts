@@ -15,15 +15,18 @@ import type {
   AdminVisitDetail,
   AuditFilters,
   AuditLog,
+  DepartmentFilters,
   PatientFilters,
   PublicQueueStation,
   Referral,
   ReferralDetail,
   ReferralFilters,
+  StationListFilters,
   TicketFilters,
   UserFilters,
   VisitFilters,
   Workflow,
+  WorkflowListFilters,
 } from "@/types/admin"
 
 type QueryValue = string | number | boolean | null | undefined
@@ -63,6 +66,37 @@ export async function getWorkflowsServer(
 ): Promise<Workflow[]> {
   const response = await serverApiFetch<{ data: Workflow[] }>(
     `/workflows${toQuery(filters)}`
+  )
+  return response.data
+}
+
+/**
+ * Departments as table rows: paginated, searchable and sortable on the API.
+ * The unpaginated `getDepartmentsServer` variant stays for dropdown options.
+ */
+export async function getDepartmentsTableServer(
+  filters: DepartmentFilters = {}
+): Promise<Paginated<Department>> {
+  const response = await serverApiFetch<{ data: Paginated<Department> }>(
+    `/departments${toQuery({ ...filters, paginated: 1 })}`
+  )
+  return response.data
+}
+
+export async function getStationsTableServer(
+  filters: StationListFilters = {}
+): Promise<Paginated<AdminStation>> {
+  const response = await serverApiFetch<{ data: Paginated<AdminStation> }>(
+    `/stations${toQuery({ ...filters, paginated: 1 })}`
+  )
+  return response.data
+}
+
+export async function getWorkflowsTableServer(
+  filters: WorkflowListFilters = {}
+): Promise<Paginated<Workflow>> {
+  const response = await serverApiFetch<{ data: Paginated<Workflow> }>(
+    `/workflows${toQuery({ ...filters, paginated: 1 })}`
   )
   return response.data
 }

@@ -13,13 +13,12 @@ import {
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { parseTableParams } from "@/lib/table-params"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
 import type { Department, Paginated } from "@/types/reception"
 
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value
-}
+const SORTABLE = ["name", "email", "role", "created_at", "id"]
 
 export default async function Page({
   searchParams,
@@ -33,11 +32,11 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const search = first(params.search) ?? ""
-  const role = first(params.role) ?? ""
-  const rawPage = first(params.page)
-  const parsedPage = rawPage ? Number(rawPage) : 1
-  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+    filters: ["role"],
+  })
 
   let users: Paginated<AdminUser> | null = null
   let departments: Department[] = []
@@ -46,12 +45,7 @@ export default async function Page({
 
   try {
     ;[users, departments, stations] = await Promise.all([
-      getUsersServer({
-        search: search || undefined,
-        role: role || undefined,
-        page,
-        per_page: 200,
-      }),
+      getUsersServer({ ...table, ...filters }),
       getDepartmentsServer(),
       getStationsServer(),
     ])
@@ -77,14 +71,21 @@ export default async function Page({
         </Alert>
       ) : (
         <UserManager
-          users={users.data}
+          rows={users.data}
+          total={users.total}
+          lastPage={users.last_page}
+          filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+            filterKeys: ["role"],
+          }}
           departments={departments}
           stations={stations}
-          filters={{
-            search: search || undefined,
-            role: role || undefined,
-            page,
-          }}
           currentUserId={session.user.id}
         />
       )}

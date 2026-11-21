@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { PencilIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react"
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -24,7 +24,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -39,81 +38,41 @@ import {
 
 import { UserFormDialog } from "@/components/admin/users/user-form-dialog"
 
+import { useTableQuery } from "@/hooks/use-table-query"
 import { STAFF_ROLE_OPTIONS, staffRoleLabel } from "@/lib/admin/roles"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteUser } from "@/lib/api/admin"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
 import type { Department } from "@/types/reception"
+import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<AdminUser>()
 
-type UserFilters = {
-  search?: string
-  role?: string
-  page?: number
-}
-
-function buildQuery(
-  filters: UserFilters,
-  overrides: Partial<UserFilters> = {}
-): string {
-  const merged = { ...filters, ...overrides }
-  const params = new URLSearchParams()
-
-  if (merged.search) params.set("search", merged.search)
-  if (merged.role) params.set("role", merged.role)
-  if (merged.page && merged.page > 1) params.set("page", String(merged.page))
-
-  const query = params.toString()
-
-  return query ? `/admin/users?${query}` : "/admin/users"
-}
-
 export function UserManager({
-  users,
+  rows,
+  total,
+  lastPage,
+  state,
   departments,
   stations,
-  filters,
   currentUserId,
 }: {
-  users: AdminUser[]
+  rows: AdminUser[]
+  total: number
+  lastPage: number
+  filters: Record<string, string>
+  state: TableQueryState
   departments: Department[]
   stations: AdminStation[]
-  filters: UserFilters
   currentUserId: number
 }) {
   const router = useRouter()
-  const [search, setSearch] = useState(filters.search ?? "")
-  const [role, setRole] = useState(filters.role ?? "all")
+  const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<AdminUser | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null)
   const [processing, setProcessing] = useState(false)
-
-  useEffect(() => {
-    setSearch(filters.search ?? "")
-    setRole(filters.role ?? "all")
-  }, [filters.search, filters.role])
-
-  function applyFilters() {
-    router.push(
-      buildQuery(
-        {},
-        {
-          search: search.trim() || undefined,
-          role: role === "all" ? undefined : role,
-          page: 1,
-        }
-      )
-    )
-  }
-
-  function resetFilters() {
-    setSearch("")
-    setRole("all")
-    router.push("/admin/users")
-  }
 
   function openCreate() {
     setEditing(null)
@@ -164,11 +123,13 @@ export function UserManager({
           id: "department",
           header: "Department",
           cell: ({ row }) => row.original.department?.name ?? "-",
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "station",
           header: "Station",
           cell: ({ row }) => row.original.station?.name ?? "-",
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "actions",
@@ -199,6 +160,7 @@ export function UserManager({
               )}
             </div>
           ),
+          enableSorting: false,
         }),
       ]),
     [currentUserId]
@@ -222,58 +184,48 @@ export function UserManager({
               Tambah Pengguna
             </Button>
           </div>
-
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <div className="relative max-w-sm flex-1">
-              <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault()
-                    applyFilters()
-                  }
-                }}
-                placeholder="Cari nama atau email..."
-                className="h-9 pl-9"
-              />
-            </div>
-
-            <Select
-              value={role}
-              onValueChange={(value) => setRole(value ?? "all")}
-            >
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="all">Semua Role</SelectItem>
-
-                {STAFF_ROLE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button onClick={applyFilters}>Terapkan</Button>
-
-            <Button variant="outline" onClick={resetFilters}>
-              Reset
-            </Button>
-          </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={users}
+            data={rows}
             getRowId={(row) => String(row.id)}
             emptyMessage="Pengguna tidak ditemukan."
+            pageCount={lastPage}
+            pageIndex={state.page - 1}
+            pageSize={state.perPage}
+            total={total}
+            sorting={tq.sorting}
+            onSortingChange={tq.setSorting}
+            onPageChange={tq.setPageIndex}
+            onPageSizeChange={tq.setPerPage}
+            searchValue={tq.searchInput}
+            onSearchChange={tq.setSearchInput}
+            searching={tq.pending}
+            searchPlaceholder="Cari nama atau email..."
+            toolbar={
+              <Select
+                value={state.filters?.role ?? "all"}
+                onValueChange={(value) =>
+                  tq.setFilter("role", value === "all" ? null : value)
+                }
+              >
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="all">Semua Role</SelectItem>
+
+                  {STAFF_ROLE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            }
           />
         </CardContent>
       </Card>

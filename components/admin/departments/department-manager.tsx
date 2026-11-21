@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { PencilIcon, PlusIcon, SearchIcon } from "lucide-react"
+import { PencilIcon, PlusIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -19,37 +19,32 @@ import {
   DataTable,
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
-import { Input } from "@/components/ui/input"
 
 import { DepartmentFormDialog } from "@/components/admin/departments/department-form-dialog"
 
+import { useTableQuery } from "@/hooks/use-table-query"
+
 import type { Department } from "@/types/reception"
+import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<Department>()
 
 export function DepartmentManager({
-  departments,
+  rows,
+  total,
+  lastPage,
+  state,
 }: {
-  departments: Department[]
+  rows: Department[]
+  total: number
+  lastPage: number
+  filters: Record<string, string>
+  state: TableQueryState
 }) {
   const router = useRouter()
-  const [query, setQuery] = useState("")
+  const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Department | null>(null)
-
-  const filtered = useMemo(() => {
-    const keyword = query.trim().toLowerCase()
-
-    if (!keyword) {
-      return departments
-    }
-
-    return departments.filter(
-      (department) =>
-        department.name.toLowerCase().includes(keyword) ||
-        department.code.toLowerCase().includes(keyword)
-    )
-  }, [departments, query])
 
   const columns = useMemo(
     () =>
@@ -70,6 +65,7 @@ export function DepartmentManager({
           id: "stations",
           header: "Station",
           cell: ({ row }) => row.original.stations?.length ?? 0,
+          enableSorting: false,
         }),
         columnHelper.accessor("is_active", {
           header: "Status",
@@ -93,6 +89,7 @@ export function DepartmentManager({
               {row.original.display_in_kiosk === false ? "Internal" : "Tampil"}
             </Badge>
           ),
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "actions",
@@ -119,6 +116,7 @@ export function DepartmentManager({
               </Button>
             </div>
           ),
+          enableSorting: false,
         }),
       ]),
     []
@@ -152,25 +150,26 @@ export function DepartmentManager({
               Tambah Poli
             </Button>
           </div>
-
-          <div className="relative mt-3 max-w-sm">
-            <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari kode atau nama poli..."
-              className="h-9 pl-9"
-            />
-          </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={filtered}
+            data={rows}
             getRowId={(department) => String(department.id)}
             emptyMessage="Poli tidak ditemukan."
+            pageCount={lastPage}
+            pageIndex={state.page - 1}
+            pageSize={state.perPage}
+            total={total}
+            sorting={tq.sorting}
+            onSortingChange={tq.setSorting}
+            onPageChange={tq.setPageIndex}
+            onPageSizeChange={tq.setPerPage}
+            searchValue={tq.searchInput}
+            onSearchChange={tq.setSearchInput}
+            searching={tq.pending}
+            searchPlaceholder="Cari kode atau nama poli..."
           />
         </CardContent>
       </Card>

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { PencilIcon, PlusIcon, SearchIcon } from "lucide-react"
+import { PencilIcon, PlusIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import {
   DataTable,
   createDataTableColumnHelper,
@@ -20,37 +19,30 @@ import {
 
 import { PatientFormDialog } from "@/components/admin/patients/patient-form-dialog"
 
+import { useTableQuery } from "@/hooks/use-table-query"
 import { formatDate, genderLabel } from "@/lib/reception/format"
 
 import type { Patient } from "@/types/reception"
+import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<Patient>()
 
 export function PatientManager({
-  patients,
-  search,
+  rows,
+  total,
+  lastPage,
+  state,
 }: {
-  patients: Patient[]
-  search: string
+  rows: Patient[]
+  total: number
+  lastPage: number
+  filters: Record<string, string>
+  state: TableQueryState
 }) {
   const router = useRouter()
-  const [query, setQuery] = useState(search)
+  const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Patient | null>(null)
-
-  function applySearch() {
-    const keyword = query.trim()
-    router.push(
-      keyword
-        ? `/admin/patients?search=${encodeURIComponent(keyword)}`
-        : "/admin/patients"
-    )
-  }
-
-  function resetSearch() {
-    setQuery("")
-    router.push("/admin/patients")
-  }
 
   function openCreate() {
     setEditing(null)
@@ -81,14 +73,17 @@ export function PatientManager({
         columnHelper.accessor("date_of_birth", {
           header: "Tanggal Lahir",
           cell: ({ row }) => formatDate(row.original.date_of_birth),
+          enableSorting: false,
         }),
         columnHelper.accessor("gender", {
           header: "Gender",
           cell: ({ row }) => genderLabel(row.original.gender),
+          enableSorting: false,
         }),
         columnHelper.accessor("phone", {
           header: "Telepon",
           cell: ({ row }) => row.original.phone ?? "-",
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "actions",
@@ -108,6 +103,7 @@ export function PatientManager({
               </Button>
             </div>
           ),
+          enableSorting: false,
         }),
       ]),
     []
@@ -131,39 +127,26 @@ export function PatientManager({
               Tambah Pasien
             </Button>
           </div>
-
-          <form
-            className="mt-3 flex max-w-lg gap-2"
-            onSubmit={(event) => {
-              event.preventDefault()
-              applySearch()
-            }}
-          >
-            <div className="relative flex-1">
-              <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Cari nama, MRN, NIK, atau telepon..."
-                className="h-9 pl-9"
-              />
-            </div>
-
-            <Button type="submit">Cari</Button>
-
-            <Button type="button" variant="outline" onClick={resetSearch}>
-              Reset
-            </Button>
-          </form>
         </CardHeader>
 
         <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={patients}
+            data={rows}
             getRowId={(row) => String(row.id)}
             emptyMessage="Pasien tidak ditemukan."
+            pageCount={lastPage}
+            pageIndex={state.page - 1}
+            pageSize={state.perPage}
+            total={total}
+            sorting={tq.sorting}
+            onSortingChange={tq.setSorting}
+            onPageChange={tq.setPageIndex}
+            onPageSizeChange={tq.setPerPage}
+            searchValue={tq.searchInput}
+            onSearchChange={tq.setSearchInput}
+            searching={tq.pending}
+            searchPlaceholder="Cari nama, MRN, NIK, atau telepon..."
           />
         </CardContent>
       </Card>

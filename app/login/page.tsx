@@ -1,7 +1,18 @@
 "use client"
 
-import { LoginForm } from "@/components/login-form"
+import { Suspense } from "react"
 import { GalleryVerticalEndIcon } from "lucide-react"
+
+import { LoginForm } from "@/components/login-form"
+import { Spinner } from "@/components/ui/spinner"
+
+function LoginFormFallback() {
+  return (
+    <div className="flex h-[420px] items-center justify-center">
+      <Spinner className="size-5 text-muted-foreground" />
+    </div>
+  )
+}
 
 export default function LoginPage() {
   return (
@@ -13,7 +24,9 @@ export default function LoginPage() {
           </div>
           Acme Inc.
         </a>
-        <LoginForm />
+        <Suspense fallback={<LoginFormFallback />}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )

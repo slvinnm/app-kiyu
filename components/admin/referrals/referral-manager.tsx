@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useMemo, useState } from "react"
 import { ArrowRightLeft } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -28,82 +27,36 @@ import {
 
 import { ReferralDetailSheet } from "@/components/admin/referrals/referral-detail-sheet"
 
+import { useTableQuery } from "@/hooks/use-table-query"
 import { referralStatusLabel } from "@/lib/admin/referrals"
 import { formatDateTime, priorityLabel } from "@/lib/reception/format"
 
 import type { Referral } from "@/types/admin"
 import type { Department } from "@/types/reception"
+import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<Referral>()
 
 const STATUS_OPTIONS = ["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED"]
 
-type ReferralFilters = {
-  target_department_id?: number
-  status?: string
-  page?: number
-}
-
-function buildQuery(
-  filters: ReferralFilters,
-  overrides: Partial<ReferralFilters> = {}
-): string {
-  const merged = { ...filters, ...overrides }
-  const params = new URLSearchParams()
-
-  if (merged.target_department_id) {
-    params.set("target_department_id", String(merged.target_department_id))
-  }
-
-  if (merged.status) params.set("status", merged.status)
-  if (merged.page && merged.page > 1) params.set("page", String(merged.page))
-
-  const query = params.toString()
-
-  return query ? `/admin/referrals?${query}` : "/admin/referrals"
-}
-
 export function ReferralManager({
-  referrals,
+  rows,
+  total,
+  lastPage,
+  state,
   departments,
-  filters,
 }: {
-  referrals: Referral[]
+  rows: Referral[]
+  total: number
+  lastPage: number
+  filters: Record<string, string>
+  state: TableQueryState
   departments: Department[]
-  filters: ReferralFilters
 }) {
-  const router = useRouter()
-  const [departmentId, setDepartmentId] = useState(
-    filters.target_department_id ? String(filters.target_department_id) : "all"
-  )
-  const [status, setStatus] = useState(filters.status ?? "all")
+  const tq = useTableQuery(state)
   const [selectedReferralId, setSelectedReferralId] = useState<number | null>(
     null
   )
-
-  useEffect(() => {
-    setDepartmentId(
-      filters.target_department_id
-        ? String(filters.target_department_id)
-        : "all"
-    )
-    setStatus(filters.status ?? "all")
-  }, [filters.target_department_id, filters.status])
-
-  function applyFilters() {
-    router.push(
-      buildQuery(filters, {
-        target_department_id:
-          departmentId === "all" ? undefined : Number(departmentId),
-        status: status === "all" ? undefined : status,
-        page: 1,
-      })
-    )
-  }
-
-  function resetFilters() {
-    router.push("/admin/referrals")
-  }
 
   const columns = useMemo(
     () =>
@@ -128,11 +81,13 @@ export function ReferralManager({
               </p>
             </div>
           ),
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "target",
           header: "Tujuan",
           cell: ({ row }) => row.original.target_department?.name ?? "-",
+          enableSorting: false,
         }),
         columnHelper.accessor("status", {
           header: "Status",
@@ -154,6 +109,7 @@ export function ReferralManager({
               {row.original.target_visit?.visit_number ?? "-"}
             </span>
           ),
+          enableSorting: false,
         }),
         columnHelper.accessor("created_at", {
           header: "Dibuat",
@@ -178,6 +134,7 @@ export function ReferralManager({
               </Button>
             </div>
           ),
+          enableSorting: false,
         }),
       ]),
     []
@@ -195,73 +152,77 @@ export function ReferralManager({
               tiketnya dibuat otomatis.
             </CardDescription>
           </div>
-
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-2">
-              <Label>Department Tujuan</Label>
-
-              <Select
-                value={departmentId}
-                onValueChange={(value) => setDepartmentId(value ?? "all")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="all">Semua Department</SelectItem>
-
-                  {departments.map((department) => (
-                    <SelectItem
-                      key={department.id}
-                      value={String(department.id)}
-                    >
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Status</Label>
-
-              <Select
-                value={status}
-                onValueChange={(value) => setStatus(value ?? "all")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-
-                  {STATUS_OPTIONS.map((value) => (
-                    <SelectItem key={value} value={value}>
-                      {referralStatusLabel(value)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-end gap-2">
-              <Button onClick={applyFilters}>Terapkan</Button>
-
-              <Button variant="outline" onClick={resetFilters}>
-                Reset
-              </Button>
-            </div>
-          </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={referrals}
+            data={rows}
             getRowId={(row) => String(row.id)}
             emptyMessage="Tidak ada referral untuk filter ini."
+            pageCount={lastPage}
+            pageIndex={state.page - 1}
+            pageSize={state.perPage}
+            total={total}
+            sorting={tq.sorting}
+            onSortingChange={tq.setSorting}
+            onPageChange={tq.setPageIndex}
+            onPageSizeChange={tq.setPerPage}
+            searchValue={tq.searchInput}
+            onSearchChange={tq.setSearchInput}
+            searching={tq.pending}
+            searchPlaceholder="Cari nama pasien atau nomor kunjungan..."
+            toolbar={
+              <>
+                <Select
+                  value={state.filters?.target_department_id ?? "all"}
+                  onValueChange={(value) =>
+                    tq.setFilter(
+                      "target_department_id",
+                      value === "all" ? null : value
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="all">Semua Department</SelectItem>
+
+                    {departments.map((department) => (
+                      <SelectItem
+                        key={department.id}
+                        value={String(department.id)}
+                      >
+                        {department.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={state.filters?.status ?? "all"}
+                  onValueChange={(value) =>
+                    tq.setFilter("status", value === "all" ? null : value)
+                  }
+                >
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="all">Semua Status</SelectItem>
+
+                    {STATUS_OPTIONS.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {referralStatusLabel(value)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            }
           />
         </CardContent>
       </Card>

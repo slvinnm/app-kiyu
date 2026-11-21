@@ -6,17 +6,30 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { StationManager } from "@/components/admin/stations/station-manager"
 
-import { getDepartmentsServer, getStationsServer } from "@/lib/api/admin-server"
+import {
+  getDepartmentsServer,
+  getStationsTableServer,
+} from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { numberFilter, parseTableParams } from "@/lib/table-params"
 
 import type { AdminStation } from "@/types/admin"
-import type { Department } from "@/types/reception"
+import type { Department, Paginated } from "@/types/reception"
+
+const SORTABLE = [
+  "code",
+  "name",
+  "type",
+  "is_active",
+  "department_id",
+  "created_at",
+]
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ department_id?: string | string[] }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const session = await getSession()
 
@@ -25,21 +38,23 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const rawDepartment = Array.isArray(params.department_id)
-    ? params.department_id[0]
-    : params.department_id
-  const parsedDepartment = rawDepartment ? Number(rawDepartment) : Number.NaN
-  const defaultDepartmentId = Number.isInteger(parsedDepartment)
-    ? parsedDepartment
-    : null
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+    filters: ["department_id", "type"],
+  })
 
-  let stations: AdminStation[] = []
+  let stations: Paginated<AdminStation> | null = null
   let departments: Department[] = []
   let error: string | null = null
 
   try {
     ;[stations, departments] = await Promise.all([
-      getStationsServer(),
+      getStationsTableServer({
+        ...table,
+        department_id: numberFilter(filters.department_id),
+        type: filters.type || undefined,
+      }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -54,17 +69,30 @@ export default async function Page({
         icon={<MapPin className="size-5" />}
       />
 
-      {error ? (
+      {error || !stations ? (
         <Alert variant="destructive">
           <AlertTitle>Data station tidak tersedia</AlertTitle>
 
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error ?? "Terjadi kesalahan saat memuat station."}
+          </AlertDescription>
         </Alert>
       ) : (
         <StationManager
-          stations={stations}
+          rows={stations.data}
+          total={stations.total}
+          lastPage={stations.last_page}
           departments={departments}
-          defaultDepartmentId={defaultDepartmentId}
+          filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+            filterKeys: ["department_id", "type"],
+          }}
         />
       )}
     </div>

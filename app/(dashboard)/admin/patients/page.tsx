@@ -9,12 +9,11 @@ import { PatientManager } from "@/components/admin/patients/patient-manager"
 import { getPatientsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { parseTableParams } from "@/lib/table-params"
 
 import type { Paginated, Patient } from "@/types/reception"
 
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value
-}
+const SORTABLE = ["name", "mrn", "nik", "created_at", "id"]
 
 export default async function Page({
   searchParams,
@@ -28,20 +27,16 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const search = first(params.search) ?? ""
-  const rawPage = first(params.page)
-  const parsedPage = rawPage ? Number(rawPage) : 1
-  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+  })
 
   let patients: Paginated<Patient> | null = null
   let error: string | null = null
 
   try {
-    patients = await getPatientsServer({
-      search: search || undefined,
-      page,
-      per_page: 200,
-    })
+    patients = await getPatientsServer({ ...table, ...filters })
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat data pasien.")
   }
@@ -63,7 +58,20 @@ export default async function Page({
           </AlertDescription>
         </Alert>
       ) : (
-        <PatientManager patients={patients.data} search={search} />
+        <PatientManager
+          rows={patients.data}
+          total={patients.total}
+          lastPage={patients.last_page}
+          filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+          }}
+        />
       )}
     </div>
   )

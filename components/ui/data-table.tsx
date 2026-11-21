@@ -20,6 +20,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Columns3Icon,
+  SearchIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -32,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -39,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -84,6 +87,12 @@ export function DataTable<TData extends RowData>({
   total,
   onPageChange,
   onPageSizeChange,
+  sorting,
+  onSortingChange,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Cari…",
+  searching,
   className,
 }: {
   columns: DataTableColumns<TData>
@@ -102,11 +111,27 @@ export function DataTable<TData extends RowData>({
   total?: number
   onPageChange?: (pageIndex: number) => void
   onPageSizeChange?: (pageSize: number) => void
+  /**
+   * Server-side sorting state. When provided the table stops sorting its own
+   * rows (which are only the current page) and asks the parent instead.
+   */
+  sorting?: SortingState
+  onSortingChange?: (sorting: SortingState) => void
+  /**
+   * Server-side search. Passing `onSearchChange` renders a debounced input in
+   * the toolbar (no search button); the parent owns the debounce.
+   */
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  searchPlaceholder?: string
+  /** Shows a spinner inside the search input while a request is in flight. */
+  searching?: boolean
   className?: string
 }) {
   const manual = typeof pageCount === "number"
+  const manualSorting = onSortingChange !== undefined
 
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [clientSorting, setClientSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({})
   const [clientPageSize, setClientPageSize] = React.useState(
@@ -114,13 +139,22 @@ export function DataTable<TData extends RowData>({
   )
   const [clientPageIndex, setClientPageIndex] = React.useState(0)
 
+  const resolvedSorting = sorting ?? clientSorting
+  const resolvedOnSortingChange = onSortingChange ?? setClientSorting
+
   const table = useTable({
     features: dataTableFeatures,
     data,
     columns,
     ...(getRowId ? { getRowId } : {}),
-    state: { sorting, columnVisibility },
-    onSortingChange: setSorting,
+    manualSorting,
+    state: { sorting: resolvedSorting, columnVisibility },
+    onSortingChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(resolvedSorting) : updater
+
+      resolvedOnSortingChange(next)
+    },
     onColumnVisibilityChange: setColumnVisibility,
   })
 
@@ -128,7 +162,7 @@ export function DataTable<TData extends RowData>({
 
   // Client pagination slices the sorted rows; server pagination trusts `data`.
   const effectivePageSize = manual
-    ? rows.length || PAGE_SIZE_OPTIONS[0]
+    ? (pageSize ?? (rows.length || PAGE_SIZE_OPTIONS[0]))
     : clientPageSize
   const effectivePageIndex = manual ? 0 : clientPageIndex
   const pageRows = manual
@@ -166,13 +200,33 @@ export function DataTable<TData extends RowData>({
   }
 
   const showToolbar =
-    toolbar !== undefined || table.getAllLeafColumns().length > 0
+    toolbar !== undefined ||
+    onSearchChange !== undefined ||
+    table.getAllLeafColumns().length > 0
 
   return (
     <div className={className}>
       {showToolbar && (
         <div className="flex flex-col gap-2 px-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 flex-wrap items-center gap-2">
+            {onSearchChange !== undefined && (
+              <div className="relative w-full sm:max-w-xs">
+                <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+
+                <Input
+                  value={searchValue ?? ""}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="pl-8"
+                  aria-label={searchPlaceholder}
+                />
+
+                {searching && (
+                  <Spinner className="absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                )}
+              </div>
+            )}
+
             {toolbar}
           </div>
 

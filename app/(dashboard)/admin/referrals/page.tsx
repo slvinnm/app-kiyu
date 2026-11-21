@@ -12,13 +12,12 @@ import {
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { numberFilter, parseTableParams } from "@/lib/table-params"
 
 import type { Referral } from "@/types/admin"
 import type { Department, Paginated } from "@/types/reception"
 
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value
-}
+const SORTABLE = ["status", "priority", "created_at", "id"]
 
 export default async function Page({
   searchParams,
@@ -32,18 +31,11 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const rawDepartment = first(params.target_department_id)
-  const rawPage = first(params.page)
-  const parsedDepartment = rawDepartment ? Number(rawDepartment) : Number.NaN
-  const parsedPage = rawPage ? Number(rawPage) : 1
-
-  const filters = {
-    target_department_id: Number.isInteger(parsedDepartment)
-      ? parsedDepartment
-      : undefined,
-    status: first(params.status) || undefined,
-    page: Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1,
-  }
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+    filters: ["target_department_id", "status"],
+  })
 
   let referrals: Paginated<Referral> | null = null
   let departments: Department[] = []
@@ -51,7 +43,11 @@ export default async function Page({
 
   try {
     ;[referrals, departments] = await Promise.all([
-      getReferralsServer({ ...filters, per_page: 200 }),
+      getReferralsServer({
+        ...table,
+        target_department_id: numberFilter(filters.target_department_id),
+        status: filters.status,
+      }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -76,9 +72,20 @@ export default async function Page({
         </Alert>
       ) : (
         <ReferralManager
-          referrals={referrals.data}
-          departments={departments}
+          rows={referrals.data}
+          total={referrals.total}
+          lastPage={referrals.last_page}
           filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+            filterKeys: ["target_department_id", "status"],
+          }}
+          departments={departments}
         />
       )}
     </div>

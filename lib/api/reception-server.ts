@@ -54,3 +54,31 @@ export async function getPatientServer(id: number): Promise<PatientDetail> {
 
   return response.data
 }
+
+/**
+ * Paginated patient directory for the receptionist workspace. The API does the
+ * searching and sorting; the browser only ever receives the current page.
+ */
+export async function getPatientsTableServer(filters: {
+  search?: string
+  sort?: string
+  direction?: "asc" | "desc"
+  page?: number
+  per_page?: number
+}): Promise<Paginated<Patient>> {
+  const params = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== "") {
+      params.set(key, String(value))
+    }
+  }
+
+  const query = params.toString()
+
+  const response = await serverApiFetch<{ data: Paginated<Patient> }>(
+    `/patients${query ? `?${query}` : ""}`
+  )
+
+  return response.data
+}

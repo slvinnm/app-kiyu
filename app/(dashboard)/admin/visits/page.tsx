@@ -9,12 +9,18 @@ import { VisitManager } from "@/components/admin/visits/visit-manager"
 import { getDepartmentsServer, getVisitsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { numberFilter, parseTableParams } from "@/lib/table-params"
 
 import type { Department, Paginated, Visit } from "@/types/reception"
 
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value
-}
+const SORTABLE = [
+  "visit_number",
+  "status",
+  "priority",
+  "intake_channel",
+  "created_at",
+  "id",
+]
 
 export default async function Page({
   searchParams,
@@ -28,19 +34,11 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const rawDepartment = first(params.department_id)
-  const rawPage = first(params.page)
-  const parsedDepartment = rawDepartment ? Number(rawDepartment) : Number.NaN
-  const parsedPage = rawPage ? Number(rawPage) : 1
-
-  const filters = {
-    department_id: Number.isInteger(parsedDepartment)
-      ? parsedDepartment
-      : undefined,
-    status: first(params.status) || undefined,
-    date: first(params.date) || undefined,
-    page: Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1,
-  }
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+    filters: ["department_id", "status", "date"],
+  })
 
   let visits: Paginated<Visit> | null = null
   let departments: Department[] = []
@@ -48,7 +46,12 @@ export default async function Page({
 
   try {
     ;[visits, departments] = await Promise.all([
-      getVisitsServer({ ...filters, per_page: 200 }),
+      getVisitsServer({
+        ...table,
+        department_id: numberFilter(filters.department_id),
+        status: filters.status,
+        date: filters.date,
+      }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -73,9 +76,20 @@ export default async function Page({
         </Alert>
       ) : (
         <VisitManager
-          visits={visits.data}
-          departments={departments}
+          rows={visits.data}
+          total={visits.total}
+          lastPage={visits.last_page}
           filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+            filterKeys: ["department_id", "status", "date"],
+          }}
+          departments={departments}
           actorEmail={session.user.email}
         />
       )}

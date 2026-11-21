@@ -127,20 +127,26 @@ export type PatientPayload = {
 }
 
 export type VisitFilters = {
+  search?: string
   department_id?: number
   status?: string
   patient_id?: number
   intake_channel?: string
   date?: string
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
 }
 
 export type AuditFilters = {
+  search?: string
   action?: string
   entity_type?: string
   entity_id?: string
   user_id?: string
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
 }
@@ -149,18 +155,41 @@ export type PatientFilters = {
   search?: string
   nik?: string
   mrn?: string
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
 }
 
 export type TicketFilters = {
+  search?: string
   station_id?: number
   status?: string
   visit_id?: number
   priority?: Priority
   date?: string
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
+}
+
+/** Filters for master-data tables that are paginated on request. */
+export type DepartmentFilters = {
+  search?: string
+  sort?: string
+  direction?: "asc" | "desc"
+  page?: number
+  per_page?: number
+}
+
+export type StationListFilters = DepartmentFilters & {
+  department_id?: number
+  type?: string
+}
+
+export type WorkflowListFilters = DepartmentFilters & {
+  department_id?: number
 }
 
 export type AdminUser = {
@@ -190,6 +219,8 @@ export type UserFilters = {
   role?: string
   department_id?: number
   station_id?: number
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
 }
@@ -217,9 +248,12 @@ export type ReferralDetail = Referral & {
 }
 
 export type ReferralFilters = {
+  search?: string
   source_visit_id?: number
   target_department_id?: number
   status?: string
+  sort?: string
+  direction?: "asc" | "desc"
   page?: number
   per_page?: number
 }

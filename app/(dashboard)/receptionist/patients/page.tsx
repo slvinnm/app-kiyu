@@ -1,10 +1,46 @@
+import { redirect } from "next/navigation"
 import { UsersIcon } from "lucide-react"
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 
 import { PatientDirectory } from "@/components/receptionist/patients/patient-directory"
 
-export default function Page() {
+import { getApiErrorMessage } from "@/lib/api/error"
+import { getPatientsTableServer } from "@/lib/api/reception-server"
+import { getSession } from "@/lib/auth/session"
+import { parseTableParams } from "@/lib/table-params"
+
+import type { Paginated, Patient } from "@/types/reception"
+
+const SORTABLE = ["name", "mrn", "nik", "created_at", "id"]
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const session = await getSession()
+
+  if (!session?.user?.role) {
+    redirect("/login")
+  }
+
+  const params = await searchParams
+  const { table } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+  })
+
+  let patients: Paginated<Patient> | null = null
+  let error: string | null = null
+
+  try {
+    patients = await getPatientsTableServer(table)
+  } catch (cause) {
+    error = getApiErrorMessage(cause, "Gagal memuat data pasien.")
+  }
+
   return (
     <div className="mx-auto w-full p-4 md:p-6 lg:p-8">
       <div className="mb-6 flex flex-col gap-2">
@@ -31,7 +67,28 @@ export default function Page() {
         </div>
       </div>
 
-      <PatientDirectory />
+      {error || !patients ? (
+        <Alert variant="destructive">
+          <AlertTitle>Data pasien tidak tersedia</AlertTitle>
+
+          <AlertDescription>
+            {error ?? "Terjadi kesalahan saat memuat pasien."}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <PatientDirectory
+          rows={patients.data}
+          total={patients.total}
+          lastPage={patients.last_page}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+          }}
+        />
+      )}
     </div>
   )
 }

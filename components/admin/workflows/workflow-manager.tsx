@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRightIcon, PlusIcon, SearchIcon } from "lucide-react"
+import { ArrowRightIcon, PlusIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -18,7 +18,6 @@ import {
   DataTable,
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -29,46 +28,37 @@ import {
 
 import { WorkflowFormDialog } from "@/components/admin/workflows/workflow-form-dialog"
 
+import { useTableQuery } from "@/hooks/use-table-query"
+
 import type { Workflow } from "@/types/admin"
 import type { Department } from "@/types/reception"
+import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<Workflow>()
 
 export function WorkflowManager({
-  workflows,
+  rows,
+  total,
+  lastPage,
   departments,
-  defaultDepartmentId,
+  state,
 }: {
-  workflows: Workflow[]
+  rows: Workflow[]
+  total: number
+  lastPage: number
   departments: Department[]
-  defaultDepartmentId: number | null
+  filters: Record<string, string>
+  state: TableQueryState
 }) {
   const router = useRouter()
-  const [query, setQuery] = useState("")
-  const [departmentFilter, setDepartmentFilter] = useState(
-    defaultDepartmentId ? String(defaultDepartmentId) : "all"
-  )
+  const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const filtered = useMemo(() => {
-    const keyword = query.trim().toLowerCase()
-
-    return workflows.filter((workflow) => {
-      const matchesDepartment =
-        departmentFilter === "all" ||
-        workflow.department_id === Number(departmentFilter)
-
-      if (!matchesDepartment) {
-        return false
-      }
-
-      if (!keyword) {
-        return true
-      }
-
-      return workflow.name.toLowerCase().includes(keyword)
-    })
-  }, [workflows, query, departmentFilter])
+  const departmentFilter = state.filters?.department_id ?? "all"
+  const parsedDepartment = Number(departmentFilter)
+  const defaultDepartmentId = Number.isInteger(parsedDepartment)
+    ? parsedDepartment
+    : null
 
   const columns = useMemo(
     () =>
@@ -87,11 +77,13 @@ export function WorkflowManager({
             departments.find((d) => d.id === row.original.department_id)
               ?.name ??
             "-",
+          enableSorting: false,
         }),
         columnHelper.display({
           id: "steps",
           header: "Langkah",
           cell: ({ row }) => row.original.steps?.length ?? 0,
+          enableSorting: false,
         }),
         columnHelper.accessor("is_active", {
           header: "Status",
@@ -118,6 +110,7 @@ export function WorkflowManager({
               </Link>
             </div>
           ),
+          enableSorting: false,
         }),
       ]),
     [departments]
@@ -141,46 +134,54 @@ export function WorkflowManager({
               Tambah Workflow
             </Button>
           </div>
-
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <div className="relative max-w-sm flex-1">
-              <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Cari nama workflow..."
-                className="h-9 pl-9"
-              />
-            </div>
-
-            <Select
-              value={departmentFilter}
-              onValueChange={(value) => setDepartmentFilter(value ?? "all")}
-            >
-              <SelectTrigger className="w-full sm:w-[220px]">
-                <SelectValue />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="all">Semua Poli</SelectItem>
-
-                {departments.map((department) => (
-                  <SelectItem key={department.id} value={String(department.id)}>
-                    {department.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <DataTable
             columns={columns}
-            data={filtered}
+            data={rows}
             getRowId={(workflow) => String(workflow.id)}
             emptyMessage="Workflow tidak ditemukan. Poli tanpa workflow tidak dapat menerima kunjungan."
+            pageCount={lastPage}
+            pageIndex={state.page - 1}
+            pageSize={state.perPage}
+            total={total}
+            sorting={tq.sorting}
+            onSortingChange={tq.setSorting}
+            onPageChange={tq.setPageIndex}
+            onPageSizeChange={tq.setPerPage}
+            searchValue={tq.searchInput}
+            onSearchChange={tq.setSearchInput}
+            searching={tq.pending}
+            searchPlaceholder="Cari nama workflow..."
+            toolbar={
+              <Select
+                value={departmentFilter}
+                onValueChange={(value) =>
+                  tq.setFilter(
+                    "department_id",
+                    !value || value === "all" ? null : value
+                  )
+                }
+              >
+                <SelectTrigger className="w-full sm:w-[220px]">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="all">Semua Poli</SelectItem>
+
+                  {departments.map((department) => (
+                    <SelectItem
+                      key={department.id}
+                      value={String(department.id)}
+                    >
+                      {department.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            }
           />
         </CardContent>
       </Card>
@@ -189,9 +190,7 @@ export function WorkflowManager({
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         departments={departments}
-        defaultDepartmentId={
-          departmentFilter === "all" ? null : Number(departmentFilter)
-        }
+        defaultDepartmentId={defaultDepartmentId}
         onSaved={() => router.refresh()}
       />
     </>

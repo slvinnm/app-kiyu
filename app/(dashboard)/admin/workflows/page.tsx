@@ -8,18 +8,21 @@ import { WorkflowManager } from "@/components/admin/workflows/workflow-manager"
 
 import {
   getDepartmentsServer,
-  getWorkflowsServer,
+  getWorkflowsTableServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
+import { numberFilter, parseTableParams } from "@/lib/table-params"
 
 import type { Workflow } from "@/types/admin"
-import type { Department } from "@/types/reception"
+import type { Department, Paginated } from "@/types/reception"
+
+const SORTABLE = ["name", "is_active", "department_id", "created_at"]
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ department_id?: string | string[] }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const session = await getSession()
 
@@ -28,21 +31,22 @@ export default async function Page({
   }
 
   const params = await searchParams
-  const rawDepartment = Array.isArray(params.department_id)
-    ? params.department_id[0]
-    : params.department_id
-  const parsedDepartment = rawDepartment ? Number(rawDepartment) : Number.NaN
-  const defaultDepartmentId = Number.isInteger(parsedDepartment)
-    ? parsedDepartment
-    : null
+  const { table, filters } = parseTableParams(params, {
+    sortable: SORTABLE,
+    defaultPerPage: 10,
+    filters: ["department_id"],
+  })
 
-  let workflows: Workflow[] = []
+  let workflows: Paginated<Workflow> | null = null
   let departments: Department[] = []
   let error: string | null = null
 
   try {
     ;[workflows, departments] = await Promise.all([
-      getWorkflowsServer(),
+      getWorkflowsTableServer({
+        ...table,
+        department_id: numberFilter(filters.department_id),
+      }),
       getDepartmentsServer(),
     ])
   } catch (cause) {
@@ -57,17 +61,30 @@ export default async function Page({
         icon={<GitBranch className="size-5" />}
       />
 
-      {error ? (
+      {error || !workflows ? (
         <Alert variant="destructive">
           <AlertTitle>Workflow tidak tersedia</AlertTitle>
 
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error ?? "Terjadi kesalahan saat memuat workflow."}
+          </AlertDescription>
         </Alert>
       ) : (
         <WorkflowManager
-          workflows={workflows}
+          rows={workflows.data}
+          total={workflows.total}
+          lastPage={workflows.last_page}
           departments={departments}
-          defaultDepartmentId={defaultDepartmentId}
+          filters={filters}
+          state={{
+            search: table.search ?? "",
+            page: table.page,
+            perPage: table.per_page,
+            sort: table.sort ?? "",
+            direction: table.direction,
+            filters,
+            filterKeys: ["department_id"],
+          }}
         />
       )}
     </div>
