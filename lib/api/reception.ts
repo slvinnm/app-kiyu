@@ -4,19 +4,14 @@ import type {
   ApiResponse,
   CompleteRegistrationPatientData,
   CompleteRegistrationResult,
-  Department,
   ManualIntakeResult,
-  Paginated,
   PaginatedResponse,
   Patient,
   PatientDetail,
   Priority,
   QueueAcquisition,
-  QueueAcquisitionStatus,
   QueueTicket,
   ReceptionQueueSnapshot,
-  Visit,
-  VisitDetail,
 } from "@/types/reception"
 
 type QueryValue = string | number | boolean | null | undefined
@@ -45,18 +40,6 @@ function postJson<T>(path: string, body: unknown): Promise<T> {
     },
     body: JSON.stringify(body),
   })
-}
-
-/* -------------------------------------------------------------------------- */
-/* Organization                                                               */
-/* -------------------------------------------------------------------------- */
-
-export function getActiveDepartments(signal?: AbortSignal) {
-  return apiFetch<{ data: Department[] }>("/departments/active", { signal })
-}
-
-export function getAllDepartments(signal?: AbortSignal) {
-  return apiFetch<{ data: Department[] }>("/departments", { signal })
 }
 
 /* -------------------------------------------------------------------------- */
@@ -137,25 +120,17 @@ export function completeRegistration(payload: CompleteRegistrationPayload) {
 /* Visits & acquisitions                                                      */
 /* -------------------------------------------------------------------------- */
 
-export function getVisitDetail(visitId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<VisitDetail>>(`/visits/${visitId}`, { signal })
-}
-
-export type QueueAcquisitionFilters = {
-  channel?: "MANUAL" | "KIOSK" | "ONLINE"
-  status?: QueueAcquisitionStatus
-  department_id?: number
-  date?: string
-  page?: number
-  per_page?: number
-}
-
-export function getQueueAcquisitions(
-  filters: QueueAcquisitionFilters = {},
+/**
+ * The acquisition awaiting registration for a visit. This is a dedicated
+ * visit sub-resource; `/queue-acquisitions` is the management list and is not
+ * meant to be used as a lookup.
+ */
+export function getVisitAcquisition(
+  visitId: number,
   signal?: AbortSignal
 ) {
-  return apiFetch<ApiResponse<Paginated<QueueAcquisition>>>(
-    `/queue-acquisitions${toQuery(filters)}`,
+  return apiFetch<ApiResponse<QueueAcquisition | null>>(
+    `/visits/${visitId}/acquisition`,
     { signal }
   )
 }
@@ -181,12 +156,6 @@ export function searchPatients(
 
 export function getPatient(patientId: number, signal?: AbortSignal) {
   return apiFetch<ApiResponse<PatientDetail>>(`/patients/${patientId}`, {
-    signal,
-  })
-}
-
-export function getPatientVisits(patientId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<Visit[]>>(`/patients/${patientId}/visits`, {
     signal,
   })
 }

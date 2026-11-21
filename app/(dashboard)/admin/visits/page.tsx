@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { VisitManager } from "@/components/admin/visits/visit-manager"
 
-import { getDepartmentsServer, getVisitsServer } from "@/lib/api/admin-server"
+import { getDepartmentOptionsServer, getVisitsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 import { numberFilter, parseTableParams } from "@/lib/table-params"
@@ -52,7 +52,7 @@ export default async function Page({
         status: filters.status,
         date: filters.date,
       }),
-      getDepartmentsServer(),
+      getDepartmentOptionsServer(),
     ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat kunjungan.")

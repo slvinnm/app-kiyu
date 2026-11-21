@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { WorkflowDetail } from "@/components/admin/workflows/workflow-detail"
 
-import { getStationsServer, getWorkflowServer } from "@/lib/api/admin-server"
+import { getStationOptionsServer, getWorkflowServer } from "@/lib/api/admin-server"
 import { ApiError, getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 
@@ -65,7 +65,7 @@ export default async function Page({
   let stations: AdminStation[] = []
 
   try {
-    stations = await getStationsServer({
+    stations = await getStationOptionsServer({
       department_id: workflow.department_id,
     })
   } catch {

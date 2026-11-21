@@ -45,9 +45,10 @@ export function getStations(
 
   const query = search.toString()
 
-  return apiFetch<{ data: Station[] }>(`/stations${query ? `?${query}` : ""}`, {
-    signal,
-  })
+  return apiFetch<{ data: Station[] }>(
+    `/stations/options${query ? `?${query}` : ""}`,
+    { signal }
+  )
 }
 
 /* -------------------------------------------------------------------------- */

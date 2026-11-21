@@ -1,55 +1,22 @@
 import { apiFetch } from "@/lib/api/client"
 
-import type {
-  Department,
-  Paginated,
-  Patient,
-  QueueTicket,
-  Visit,
-} from "@/types/reception"
+import type { Department, Patient, Visit } from "@/types/reception"
 import type {
   AdminStation,
   AdminUser,
   AdminVisitDetail,
-  AuditFilters,
-  AuditLog,
   CreateReferralPayload,
   CreateReferralResult,
   DepartmentPayload,
-  PatientFilters,
   PatientPayload,
-  PublicQueueStation,
-  Referral,
   ReferralDetail,
-  ReferralFilters,
   StationPayload,
-  TicketFilters,
-  UserFilters,
   UserPayload,
-  VisitFilters,
   Workflow,
   WorkflowPayload,
   WorkflowStep,
   WorkflowStepPayload,
 } from "@/types/admin"
-
-type QueryValue = string | number | boolean | null | undefined
-
-function toQuery(params: Record<string, QueryValue>): string {
-  const search = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === null || value === "") {
-      continue
-    }
-
-    search.set(key, String(value))
-  }
-
-  const query = search.toString()
-
-  return query ? `?${query}` : ""
-}
 
 function sendJson<T>(
   path: string,
@@ -66,10 +33,6 @@ function sendJson<T>(
 /* -------------------------------------------------------------------------- */
 /* Departments                                                                */
 /* -------------------------------------------------------------------------- */
-
-export function getDepartments(signal?: AbortSignal) {
-  return apiFetch<{ data: Department[] }>("/departments", { signal })
-}
 
 export function createDepartment(payload: DepartmentPayload) {
   return sendJson<{ message: string; data: Department }>(
@@ -91,15 +54,6 @@ export function updateDepartment(id: number, payload: DepartmentPayload) {
 /* Stations                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export function getStations(
-  filters: { department_id?: number; type?: string } = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: AdminStation[] }>(`/stations${toQuery(filters)}`, {
-    signal,
-  })
-}
-
 export function createStation(payload: StationPayload) {
   return sendJson<{ message: string; data: AdminStation }>(
     "/stations",
@@ -120,25 +74,12 @@ export function updateStation(id: number, payload: StationPayload) {
 /* Workflows & steps                                                          */
 /* -------------------------------------------------------------------------- */
 
-export function getWorkflows(
-  filters: { department_id?: number } = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: Workflow[] }>(`/workflows${toQuery(filters)}`, {
-    signal,
-  })
-}
-
 export function createWorkflow(payload: WorkflowPayload) {
   return sendJson<{ message: string; data: Workflow }>(
     "/workflows",
     "POST",
     payload
   )
-}
-
-export function getWorkflow(id: number, signal?: AbortSignal) {
-  return apiFetch<{ data: Workflow }>(`/workflows/${id}`, { signal })
 }
 
 export function addWorkflowStep(
@@ -171,16 +112,6 @@ export function deleteWorkflowStep(stepId: number) {
 /* Patients                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export function getPatients(
-  filters: PatientFilters = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: Paginated<Patient> }>(
-    `/patients${toQuery(filters)}`,
-    { signal }
-  )
-}
-
 export function createPatient(payload: PatientPayload) {
   return sendJson<{ message: string; data: Patient }>(
     "/patients",
@@ -200,12 +131,6 @@ export function updatePatient(id: number, payload: PatientPayload) {
 /* -------------------------------------------------------------------------- */
 /* Visits                                                                     */
 /* -------------------------------------------------------------------------- */
-
-export function getVisits(filters: VisitFilters = {}, signal?: AbortSignal) {
-  return apiFetch<{ data: Paginated<Visit> }>(`/visits${toQuery(filters)}`, {
-    signal,
-  })
-}
 
 export function getVisitDetail(id: number, signal?: AbortSignal) {
   return apiFetch<{ data: AdminVisitDetail }>(`/visits/${id}`, { signal })
@@ -234,46 +159,8 @@ export function cancelVisit(
 }
 
 /* -------------------------------------------------------------------------- */
-/* Tickets & queues                                                           */
-/* -------------------------------------------------------------------------- */
-
-export function getTickets(filters: TicketFilters = {}, signal?: AbortSignal) {
-  return apiFetch<{ data: Paginated<QueueTicket> }>(
-    `/tickets${toQuery(filters)}`,
-    { signal }
-  )
-}
-
-export function getPublicQueue(
-  filters: { station_id?: number; department_id?: number } = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: PublicQueueStation[] }>(
-    `/public/queue${toQuery(filters)}`,
-    { signal }
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* Audit logs                                                                 */
-/* -------------------------------------------------------------------------- */
-
-export function getAuditLogs(filters: AuditFilters = {}, signal?: AbortSignal) {
-  return apiFetch<{ data: Paginated<AuditLog> }>(
-    `/audit-logs${toQuery(filters)}`,
-    { signal }
-  )
-}
-
-/* -------------------------------------------------------------------------- */
 /* Staff users                                                                */
 /* -------------------------------------------------------------------------- */
-
-export function getUsers(filters: UserFilters = {}, signal?: AbortSignal) {
-  return apiFetch<{ data: Paginated<AdminUser> }>(`/users${toQuery(filters)}`, {
-    signal,
-  })
-}
 
 export function createUser(payload: UserPayload) {
   return sendJson<{ message: string; data: AdminUser }>(
@@ -298,16 +185,6 @@ export function deleteUser(id: number) {
 /* -------------------------------------------------------------------------- */
 /* Referrals                                                                  */
 /* -------------------------------------------------------------------------- */
-
-export function getReferrals(
-  filters: ReferralFilters = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<{ data: Paginated<Referral> }>(
-    `/referrals${toQuery(filters)}`,
-    { signal }
-  )
-}
 
 export function getReferral(id: number, signal?: AbortSignal) {
   return apiFetch<{ data: ReferralDetail }>(`/referrals/${id}`, { signal })

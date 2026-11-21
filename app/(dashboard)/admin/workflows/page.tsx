@@ -7,7 +7,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { WorkflowManager } from "@/components/admin/workflows/workflow-manager"
 
 import {
-  getDepartmentsServer,
+  getDepartmentOptionsServer,
   getWorkflowsTableServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -47,7 +47,7 @@ export default async function Page({
         ...table,
         department_id: numberFilter(filters.department_id),
       }),
-      getDepartmentsServer(),
+      getDepartmentOptionsServer(),
     ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat workflow.")

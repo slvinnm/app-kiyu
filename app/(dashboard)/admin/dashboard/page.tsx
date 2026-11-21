@@ -27,24 +27,19 @@ import { AdminStatCard } from "@/components/admin/admin-stat-card"
 
 import {
   getAuditLogsServer,
-  getDepartmentsServer,
-  getPatientsServer,
-  getTicketsServer,
-  getVisitsServer,
-  getWorkflowsServer,
+  getDepartmentOptionsServer,
+  getPatientStatisticsServer,
+  getTicketStatisticsServer,
+  getVisitStatisticsServer,
+  getWorkflowStatisticsServer,
 } from "@/lib/api/admin-server"
+import type { CountStatistics } from "@/lib/api/admin-server"
 import { todayJakarta } from "@/lib/admin/date"
 import { getSession } from "@/lib/auth/session"
 import { formatDateTime } from "@/lib/reception/format"
 
-import type { AuditLog, Workflow } from "@/types/admin"
-import type {
-  Department,
-  Paginated,
-  Patient,
-  QueueTicket,
-  Visit,
-} from "@/types/reception"
+import type { AuditLog } from "@/types/admin"
+import type { Department, Paginated } from "@/types/reception"
 
 function metadataText(metadata: unknown): string {
   if (metadata === null || metadata === undefined) {
@@ -68,12 +63,12 @@ export default async function Page() {
   }
 
   const results = await Promise.allSettled([
-    getDepartmentsServer(),
-    getWorkflowsServer(),
-    getPatientsServer({ per_page: 1 }),
-    getVisitsServer({ date: todayJakarta(), per_page: 1 }),
-    getTicketsServer({ status: "CREATED", per_page: 1 }),
-    getTicketsServer({ status: "IN_PROGRESS", per_page: 1 }),
+    getDepartmentOptionsServer(),
+    getWorkflowStatisticsServer(),
+    getPatientStatisticsServer(),
+    getVisitStatisticsServer({ date: todayJakarta() }),
+    getTicketStatisticsServer({ status: "CREATED" }),
+    getTicketStatisticsServer({ status: "IN_PROGRESS" }),
     getAuditLogsServer({ per_page: 5 }),
   ])
 
@@ -84,17 +79,17 @@ export default async function Page() {
   }
 
   const departments = value<Department[]>(0)
-  const workflows = value<Workflow[]>(1)
-  const patients = value<Paginated<Patient>>(2)
-  const visitsToday = value<Paginated<Visit>>(3)
-  const waiting = value<Paginated<QueueTicket>>(4)
-  const inProgress = value<Paginated<QueueTicket>>(5)
+  const workflowCount = value<CountStatistics>(1)
+  const patientCount = value<CountStatistics>(2)
+  const visitsToday = value<CountStatistics>(3)
+  const waiting = value<CountStatistics>(4)
+  const inProgress = value<CountStatistics>(5)
   const auditLogs = value<Paginated<AuditLog>>(6)
 
   const failed = results.filter((result) => result.status === "rejected").length
   const stationCount =
     departments?.reduce(
-      (total, department) => total + (department.stations?.length ?? 0),
+      (total, department) => total + (department.stations_count ?? 0),
       0
     ) ?? null
 
@@ -132,13 +127,13 @@ export default async function Page() {
 
         <AdminStatCard
           label="Workflow"
-          value={workflows?.length ?? null}
+          value={workflowCount?.total ?? null}
           icon={<GitBranch className="size-4" />}
         />
 
         <AdminStatCard
           label="Pasien"
-          value={patients?.total ?? null}
+          value={patientCount?.total ?? null}
           icon={<Users className="size-4" />}
         />
       </div>
@@ -251,7 +246,7 @@ export default async function Page() {
                       </p>
 
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {department.code} · {department.stations?.length ?? 0}{" "}
+                        {department.code} · {department.stations_count ?? 0}{" "}
                         station
                       </p>
                     </div>

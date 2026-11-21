@@ -7,7 +7,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { ReferralManager } from "@/components/admin/referrals/referral-manager"
 
 import {
-  getDepartmentsServer,
+  getDepartmentOptionsServer,
   getReferralsServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -48,7 +48,7 @@ export default async function Page({
         target_department_id: numberFilter(filters.target_department_id),
         status: filters.status,
       }),
-      getDepartmentsServer(),
+      getDepartmentOptionsServer(),
     ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat referral.")

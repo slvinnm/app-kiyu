@@ -7,7 +7,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { StationManager } from "@/components/admin/stations/station-manager"
 
 import {
-  getDepartmentsServer,
+  getDepartmentOptionsServer,
   getStationsTableServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -55,7 +55,7 @@ export default async function Page({
         department_id: numberFilter(filters.department_id),
         type: filters.type || undefined,
       }),
-      getDepartmentsServer(),
+      getDepartmentOptionsServer(),
     ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat data station.")

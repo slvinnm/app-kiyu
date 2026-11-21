@@ -69,6 +69,7 @@ export type Department = {
   is_active: boolean
   display_in_kiosk?: boolean
   stations?: Station[]
+  stations_count?: number
 }
 
 export type Patient = {

@@ -174,7 +174,7 @@ export type TicketFilters = {
   per_page?: number
 }
 
-/** Filters for master-data tables that are paginated on request. */
+/** Filters for the master-data table endpoints (paginated by the API). */
 export type DepartmentFilters = {
   search?: string
   sort?: string

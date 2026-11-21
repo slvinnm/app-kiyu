@@ -7,8 +7,8 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { UserManager } from "@/components/admin/users/user-manager"
 
 import {
-  getDepartmentsServer,
-  getStationsServer,
+  getDepartmentOptionsServer,
+  getStationOptionsServer,
   getUsersServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -46,8 +46,8 @@ export default async function Page({
   try {
     ;[users, departments, stations] = await Promise.all([
       getUsersServer({ ...table, ...filters }),
-      getDepartmentsServer(),
-      getStationsServer(),
+      getDepartmentOptionsServer(),
+      getStationOptionsServer(),
     ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat pengguna.")
