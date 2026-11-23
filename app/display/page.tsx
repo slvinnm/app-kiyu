@@ -1,3 +1,4 @@
+import { DisplayGate } from "@/components/display/display-gate"
 import { PublicDisplay } from "@/components/display/public-display"
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 }
 
 export default function DisplayPage() {
-  return <PublicDisplay />
+  return (
+    <DisplayGate>
+      <PublicDisplay />
+    </DisplayGate>
+  )
 }

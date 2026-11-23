@@ -6,6 +6,7 @@ import type {
   ApiResponse,
   Client,
   Department,
+  DisplayDevice,
   Facility,
   KioskDevice,
   QueueTicket,
@@ -278,7 +279,7 @@ export type KioskDeviceInput = {
 
 export type KioskDeviceCreated = {
   device: KioskDevice
-  credential: string
+  pairing_code: string
 }
 
 export function createKioskDevice(input: KioskDeviceInput) {
@@ -292,6 +293,49 @@ export function deleteKioskDevice(id: number) {
   return apiFetch<ApiResponse<null>>(`/kiosk-devices/${id}`, {
     method: "DELETE",
   })
+}
+
+/** Issue a fresh pairing code for a device that has not finished onboarding. */
+export function reissueKioskPairingCode(id: number) {
+  return apiFetch<ApiResponse<KioskDeviceCreated>>(
+    `/kiosk-devices/${id}/pairing-code`,
+    { method: "POST" }
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Display devices                                                            */
+/* -------------------------------------------------------------------------- */
+
+export type DisplayDeviceInput = {
+  name: string
+  expires_at?: string
+}
+
+export type DisplayDeviceCreated = {
+  device: DisplayDevice
+  pairing_code: string
+}
+
+export function createDisplayDevice(input: DisplayDeviceInput) {
+  return apiFetch<ApiResponse<DisplayDeviceCreated>>("/display-devices", {
+    method: "POST",
+    body: JSON.stringify(input),
+  })
+}
+
+export function deleteDisplayDevice(id: number) {
+  return apiFetch<ApiResponse<null>>(`/display-devices/${id}`, {
+    method: "DELETE",
+  })
+}
+
+/** Issue a fresh pairing code for a screen that has not finished onboarding. */
+export function reissueDisplayPairingCode(id: number) {
+  return apiFetch<ApiResponse<DisplayDeviceCreated>>(
+    `/display-devices/${id}/pairing-code`,
+    { method: "POST" }
+  )
 }
 
 /* -------------------------------------------------------------------------- */

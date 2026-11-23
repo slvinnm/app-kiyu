@@ -1,4 +1,5 @@
 import { DepartmentDisplay } from "@/components/display/department-display"
+import { DisplayGate } from "@/components/display/display-gate"
 
 export const metadata = {
   title: "Antrian Departemen · Kiyu",
@@ -11,5 +12,9 @@ export default async function DepartmentDisplayPage({
 }) {
   const { code } = await params
 
-  return <DepartmentDisplay departmentCode={code} />
+  return (
+    <DisplayGate>
+      <DepartmentDisplay departmentCode={code} />
+    </DisplayGate>
+  )
 }

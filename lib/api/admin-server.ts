@@ -8,6 +8,7 @@ import type {
   AuditLog,
   Client,
   Department,
+  DisplayDevice,
   Facility,
   KioskDevice,
   Paginated,
@@ -51,6 +52,13 @@ export async function getFacilitiesServer(): Promise<Facility[]> {
 export async function getKioskDevicesServer(): Promise<KioskDevice[]> {
   const response = await serverApiFetch<{ data: KioskDevice[] }>(
     "/kiosk-devices"
+  )
+  return response.data
+}
+
+export async function getDisplayDevicesServer(): Promise<DisplayDevice[]> {
+  const response = await serverApiFetch<{ data: DisplayDevice[] }>(
+    "/display-devices"
   )
   return response.data
 }

@@ -1,4 +1,4 @@
-import { kioskHeaders, publicHeaders } from "@/lib/public-headers"
+import { kioskHeaders } from "@/lib/public-headers"
 
 import type {
   ApiResponse,
@@ -15,6 +15,20 @@ if (!API_BASE_URL) {
 }
 
 const DEFAULT_TIMEOUT = 15_000
+
+/**
+ * The API answered but rejected the request. Kiosk callers branch on `status`
+ * to tell "credential revoked" (403) from ordinary failures.
+ */
+export class KioskApiError extends Error {
+  status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.name = "KioskApiError"
+    this.status = status
+  }
+}
 
 async function request<T>(
   input: RequestInfo | URL,
@@ -40,7 +54,10 @@ async function request<T>(
     const payload = await response.json().catch(() => null)
 
     if (!response.ok) {
-      throw new Error(payload?.message ?? "Terjadi kesalahan pada server.")
+      throw new KioskApiError(
+        response.status,
+        payload?.message ?? "Terjadi kesalahan pada server."
+      )
     }
 
     if (
@@ -71,10 +88,34 @@ async function request<T>(
 
 export const SUCCESS_RESET_DELAY = 10
 
+export type KioskPairingResult = {
+  credential: string
+  device: {
+    id: number
+    name: string
+    tenant: { id: number; name: string; slug: string }
+    facility: { id: number; name: string; code: string | null }
+  }
+}
+
+/**
+ * Redeem a pairing code for a device credential. Called from the onboarding
+ * screen; the credential is stored locally and never sent anywhere else.
+ */
+export async function pairKioskDevice(
+  pairingCode: string
+): Promise<ApiResponse<KioskPairingResult>> {
+  return request<KioskPairingResult>(`${API_BASE_URL}/kiosk/pair`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pairing_code: pairingCode }),
+  })
+}
+
 export async function getDepartments(): Promise<Department[]> {
   const response = await request<Department[]>(
     `${API_BASE_URL}/departments/active`,
-    { method: "GET", headers: publicHeaders() }
+    { method: "GET", headers: kioskHeaders() }
   )
 
   return Array.isArray(response.data) ? response.data : []

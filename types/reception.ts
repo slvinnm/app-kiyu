@@ -237,16 +237,32 @@ export type Facility = {
   is_active: boolean
 }
 
-export type KioskDevice = {
+export type DisplayDevice = {
   id: number
-  tenant_id: number
-  facility_id: number
   name: string
+  facility_id: number
   is_active: boolean
+  /** True once the screen has redeemed a pairing code. */
+  is_paired: boolean
+  /** True while a pairing code is outstanding. */
+  is_awaiting_pairing: boolean
+  paired_at: string | null
   last_seen_at: string | null
   expires_at: string | null
-  created_at?: string
-  updated_at?: string
+}
+
+export type KioskDevice = {
+  id: number
+  name: string
+  facility_id: number
+  is_active: boolean
+  /** True once the device has redeemed a pairing code and holds a credential. */
+  is_paired: boolean
+  /** True while a pairing code is outstanding and not yet expired. */
+  is_awaiting_pairing: boolean
+  paired_at: string | null
+  last_seen_at: string | null
+  expires_at: string | null
 }
 
 export type Subscription = {

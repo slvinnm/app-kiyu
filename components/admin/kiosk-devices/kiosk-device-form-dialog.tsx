@@ -31,7 +31,7 @@ export function KioskDeviceFormDialog({
 }) {
   const [name, setName] = useState("")
   const [expiresAt, setExpiresAt] = useState("")
-  const [credential, setCredential] = useState<string | null>(null)
+  const [pairingCode, setPairingCode] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -40,7 +40,7 @@ export function KioskDeviceFormDialog({
     if (!open) return
     setName("")
     setExpiresAt("")
-    setCredential(null)
+    setPairingCode(null)
     setError(null)
     setErrors({})
     setSubmitting(false)
@@ -66,7 +66,7 @@ export function KioskDeviceFormDialog({
         expires_at: expiresAt || undefined,
       })
 
-      setCredential(response.data.credential)
+      setPairingCode(response.data.pairing_code)
       toast.success("Perangkat kiosk terdaftar.")
       onSaved()
     } catch (cause) {
@@ -97,19 +97,24 @@ export function KioskDeviceFormDialog({
           <DialogTitle>Daftarkan Kiosk</DialogTitle>
 
           <DialogDescription>
-            Kredensial hanya ditampilkan sekali setelah perangkat dibuat.
+            Kode pairing hanya ditampilkan sekali setelah perangkat dibuat.
           </DialogDescription>
         </DialogHeader>
 
-        {credential ? (
+        {pairingCode ? (
           <div className="space-y-4">
             <Alert>
-              <AlertTitle>Simpan kredensial ini</AlertTitle>
+              <AlertTitle>Masukkan kode ini di perangkat kiosk</AlertTitle>
 
               <AlertDescription>
-                <code className="mt-2 block break-all rounded-md bg-muted p-3 font-mono text-xs">
-                  {credential}
+                <code className="mt-2 block rounded-md bg-muted p-3 text-center font-mono text-2xl tracking-[0.35em]">
+                  {pairingCode}
                 </code>
+
+                <span className="mt-2 block text-xs">
+                  Berlaku 30 menit dan hanya bisa dipakai sekali. Kode hilang?
+                  Buat ulang dari daftar perangkat.
+                </span>
               </AlertDescription>
             </Alert>
 
@@ -117,7 +122,7 @@ export function KioskDeviceFormDialog({
               <Button
                 type="button"
                 onClick={() => {
-                  setCredential(null)
+                  setPairingCode(null)
                   onOpenChange(false)
                 }}
               >

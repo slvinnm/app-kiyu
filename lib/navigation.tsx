@@ -11,6 +11,7 @@ import {
   LayoutDashboardIcon,
   ListOrdered,
   MapPin,
+  MonitorPlay,
   ScrollText,
   UserCog,
   UserPlus,
@@ -43,6 +44,7 @@ const navigation: Record<UserRole, NavItem[]> = {
         { title: "Staff", url: "/admin/users", icon: <UserCog /> },
         { title: "Fasilitas", url: "/admin/facilities", icon: <Building2 /> },
         { title: "Kiosk", url: "/admin/kiosk-devices", icon: <Ticket /> },
+        { title: "Display", url: "/admin/display-devices", icon: <MonitorPlay /> },
       ],
     },
     {

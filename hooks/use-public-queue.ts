@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { fetchPublicQueue } from "@/lib/api/display"
+import { DisplayApiError, fetchPublicQueue } from "@/lib/api/display"
+import { clearDisplayDevice } from "@/lib/display/device"
 import { getEcho, publicFacilityChannel } from "@/lib/echo"
 import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
@@ -172,6 +173,14 @@ export function usePublicQueue() {
       }
     } catch (cause) {
       if (!mountedRef.current) {
+        return
+      }
+
+      // A revoked or expired display credential means this screen must pair
+      // again. Drop the stored credential and reload into onboarding.
+      if (cause instanceof DisplayApiError && cause.status === 403) {
+        clearDisplayDevice()
+        window.location.reload()
         return
       }
 
