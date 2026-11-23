@@ -1,10 +1,27 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-import { readSessionFromRequest } from "@/lib/auth/session-core"
+import { SESSION_COOKIE_NAME, readSessionFromRequest } from "@/lib/auth/session-core"
+import { isSessionTokenValid } from "@/lib/auth/verify"
 import { getRouteRule, isRoleAllowed } from "@/lib/auth/route-access"
 
-export default function proxy(request: NextRequest) {
+/**
+ * Clears the session cookie and sends the browser to the login page.
+ *
+ * A 401-style redirect: the cookie is dead, so drop it here rather than letting
+ * every gated page discover that on its own.
+ */
+function reject(request: NextRequest, pathname: string, search: string) {
+  const loginUrl = new URL("/login", request.url)
+  loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`)
+
+  const response = NextResponse.redirect(loginUrl)
+  response.cookies.delete(SESSION_COOKIE_NAME)
+
+  return response
+}
+
+export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
   // Signed HttpOnly session cookie; tampered or absent cookies are rejected.
@@ -23,15 +40,17 @@ export default function proxy(request: NextRequest) {
   }
 
   if (!session) {
-    const loginUrl = new URL("/login", request.url)
-
-    loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`)
-
-    return NextResponse.redirect(loginUrl)
+    return reject(request, pathname, search)
   }
 
   if (!isRoleAllowed(session.user.role, rule.roles)) {
     return NextResponse.redirect(new URL("/unauthorized", request.url))
+  }
+
+  // The cookie is only a claim. Ask the API whether the token still exists —
+  // a deleted row in `personal_access_tokens` must end the session at once.
+  if (!(await isSessionTokenValid(session))) {
+    return reject(request, pathname, search)
   }
 
   return NextResponse.next()

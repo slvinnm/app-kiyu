@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session-core"
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
 
 const API_BASE_URL = process.env.API_BASE_URL ?? ""
@@ -117,11 +118,20 @@ async function proxy(request: NextRequest) {
     }
   }
 
-  return new NextResponse(response.body, {
+  const out = new NextResponse(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers: responseHeaders,
   })
+
+  // The API rejected the token: it was revoked or expired. Drop the session
+  // cookie so the next page load sends the browser to the login page instead
+  // of leaving a dead session signed in.
+  if (response.status === 401) {
+    out.cookies.delete(SESSION_COOKIE_NAME)
+  }
+
+  return out
 }
 
 export async function GET(request: NextRequest) {
