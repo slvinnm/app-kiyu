@@ -13,7 +13,7 @@ import {
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
-import { getPublicQueueServer } from "@/lib/api/admin-server"
+import { getQueueMonitorServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getSession } from "@/lib/auth/session"
 import { stationTypeLabel, ticketStatusLabel } from "@/lib/reception/format"
@@ -32,9 +32,9 @@ export default async function Page() {
   let error: string | null = null
 
   try {
-    stations = await getPublicQueueServer()
+    stations = await getQueueMonitorServer()
   } catch (cause) {
-    error = getApiErrorMessage(cause, "Gagal memuat antrian publik.")
+    error = getApiErrorMessage(cause, "Gagal memuat antrian.")
   }
 
   return (

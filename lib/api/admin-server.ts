@@ -253,9 +253,14 @@ export const getStationsTableServer = getStationsServer
 export const getWorkflowsTableServer = getWorkflowsServer
 export const getWorkflowServer = getWorkflowDetailServer
 
-export async function getPublicQueueServer(): Promise<PublicQueueStation[]> {
+/**
+ * Queue monitoring for the admin console. `/public/queue` is the signage
+ * endpoint and resolves its tenant from a device credential, so it rejects a
+ * Sanctum bearer token; this authenticated endpoint returns the same read model.
+ */
+export async function getQueueMonitorServer(): Promise<PublicQueueStation[]> {
   const response = await serverApiFetch<{ data: PublicQueueStation[] }>(
-    "/public/queue"
+    "/queue/monitor"
   )
   return response.data
 }
