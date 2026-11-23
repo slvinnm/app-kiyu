@@ -5,8 +5,8 @@ import { serverApiFetch } from "@/lib/api/server"
 import type {
   Department,
   Paginated,
-  Patient,
-  PatientDetail,
+  Client,
+  ClientDetail,
   ReceptionQueueSnapshot,
 } from "@/types/reception"
 
@@ -41,17 +41,17 @@ export async function getReceptionQueueServer(
   return response.data
 }
 
-export async function getPatientCountServer(): Promise<number> {
+export async function getClientCountServer(): Promise<number> {
   const response = await serverApiFetch<{ data: { total: number } }>(
-    "/patients/statistics"
+    "/clients/statistics"
   )
 
   return response.data.total
 }
 
-export async function getPatientServer(id: number): Promise<PatientDetail> {
-  const response = await serverApiFetch<{ data: PatientDetail }>(
-    `/patients/${id}`
+export async function getClientServer(id: number): Promise<ClientDetail> {
+  const response = await serverApiFetch<{ data: ClientDetail }>(
+    `/clients/${id}`
   )
 
   return response.data
@@ -61,13 +61,13 @@ export async function getPatientServer(id: number): Promise<PatientDetail> {
  * Paginated patient directory for the receptionist workspace. The API does the
  * searching and sorting; the browser only ever receives the current page.
  */
-export async function getPatientsTableServer(filters: {
+export async function getClientsTableServer(filters: {
   search?: string
   sort?: string
   direction?: "asc" | "desc"
   page?: number
   per_page?: number
-}): Promise<Paginated<Patient>> {
+}): Promise<Paginated<Client>> {
   const params = new URLSearchParams()
 
   for (const [key, value] of Object.entries(filters)) {
@@ -78,9 +78,13 @@ export async function getPatientsTableServer(filters: {
 
   const query = params.toString()
 
-  const response = await serverApiFetch<{ data: Paginated<Patient> }>(
-    `/patients${query ? `?${query}` : ""}`
+  const response = await serverApiFetch<{ data: Paginated<Client> }>(
+    `/clients${query ? `?${query}` : ""}`
   )
 
   return response.data
 }
+
+/* Aliases kept while older pages are migrated. */
+export const getPatientsTableServer = getClientsTableServer
+export const getPatientCountServer = getClientCountServer

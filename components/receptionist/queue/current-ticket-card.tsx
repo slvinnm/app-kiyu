@@ -115,13 +115,13 @@ export function CurrentTicketCard({
                   <p className="text-xs text-muted-foreground">Pasien</p>
 
                   <p className="mt-1 text-lg font-semibold">
-                    {ticket.visit?.patient?.name ??
+                    {ticket.visit?.client?.name ??
                       "Walk-in — pasien belum teridentifikasi"}
                   </p>
 
-                  {ticket.visit?.patient?.mrn && (
+                  {ticket.visit?.client?.mrn && (
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {ticket.visit.patient.mrn}
+                      {ticket.visit.client.mrn}
                     </p>
                   )}
                 </div>

@@ -2,35 +2,35 @@
 
 import { ApiError } from "@/lib/api/error"
 
+/**
+ * Client-side fetch through the `/api/backend` proxy, which attaches the
+ * session's bearer token. Every JSON call from a component goes through here.
+ */
 export async function apiFetch<T>(
   path: string,
-  options?: RequestInit
+  init?: RequestInit
 ): Promise<T> {
   const response = await fetch(`/api/backend${path}`, {
-    ...options,
+    ...init,
+    cache: "no-store",
     headers: {
       Accept: "application/json",
-      ...options?.headers,
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...init?.headers,
     },
   })
 
-  const contentType = response.headers.get("content-type") ?? ""
-
-  const data = contentType.includes("application/json")
-    ? await response.json()
-    : await response.text()
+  const payload: unknown = await response
+    .json()
+    .catch(() => ({ message: "Respons tidak valid." }))
 
   if (!response.ok) {
-    const message =
-      typeof data === "object" &&
-      data !== null &&
-      "message" in data &&
-      typeof data.message === "string"
-        ? data.message
-        : "Request failed."
-
-    throw new ApiError(message, response.status, data)
+    throw new ApiError(
+      response.status,
+      (payload as { message?: string })?.message ?? "Permintaan gagal.",
+      payload
+    )
   }
 
-  return data as T
+  return payload as T
 }

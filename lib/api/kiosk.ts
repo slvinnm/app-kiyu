@@ -1,3 +1,5 @@
+import { kioskHeaders, publicHeaders } from "@/lib/public-headers"
+
 import type {
   ApiResponse,
   Department,
@@ -28,8 +30,8 @@ async function request<T>(
     const response = await fetch(input, {
       ...init,
       headers: {
-        Accept: "application/json",
         "Content-Type": "application/json",
+        ...kioskHeaders(),
         ...init?.headers,
       },
       signal: controller.signal,
@@ -72,9 +74,7 @@ export const SUCCESS_RESET_DELAY = 10
 export async function getDepartments(): Promise<Department[]> {
   const response = await request<Department[]>(
     `${API_BASE_URL}/departments/active`,
-    {
-      method: "GET",
-    }
+    { method: "GET", headers: publicHeaders() }
   )
 
   return Array.isArray(response.data) ? response.data : []

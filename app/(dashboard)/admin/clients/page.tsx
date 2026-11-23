@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
-import { PatientManager } from "@/components/admin/patients/patient-manager"
+import { PatientManager } from "@/components/admin/clients/client-manager"
 
 import { getPatientsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"

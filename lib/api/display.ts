@@ -1,3 +1,5 @@
+import { publicHeaders } from "@/lib/public-headers"
+
 import type { PublicQueueStation } from "@/types/admin"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -20,7 +22,7 @@ export async function fetchPublicQueue(
 
   try {
     const response = await fetch(`${API_BASE_URL}/public/queue`, {
-      headers: { Accept: "application/json" },
+      headers: publicHeaders(),
       signal: signal ?? controller.signal,
       cache: "no-store",
     })

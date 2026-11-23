@@ -1,0 +1,55 @@
+import { CreditCard } from "lucide-react"
+import { redirect } from "next/navigation"
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
+import { SubscriptionCard } from "@/components/admin/billing/subscription-card"
+
+import { getSubscriptionServer } from "@/lib/api/admin-server"
+import { getApiErrorMessage } from "@/lib/api/error"
+import { getSession } from "@/lib/auth/session"
+
+import type { SubscriptionView } from "@/lib/api/admin-server"
+
+export default async function Page() {
+  const session = await getSession()
+
+  if (!session?.user?.role) {
+    redirect("/login")
+  }
+
+  let view: SubscriptionView | null = null
+  let error: string | null = null
+
+  try {
+    view = await getSubscriptionServer()
+  } catch (cause) {
+    error = getApiErrorMessage(cause, "Gagal memuat langganan.")
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
+      <AdminPageHeader
+        title="Billing"
+        description="Status langganan dan paket tenant."
+        icon={<CreditCard className="size-5" />}
+      />
+
+      {error || !view ? (
+        <Alert variant="destructive">
+          <AlertTitle>Data langganan tidak tersedia</AlertTitle>
+
+          <AlertDescription>
+            {error ?? "Terjadi kesalahan saat memuat langganan."}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <SubscriptionCard
+          subscription={view.subscription}
+          isEffective={view.is_effective}
+        />
+      )}
+    </div>
+  )
+}

@@ -4,7 +4,7 @@ import { UsersIcon } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 
-import { PatientDirectory } from "@/components/receptionist/patients/patient-directory"
+import { PatientDirectory } from "@/components/receptionist/clients/client-directory"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getPatientsTableServer } from "@/lib/api/reception-server"

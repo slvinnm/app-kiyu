@@ -172,7 +172,7 @@ export default async function Page() {
                       </p>
 
                       <p className="mt-3 text-sm font-medium">
-                        {snapshot.current_calling.visit?.patient?.name ??
+                        {snapshot.current_calling.visit?.client?.name ??
                           "Walk-in — belum teridentifikasi"}
                       </p>
                     </div>
@@ -248,7 +248,7 @@ export default async function Page() {
 
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm">
-                            {ticket.visit?.patient?.name ??
+                            {ticket.visit?.client?.name ??
                               "Walk-in — belum teridentifikasi"}
                           </p>
 

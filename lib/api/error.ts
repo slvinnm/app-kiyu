@@ -2,7 +2,7 @@ export class ApiError extends Error {
   status: number
   data: unknown
 
-  constructor(message: string, status: number, data: unknown) {
+  constructor(status: number, message: string, data: unknown) {
     super(message)
 
     this.name = "ApiError"
@@ -21,21 +21,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-/**
- * Returns the structured body of an `ApiError`, when available. Laravel
- * responses use `{ message, error_type?, errors? }`.
- */
 export function getApiErrorBody(error: unknown): ApiErrorBody | null {
-  if (!(error instanceof ApiError) || !isRecord(error.data)) {
-    return null
-  }
-
-  return error.data as ApiErrorBody
+  return error instanceof ApiError && isRecord(error.data)
+    ? (error.data as ApiErrorBody)
+    : null
 }
 
 /**
- * Returns the backend `error_type` (INVALID_STATE, INVALID_WORKFLOW,
- * BUSINESS_CONFLICT, ...) or `null`.
+ * Backend `error_type` (INVALID_STATE, INVALID_WORKFLOW, BUSINESS_CONFLICT,
+ * ...) or `null`. Used to branch on specific failures.
  */
 export function getApiErrorType(error: unknown): string | null {
   const type = getApiErrorBody(error)?.error_type
@@ -44,7 +38,7 @@ export function getApiErrorType(error: unknown): string | null {
 }
 
 /**
- * Returns Laravel validation errors keyed by field (e.g. `patient_data.nik`).
+ * Laravel validation errors keyed by field (e.g. `client_data.nik`).
  */
 export function getApiValidationErrors(
   error: unknown
@@ -55,8 +49,8 @@ export function getApiValidationErrors(
 }
 
 /**
- * Resolves a user-facing error message. Prefers the backend message, then the
- * `ApiError` message, then the provided fallback.
+ * User-facing message. Prefers the backend message, then the error's own,
+ * then the fallback.
  */
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   const bodyMessage = getApiErrorBody(error)?.message

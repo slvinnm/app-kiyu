@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
-export function ClinicalNotesDialog({
+export function StaffNotesDialog({
   open,
   onOpenChange,
   title,

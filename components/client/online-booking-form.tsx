@@ -23,19 +23,19 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import { OnlineBookingSuccess } from "@/components/patient/online-booking-success"
+import { OnlineBookingSuccess } from "@/components/client/online-booking-success"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { createOnlineBooking } from "@/lib/api/patient"
+import { createOnlineBooking } from "@/lib/api/clients"
 
 import type { Department } from "@/types/reception"
-import type { OnlineBookingResult } from "@/types/patient"
+import type { OnlineBookingResult } from "@/types/client"
 
 export function OnlineBookingForm({
-  patientId,
+  clientId,
   departments,
 }: {
-  patientId: number
+  clientId: number
   departments: Department[]
 }) {
   const [departmentId, setDepartmentId] = useState("")
@@ -73,7 +73,7 @@ export function OnlineBookingForm({
 
     try {
       const response = await createOnlineBooking({
-        patient_id: patientId,
+        client_id: clientId,
         department_id: Number(departmentId),
         idempotency_key: idempotencyKey,
       })

@@ -27,15 +27,15 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import {
-  createPatientProfile,
-  updatePatientProfile,
-  type PatientProfilePayload,
-} from "@/lib/api/patient"
+  createClientProfile,
+  updateClientProfile,
+  type ClientProfilePayload,
+} from "@/lib/api/clients"
 import { formatDateInput } from "@/lib/reception/format"
 
-import type { PatientProfile, PatientProfileInput } from "@/types/patient"
+import type { ClientProfile, ClientProfileInput } from "@/types/client"
 
-const emptyProfile: PatientProfileInput = {
+const emptyProfile: ClientProfileInput = {
   name: "",
   nik: "",
   date_of_birth: "",
@@ -63,7 +63,7 @@ function normalizeGender(
   return ""
 }
 
-export function PatientProfileForm({
+export function ClientProfileForm({
   userId,
   profile,
   defaultName = "",
@@ -71,14 +71,14 @@ export function PatientProfileForm({
   redirectTo,
 }: {
   userId: number
-  profile: PatientProfile | null
+  profile: ClientProfile | null
   defaultName?: string
   defaultEmail?: string
   redirectTo?: string
 }) {
   const router = useRouter()
 
-  const [form, setForm] = useState<PatientProfileInput>(() =>
+  const [form, setForm] = useState<ClientProfileInput>(() =>
     profile
       ? {
           name: profile.name,
@@ -99,7 +99,7 @@ export function PatientProfileForm({
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  function update(patch: Partial<PatientProfileInput>) {
+  function update(patch: Partial<ClientProfileInput>) {
     setForm((current) => ({ ...current, ...patch }))
   }
 
@@ -126,7 +126,7 @@ export function PatientProfileForm({
     setErrors({})
     setError(null)
 
-    const payload: PatientProfilePayload = {
+    const payload: ClientProfilePayload = {
       name: form.name.trim(),
     }
 
@@ -148,10 +148,10 @@ export function PatientProfileForm({
 
     try {
       if (profile) {
-        await updatePatientProfile(profile.id, payload)
+        await updateClientProfile(profile.id, payload)
         toast.success("Profil pasien diperbarui.")
       } else {
-        await createPatientProfile({ ...payload, user_id: userId })
+        await createClientProfile({ ...payload, user_id: userId })
         toast.success("Profil pasien berhasil dibuat.")
       }
 
@@ -382,3 +382,6 @@ export function PatientProfileForm({
     </div>
   )
 }
+
+/* Alias kept while older pages are migrated. */
+export const PatientProfileForm = ClientProfileForm

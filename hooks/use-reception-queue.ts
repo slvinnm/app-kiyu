@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import { getReceptionQueue } from "@/lib/api/reception"
-import { bindEchoConnectionState, getEcho } from "@/lib/echo"
+import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
+import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 
@@ -136,7 +137,7 @@ export function useReceptionQueue(
       return
     }
 
-    const channels = [`department.${departmentId}`]
+    const channels = [publicFacilityChannel(PUBLIC_FACILITY_ID)]
 
     const handler = () => {
       if (!pausedRef.current) {

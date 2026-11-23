@@ -11,18 +11,18 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  // Patients must finish onboarding before reaching the dashboard.
-  if (normalizeRole(session.user.role) === "patient") {
-    const { getCurrentPatientServer } = await import("@/lib/api/patient-server")
+  // Clients must finish onboarding before reaching the dashboard.
+  if (normalizeRole(session.user.role) === "client") {
+    const { getCurrentClientServer } = await import("@/lib/api/clients-server")
 
     try {
-      const current = await getCurrentPatientServer()
+      const current = await getCurrentClientServer()
 
       if (!current.profile) {
-        redirect("/patient/onboarding")
+        redirect("/client/onboarding")
       }
     } catch {
-      redirect("/patient/onboarding")
+      redirect("/client/onboarding")
     }
   }
 

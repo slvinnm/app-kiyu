@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { fetchPublicQueue } from "@/lib/api/display"
-import { getEcho, PUBLIC_QUEUE_CHANNEL } from "@/lib/echo"
+import { getEcho, publicFacilityChannel } from "@/lib/echo"
+import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { PublicQueueStation } from "@/types/admin"
 
@@ -194,7 +195,7 @@ export function usePublicQueue() {
       return
     }
 
-    const channel = echo.channel(PUBLIC_QUEUE_CHANNEL)
+    const channel = echo.channel(publicFacilityChannel(PUBLIC_FACILITY_ID))
 
     const handler = (payload: CalledPayload) => {
       announceCall(
@@ -224,7 +225,7 @@ export function usePublicQueue() {
 
     return () => {
       channel.stopListening(".queue.called")
-      echo.leaveChannel(PUBLIC_QUEUE_CHANNEL)
+      echo.leaveChannel(publicFacilityChannel(PUBLIC_FACILITY_ID))
       unbind()
     }
   }, [load, announceCall])

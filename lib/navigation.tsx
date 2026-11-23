@@ -37,71 +37,40 @@ const navigation: Record<UserRole, NavItem[]> = {
       title: "Organisasi",
       icon: <Building2 />,
       items: [
-        {
-          title: "Poli",
-          url: "/admin/departments",
-          icon: <Building2 />,
-        },
-        {
-          title: "Station",
-          url: "/admin/stations",
-          icon: <MapPin />,
-        },
-        {
-          title: "Workflow",
-          url: "/admin/workflows",
-          icon: <GitBranch />,
-        },
-        {
-          title: "Staff",
-          url: "/admin/users",
-          icon: <UserCog />,
-        },
+        { title: "Poli", url: "/admin/departments", icon: <Building2 /> },
+        { title: "Station", url: "/admin/stations", icon: <MapPin /> },
+        { title: "Workflow", url: "/admin/workflows", icon: <GitBranch /> },
+        { title: "Staff", url: "/admin/users", icon: <UserCog /> },
+        { title: "Fasilitas", url: "/admin/facilities", icon: <Building2 /> },
+        { title: "Kiosk", url: "/admin/kiosk-devices", icon: <Ticket /> },
       ],
     },
     {
       title: "Operasional",
       icon: <CalendarClock />,
       items: [
-        {
-          title: "Kunjungan",
-          url: "/admin/visits",
-          icon: <CalendarClock />,
-        },
-        {
-          title: "Referral",
-          url: "/admin/referrals",
-          icon: <ArrowRightLeft />,
-        },
-        {
-          title: "Antrian",
-          url: "/admin/queue",
-          icon: <ListOrdered />,
-        },
+        { title: "Kunjungan", url: "/admin/visits", icon: <CalendarClock /> },
+        { title: "Referral", url: "/admin/referrals", icon: <ArrowRightLeft /> },
+        { title: "Antrian", url: "/admin/queue", icon: <ListOrdered /> },
       ],
     },
     {
-      title: "Pasien",
-      url: "/admin/patients",
+      title: "Klien",
+      url: "/admin/clients",
       icon: <Users />,
+    },
+    {
+      title: "Laporan",
+      icon: <FileText />,
+      items: [
+        { title: "Ringkasan", url: "/admin/reports", icon: <FileText /> },
+        { title: "Billing", url: "/admin/billing", icon: <ScrollText /> },
+      ],
     },
     {
       title: "Audit Log",
       url: "/admin/audit-logs",
       icon: <ScrollText />,
-    },
-  ],
-
-  doctor: [
-    {
-      title: "Dasbor",
-      url: "/doctor/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Antrian",
-      url: "/doctor/queue",
-      icon: <Ticket />,
     },
   ],
 
@@ -122,83 +91,44 @@ const navigation: Record<UserRole, NavItem[]> = {
       icon: <Ticket />,
     },
     {
-      title: "Pasien",
-      url: "/receptionist/patients",
+      title: "Klien",
+      url: "/receptionist/clients",
       icon: <Users />,
     },
   ],
 
-  nurse: [
+  staff: [
     {
       title: "Dasbor",
-      url: "/nurse/dashboard",
+      url: "/staff/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
       title: "Antrian",
-      url: "/nurse/queue",
+      url: "/staff/queue",
       icon: <Ticket />,
     },
   ],
 
-  pharmacy: [
+  client: [
     {
       title: "Dasbor",
-      url: "/pharmacy/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Antrian",
-      url: "/pharmacy/queue",
-      icon: <Ticket />,
-    },
-  ],
-
-  lab: [
-    {
-      title: "Dasbor",
-      url: "/lab/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Antrian",
-      url: "/lab/queue",
-      icon: <Ticket />,
-    },
-  ],
-
-  billing: [
-    {
-      title: "Dasbor",
-      url: "/billing/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Antrian",
-      url: "/billing/queue",
-      icon: <Ticket />,
-    },
-  ],
-
-  patient: [
-    {
-      title: "Dasbor",
-      url: "/patient/dashboard",
+      url: "/client/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
       title: "Kunjungan",
-      url: "/patient/visits",
+      url: "/client/visits",
       icon: <FileText />,
     },
     {
       title: "Booking Online",
-      url: "/patient/booking",
+      url: "/client/booking",
       icon: <CalendarPlus />,
     },
     {
       title: "Profil",
-      url: "/patient/profile",
+      url: "/client/profile",
       icon: <UserRound />,
     },
   ],
@@ -222,23 +152,15 @@ export type BreadcrumbItem = {
 const roleLabels: Record<string, string> = {
   admin: "Admin",
   receptionist: "Resepsionis",
-  doctor: "Dokter",
-  nurse: "Perawat",
-  pharmacy: "Farmasi",
-  lab: "Lab",
-  billing: "Kasir",
-  patient: "Pasien",
+  staff: "Staff",
+  client: "Klien",
 }
 
 const roleDashboardPaths: Record<string, string> = {
   admin: "/admin/dashboard",
   receptionist: "/receptionist/dashboard",
-  doctor: "/doctor/dashboard",
-  nurse: "/nurse/dashboard",
-  pharmacy: "/pharmacy/dashboard",
-  lab: "/lab/dashboard",
-  billing: "/billing/dashboard",
-  patient: "/patient/dashboard",
+  staff: "/staff/dashboard",
+  client: "/client/dashboard",
 }
 
 function findNavigationPath(

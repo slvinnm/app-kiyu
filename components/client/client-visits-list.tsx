@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientVisitDetailSheet } from "@/components/patient/patient-visit-detail-sheet"
+import { PatientVisitDetailSheet } from "@/components/client/client-visit-detail-sheet"
 
 import {
   channelLabel,
@@ -22,7 +22,7 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientVisit } from "@/types/patient"
+import type { PatientVisit } from "@/types/client"
 
 function isActive(status: string): boolean {
   return ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"].includes(status)

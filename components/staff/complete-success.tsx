@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button"
 
 import { visitStatusLabel } from "@/lib/reception/format"
 
-import type { CompleteTicketResult } from "@/types/clinical"
+import type { CompleteTicketResult } from "@/types/staff"
 
-export function ClinicalCompleteSuccess({
+export function StaffCompleteSuccess({
   result,
   onDone,
 }: {
@@ -35,7 +35,7 @@ export function ClinicalCompleteSuccess({
             <p className="text-xs text-muted-foreground">Pasien</p>
 
             <p className="mt-1 font-medium">
-              {visit.patient?.name ?? "Pasien terdaftar"}
+              {visit.client?.name ?? "Pasien terdaftar"}
             </p>
           </div>
 

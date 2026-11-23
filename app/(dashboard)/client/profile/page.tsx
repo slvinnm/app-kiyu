@@ -3,11 +3,11 @@ import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
-import { PatientLoadError } from "@/components/patient/patient-notices"
-import { PatientProfileForm } from "@/components/patient/profile-form"
+import { PatientLoadError } from "@/components/client/client-notices"
+import { PatientProfileForm } from "@/components/client/profile-form"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getCurrentPatientServer } from "@/lib/api/patient-server"
+import { getCurrentClientServer } from "@/lib/api/clients-server"
 import { getSession } from "@/lib/auth/session"
 
 export default async function Page() {
@@ -20,7 +20,7 @@ export default async function Page() {
   let current
 
   try {
-    current = await getCurrentPatientServer()
+    current = await getCurrentClientServer()
   } catch (cause) {
     return (
       <div className="mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8">

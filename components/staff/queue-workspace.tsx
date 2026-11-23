@@ -17,14 +17,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 
-import { ClinicalCompleteSuccess } from "@/components/clinical/clinical-complete-success"
-import { ClinicalCurrentTicket } from "@/components/clinical/clinical-current-ticket"
-import { ClinicalLists } from "@/components/clinical/clinical-lists"
-import { ClinicalNotesDialog } from "@/components/clinical/clinical-notes-dialog"
-import { ClinicalStats } from "@/components/clinical/clinical-stats"
-import { ClinicalTransferDialog } from "@/components/clinical/clinical-transfer-dialog"
+import { StaffCompleteSuccess } from "@/components/staff/complete-success"
+import { StaffCurrentTicket } from "@/components/staff/current-ticket"
+import { StaffLists } from "@/components/staff/staff-lists"
+import { StaffNotesDialog } from "@/components/staff/notes-dialog"
+import { StaffStats } from "@/components/staff/stats"
+import { StaffTransferDialog } from "@/components/staff/transfer-dialog"
 
-import { useClinicalQueue } from "@/hooks/use-clinical-queue"
+import { useStaffQueue } from "@/hooks/use-staff-queue"
 
 import {
   callNextClinical,
@@ -36,11 +36,11 @@ import {
   resumeTicket,
   skipTicket,
   startTicket,
-} from "@/lib/api/clinical"
+} from "@/lib/api/staff"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { formatTime, stationTypeLabel } from "@/lib/reception/format"
 
-import type { CompleteTicketResult } from "@/types/clinical"
+import type { CompleteTicketResult } from "@/types/staff"
 import type { QueueTicket } from "@/types/reception"
 
 type NotesActionType = "hold" | "skip" | "no-show" | "cancel" | "complete"
@@ -91,7 +91,7 @@ const NOTES_COPY: Record<
   },
 }
 
-export function ClinicalQueueWorkspace({
+export function StaffQueueWorkspace({
   stationId,
   departmentId,
   actorEmail,
@@ -121,7 +121,7 @@ export function ClinicalQueueWorkspace({
     lastUpdatedAt,
     isConnected,
     refresh,
-  } = useClinicalQueue(stationId, {
+  } = useStaffQueue(stationId, {
     actorEmail,
     paused:
       notesAction !== null ||
@@ -129,18 +129,7 @@ export function ClinicalQueueWorkspace({
       completeResult !== null,
   })
 
-  const roleLabel =
-    role === "nurse"
-      ? "Perawat"
-      : role === "doctor"
-        ? "Dokter"
-        : role === "pharmacy"
-          ? "Farmasi"
-          : role === "lab"
-            ? "Laboratorium"
-            : role === "billing"
-              ? "Kasir"
-              : role
+  const roleLabel = role === "staff" ? "Staff" : role
 
   const focusedCalled =
     called.find((ticket) => ticket.id === focusedCalledId) ?? null
@@ -342,7 +331,7 @@ export function ClinicalQueueWorkspace({
               </Alert>
             )}
 
-            <ClinicalStats
+            <StaffStats
               waiting={waiting.length}
               called={called.length}
               inProgress={inProgress.length}
@@ -358,7 +347,7 @@ export function ClinicalQueueWorkspace({
             )}
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_380px]">
-              <ClinicalCurrentTicket
+              <StaffCurrentTicket
                 ticket={currentTicket}
                 processing={processing || !station.is_active}
                 canCallNext={
@@ -392,7 +381,7 @@ export function ClinicalQueueWorkspace({
                 onTransfer={setTransferTarget}
               />
 
-              <ClinicalLists
+              <StaffLists
                 waiting={waiting}
                 called={called}
                 onHold={onHold}
@@ -411,7 +400,7 @@ export function ClinicalQueueWorkspace({
         ) : null}
       </div>
 
-      <ClinicalNotesDialog
+      <StaffNotesDialog
         open={notesAction !== null}
         onOpenChange={(open) => {
           if (!open) {
@@ -432,7 +421,7 @@ export function ClinicalQueueWorkspace({
         onConfirm={handleNotesConfirm}
       />
 
-      <ClinicalTransferDialog
+      <StaffTransferDialog
         ticket={transferTarget}
         departmentId={departmentId}
         stationType={station?.type ?? null}
@@ -457,7 +446,7 @@ export function ClinicalQueueWorkspace({
       >
         <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-xl">
           {completeResult && (
-            <ClinicalCompleteSuccess
+            <StaffCompleteSuccess
               result={completeResult}
               onDone={() => {
                 setCompleteResult(null)

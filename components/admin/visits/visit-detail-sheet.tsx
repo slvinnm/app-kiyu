@@ -122,7 +122,7 @@ export function VisitDetailSheet({
 
     try {
       const response = await updateVisitPriority(visit.id, {
-        priority: Number(priority),
+        priority: Number(priority) as 1 | 2 | 3,
         user_id: actorEmail,
       })
 
@@ -216,11 +216,11 @@ export function VisitDetailSheet({
                   <p className="text-xs text-muted-foreground">Pasien</p>
 
                   <p className="mt-1 text-sm font-medium">
-                    {visit.patient?.name ?? "-"}
+                    {visit.client?.name ?? "-"}
                   </p>
 
                   <p className="text-xs text-muted-foreground">
-                    {visit.patient?.mrn ?? "-"}
+                    {visit.client?.mrn ?? "-"}
                   </p>
                 </div>
 

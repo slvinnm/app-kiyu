@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getVisitDetail } from "@/lib/api/patient"
+import { getVisitDetail } from "@/lib/api/clients"
 import {
   channelLabel,
   formatDateTime,
@@ -23,7 +23,7 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientQueueTicket, PatientVisitDetail } from "@/types/patient"
+import type { PatientQueueTicket, PatientVisitDetail } from "@/types/client"
 
 function activeTickets(tickets: PatientQueueTicket[]) {
   return tickets.filter((ticket) =>

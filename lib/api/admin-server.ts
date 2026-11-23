@@ -1,47 +1,30 @@
 import "server-only"
 
 import { serverApiFetch } from "@/lib/api/server"
+import { toQuery } from "@/lib/api/query"
 
-import type { Department, Paginated, Patient, Visit } from "@/types/reception"
+import type { AdminUser } from "@/lib/api/admin"
 import type {
-  AdminStation,
-  AdminUser,
-  AdminVisitDetail,
-  AuditFilters,
   AuditLog,
-  DepartmentFilters,
-  PatientFilters,
+  Client,
+  Department,
+  Facility,
+  KioskDevice,
+  Paginated,
+  QueueAcquisition,
+  QueueTicket,
   PublicQueueStation,
   Referral,
-  ReferralDetail,
-  ReferralFilters,
-  StationListFilters,
-  UserFilters,
-  VisitFilters,
+  Station,
+  Subscription,
+  Visit,
   Workflow,
-  WorkflowListFilters,
-} from "@/types/admin"
+} from "@/types/reception"
 
-type QueryValue = string | number | boolean | null | undefined
-
-function toQuery(params: Record<string, QueryValue>): string {
-  const search = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === null || value === "") {
-      continue
-    }
-
-    search.set(key, String(value))
-  }
-
-  const query = search.toString()
-
-  return query ? `?${query}` : ""
-}
+export type CountStatistics = { total: number }
 
 /* -------------------------------------------------------------------------- */
-/* Select options (unpaginated, dedicated endpoints)                          */
+/* Master data                                                                */
 /* -------------------------------------------------------------------------- */
 
 export async function getDepartmentOptionsServer(): Promise<Department[]> {
@@ -52,20 +35,41 @@ export async function getDepartmentOptionsServer(): Promise<Department[]> {
 }
 
 export async function getStationOptionsServer(
-  filters: { department_id?: number; type?: string } = {}
-): Promise<AdminStation[]> {
-  const response = await serverApiFetch<{ data: AdminStation[] }>(
+  filters: { department_id?: number } = {}
+): Promise<Station[]> {
+  const response = await serverApiFetch<{ data: Station[] }>(
     `/stations/options${toQuery(filters)}`
   )
   return response.data
 }
 
+export async function getFacilitiesServer(): Promise<Facility[]> {
+  const response = await serverApiFetch<{ data: Facility[] }>("/facilities")
+  return response.data
+}
+
+export async function getKioskDevicesServer(): Promise<KioskDevice[]> {
+  const response = await serverApiFetch<{ data: KioskDevice[] }>(
+    "/kiosk-devices"
+  )
+  return response.data
+}
+
 /* -------------------------------------------------------------------------- */
-/* Table data (paginated by the API by default)                               */
+/* Paginated tables                                                           */
 /* -------------------------------------------------------------------------- */
 
-export async function getDepartmentsTableServer(
-  filters: DepartmentFilters = {}
+export type TableFilters = {
+  search?: string
+  sort?: string
+  direction?: "asc" | "desc"
+  page?: number
+  per_page?: number
+  [key: string]: string | number | undefined
+}
+
+export async function getDepartmentsServer(
+  filters: TableFilters = {}
 ): Promise<Paginated<Department>> {
   const response = await serverApiFetch<{ data: Paginated<Department> }>(
     `/departments${toQuery(filters)}`
@@ -73,17 +77,17 @@ export async function getDepartmentsTableServer(
   return response.data
 }
 
-export async function getStationsTableServer(
-  filters: StationListFilters = {}
-): Promise<Paginated<AdminStation>> {
-  const response = await serverApiFetch<{ data: Paginated<AdminStation> }>(
+export async function getStationsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<Station>> {
+  const response = await serverApiFetch<{ data: Paginated<Station> }>(
     `/stations${toQuery(filters)}`
   )
   return response.data
 }
 
-export async function getWorkflowsTableServer(
-  filters: WorkflowListFilters = {}
+export async function getWorkflowsServer(
+  filters: TableFilters = {}
 ): Promise<Paginated<Workflow>> {
   const response = await serverApiFetch<{ data: Paginated<Workflow> }>(
     `/workflows${toQuery(filters)}`
@@ -91,12 +95,120 @@ export async function getWorkflowsTableServer(
   return response.data
 }
 
+export async function getUsersServer(
+  filters: TableFilters = {}
+): Promise<Paginated<AdminUser>> {
+  const response = await serverApiFetch<{ data: Paginated<AdminUser> }>(
+    `/users${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getClientsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<Client>> {
+  const response = await serverApiFetch<{ data: Paginated<Client> }>(
+    `/clients${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getVisitsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<Visit>> {
+  const response = await serverApiFetch<{ data: Paginated<Visit> }>(
+    `/visits${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getTicketsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<QueueTicket>> {
+  const response = await serverApiFetch<{ data: Paginated<QueueTicket> }>(
+    `/tickets${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getQueueAcquisitionsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<QueueAcquisition>> {
+  const response = await serverApiFetch<{ data: Paginated<QueueAcquisition> }>(
+    `/queue-acquisitions${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getReferralsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<Referral>> {
+  const response = await serverApiFetch<{ data: Paginated<Referral> }>(
+    `/referrals${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getAuditLogsServer(
+  filters: TableFilters = {}
+): Promise<Paginated<AuditLog>> {
+  const response = await serverApiFetch<{ data: Paginated<AuditLog> }>(
+    `/audit-logs${toQuery(filters)}`
+  )
+  return response.data
+}
+
 /* -------------------------------------------------------------------------- */
-/* Dashboard statistics                                                       */
+/* Detail views                                                               */
 /* -------------------------------------------------------------------------- */
 
-export type CountStatistics = {
-  total: number
+export async function getVisitDetailServer(id: number): Promise<Visit> {
+  const response = await serverApiFetch<{ data: Visit }>(`/visits/${id}`)
+  return response.data
+}
+
+export async function getClientDetailServer(id: number): Promise<Client> {
+  const response = await serverApiFetch<{ data: Client }>(`/clients/${id}`)
+  return response.data
+}
+
+export async function getReferralDetailServer(id: number): Promise<Referral> {
+  const response = await serverApiFetch<{ data: Referral }>(`/referrals/${id}`)
+  return response.data
+}
+
+export async function getWorkflowDetailServer(id: number): Promise<Workflow> {
+  const response = await serverApiFetch<{ data: Workflow }>(`/workflows/${id}`)
+  return response.data
+}
+
+/* -------------------------------------------------------------------------- */
+/* Statistics                                                                 */
+/* -------------------------------------------------------------------------- */
+
+export async function getVisitStatisticsServer(
+  filters: { date?: string; status?: string; department_id?: number } = {}
+): Promise<CountStatistics> {
+  const response = await serverApiFetch<{ data: CountStatistics }>(
+    `/visits/statistics${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getTicketStatisticsServer(
+  filters: { date?: string; status?: string; station_id?: number } = {}
+): Promise<CountStatistics> {
+  const response = await serverApiFetch<{ data: CountStatistics }>(
+    `/tickets/statistics${toQuery(filters)}`
+  )
+  return response.data
+}
+
+export async function getClientStatisticsServer(): Promise<CountStatistics> {
+  const response = await serverApiFetch<{ data: CountStatistics }>(
+    "/clients/statistics"
+  )
+  return response.data
 }
 
 export async function getWorkflowStatisticsServer(): Promise<CountStatistics> {
@@ -106,106 +218,71 @@ export async function getWorkflowStatisticsServer(): Promise<CountStatistics> {
   return response.data
 }
 
-export async function getPatientStatisticsServer(): Promise<CountStatistics> {
-  const response = await serverApiFetch<{ data: CountStatistics }>(
-    "/patients/statistics"
+/* -------------------------------------------------------------------------- */
+/* Billing                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export type SubscriptionView = {
+  subscription: Subscription | null
+  is_effective: boolean
+}
+
+export async function getSubscriptionServer(): Promise<SubscriptionView> {
+  const response = await serverApiFetch<{ data: SubscriptionView }>(
+    "/billing/subscription"
   )
   return response.data
 }
 
-export async function getVisitStatisticsServer(filters: {
-  date?: string
-  status?: string
-  department_id?: number
-} = {}): Promise<CountStatistics> {
-  const response = await serverApiFetch<{ data: CountStatistics }>(
-    `/visits/statistics${toQuery(filters)}`
-  )
-  return response.data
-}
+/* -------------------------------------------------------------------------- */
+/* Aliases kept for existing pages                                            */
+/* -------------------------------------------------------------------------- */
 
-export async function getTicketStatisticsServer(filters: {
-  status?: string
-  station_id?: number
-  date?: string
-} = {}): Promise<CountStatistics> {
-  const response = await serverApiFetch<{ data: CountStatistics }>(
-    `/tickets/statistics${toQuery(filters)}`
-  )
-  return response.data
-}
+export const getPatientsServer = getClientsServer
+export const getPatientStatisticsServer = getClientStatisticsServer
+export const getDepartmentsTableServer = getDepartmentsServer
+export const getStationsTableServer = getStationsServer
+export const getWorkflowsTableServer = getWorkflowsServer
+export const getWorkflowServer = getWorkflowDetailServer
 
-export async function getWorkflowServer(id: number): Promise<Workflow> {
-  const response = await serverApiFetch<{ data: Workflow }>(`/workflows/${id}`)
-  return response.data
-}
-
-export async function getPatientsServer(
-  filters: PatientFilters = {}
-): Promise<Paginated<Patient>> {
-  const response = await serverApiFetch<{ data: Paginated<Patient> }>(
-    `/patients${toQuery(filters)}`
-  )
-  return response.data
-}
-
-export async function getVisitsServer(
-  filters: VisitFilters = {}
-): Promise<Paginated<Visit>> {
-  const response = await serverApiFetch<{ data: Paginated<Visit> }>(
-    `/visits${toQuery(filters)}`
-  )
-  return response.data
-}
-
-export async function getVisitDetailServer(
-  id: number
-): Promise<AdminVisitDetail> {
-  const response = await serverApiFetch<{ data: AdminVisitDetail }>(
-    `/visits/${id}`
-  )
-  return response.data
-}
-
-export async function getAuditLogsServer(
-  filters: AuditFilters = {}
-): Promise<Paginated<AuditLog>> {
-  const response = await serverApiFetch<{ data: Paginated<AuditLog> }>(
-    `/audit-logs${toQuery(filters)}`
-  )
-  return response.data
-}
-
-export async function getPublicQueueServer(
-  filters: { station_id?: number; department_id?: number } = {}
-): Promise<PublicQueueStation[]> {
+export async function getPublicQueueServer(): Promise<PublicQueueStation[]> {
   const response = await serverApiFetch<{ data: PublicQueueStation[] }>(
-    `/public/queue${toQuery(filters)}`
+    "/public/queue"
   )
   return response.data
 }
 
-export async function getUsersServer(
-  filters: UserFilters = {}
-): Promise<Paginated<AdminUser>> {
-  const response = await serverApiFetch<{ data: Paginated<AdminUser> }>(
-    `/users${toQuery(filters)}`
-  )
-  return response.data
+/* -------------------------------------------------------------------------- */
+/* Reports                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export type ReportSummary = {
+  visits: {
+    period: { from: string; to: string }
+    total_visits: number
+    completed_visits: number
+    completion_rate: number
+    by_status: Record<string, number>
+    by_channel: Record<string, number>
+    average_wait_minutes: number
+  }
+  queue: {
+    period: { from: string; to: string }
+    total_tickets: number
+    served: number
+    skipped: number
+    no_show: number
+    no_show_rate: number
+    by_status: Record<string, number>
+    by_station: Record<string, number>
+  }
 }
 
-export async function getReferralsServer(
-  filters: ReferralFilters = {}
-): Promise<Paginated<Referral>> {
-  const response = await serverApiFetch<{ data: Paginated<Referral> }>(
-    `/referrals${toQuery(filters)}`
-  )
-  return response.data
-}
-
-export async function getReferralServer(id: number): Promise<ReferralDetail> {
-  const response = await serverApiFetch<{ data: ReferralDetail }>(
-    `/referrals/${id}`
+export async function getReportSummaryServer(
+  filters: { from?: string; to?: string } = {}
+): Promise<ReportSummary> {
+  const response = await serverApiFetch<{ data: ReportSummary }>(
+    `/reports/summary${toQuery(filters)}`
   )
   return response.data
 }

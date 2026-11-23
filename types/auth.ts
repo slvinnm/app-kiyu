@@ -1,27 +1,15 @@
-export const USER_ROLES = [
-  "admin",
-  "doctor",
-  "patient",
-  "receptionist",
-  "nurse",
-  "pharmacy",
-  "lab",
-  "billing",
-] as const
+/**
+ * Tenant roles emitted by the API. `platform_admin` is excluded on purpose:
+ * the non-platform frontend never serves platform operators.
+ */
+export const USER_ROLES = ["admin", "receptionist", "staff", "client"] as const
 
 export type UserRole = (typeof USER_ROLES)[number]
 
 /**
- * Backend role aliases mapped onto this application's role names.
- * Kept intentionally small: only roles the backend actually emits.
- */
-export const ROLE_ALIASES: Record<string, UserRole> = {
-  pharmacist: "pharmacy",
-}
-
-/**
- * Normalizes a raw role coming from the API/session into a known `UserRole`.
- * Returns `null` for unknown roles so callers can deny access safely.
+ * Normalizes a raw role from the API/session to a known `UserRole`.
+ * Returns `null` for platform accounts and unknown roles so route guards fail
+ * closed.
  */
 export function normalizeRole(role: unknown): UserRole | null {
   if (typeof role !== "string") {
@@ -30,15 +18,9 @@ export function normalizeRole(role: unknown): UserRole | null {
 
   const normalized = role.trim().toLowerCase()
 
-  if (!normalized) {
-    return null
-  }
-
-  if ((USER_ROLES as readonly string[]).includes(normalized)) {
-    return normalized as UserRole
-  }
-
-  return ROLE_ALIASES[normalized] ?? null
+  return (USER_ROLES as readonly string[]).includes(normalized)
+    ? (normalized as UserRole)
+    : null
 }
 
 export type AuthUser = {
@@ -59,11 +41,6 @@ export type AuthResponse = {
   }
 }
 
-/**
- * Keeps only the claims the UI needs in the signed session cookie. Patient
- * profile data (PII) is intentionally excluded; fetch /auth/me server-side if
- * it is ever needed.
- */
 export function toSessionUser(user: AuthUser): AuthUser {
   return {
     id: user.id,

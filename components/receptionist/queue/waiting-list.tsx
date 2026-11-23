@@ -41,7 +41,7 @@ function TicketRow({
         </div>
 
         <p className="mt-1 truncate text-sm">
-          {ticket.visit?.patient?.name ?? "Walk-in — belum teridentifikasi"}
+          {ticket.visit?.client?.name ?? "Walk-in — belum teridentifikasi"}
         </p>
 
         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">

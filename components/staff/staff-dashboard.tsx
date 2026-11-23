@@ -18,10 +18,10 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { ClinicalStats } from "@/components/clinical/clinical-stats"
+import { StaffStats } from "@/components/staff/stats"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getStationQueueServer } from "@/lib/api/clinical-server"
+import { getStationQueueServer } from "@/lib/api/staff-server"
 import { LiveRefresh } from "@/components/realtime/live-refresh"
 import { getSession } from "@/lib/auth/session"
 import {
@@ -30,25 +30,20 @@ import {
   ticketStatusLabel,
 } from "@/lib/reception/format"
 
-import type { ClinicalQueueSnapshot } from "@/types/clinical"
+import type { ClinicalQueueSnapshot } from "@/types/staff"
 
 function roleLabel(role: string): string {
-  if (role === "nurse") return "Perawat"
-  if (role === "doctor") return "Dokter"
-  if (role === "pharmacy") return "Farmasi"
-  if (role === "lab") return "Laboratorium"
-  if (role === "billing") return "Kasir"
-  return role
+  return role === "staff" ? "Staff" : role
 }
 
-export async function ClinicalDashboard({ role }: { role: string }) {
+export async function StaffDashboard({ role }: { role: string }) {
   const session = await getSession()
 
   if (!session?.user?.role) {
     redirect("/login")
   }
 
-  const basePath = `/${role}`
+  const basePath = "/staff"
   const queuePath = `${basePath}/queue`
   const label = roleLabel(role)
   const stationId = session.user.station_id ?? null
@@ -152,7 +147,7 @@ export async function ClinicalDashboard({ role }: { role: string }) {
           </Alert>
         )}
 
-        <ClinicalStats
+        <StaffStats
           waiting={waiting.length}
           called={called.length}
           inProgress={inProgress.length}
@@ -190,7 +185,7 @@ export async function ClinicalDashboard({ role }: { role: string }) {
                     </p>
 
                     <p className="mt-3 text-sm font-medium">
-                      {current.visit?.patient?.name ??
+                      {current.visit?.client?.name ??
                         "Pasien belum teridentifikasi"}
                     </p>
 
@@ -251,7 +246,7 @@ export async function ClinicalDashboard({ role }: { role: string }) {
 
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm">
-                          {ticket.visit?.patient?.name ??
+                          {ticket.visit?.client?.name ??
                             "Pasien belum teridentifikasi"}
                         </p>
 

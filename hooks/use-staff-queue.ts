@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { getStationQueue } from "@/lib/api/clinical"
+import { getStationQueue } from "@/lib/api/staff"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { bindEchoConnectionState, getEcho } from "@/lib/echo"
+import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
+import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { QueueTicket, Station } from "@/types/reception"
 
@@ -14,7 +15,7 @@ const POLL_INTERVAL_MS = 15_000
  * Loads the operational queue for a clinical station and keeps it fresh while
  * the tab is visible. The station comes from the signed-in user's assignment.
  */
-export function useClinicalQueue(
+export function useStaffQueue(
   stationId: number | null,
   options?: { paused?: boolean; actorEmail?: string | null }
 ) {
@@ -125,7 +126,7 @@ export function useClinicalQueue(
       return
     }
 
-    const channels = [`station.${stationId}`]
+    const channels = [publicFacilityChannel(PUBLIC_FACILITY_ID)]
 
     const handler = () => {
       if (!pausedRef.current) {
@@ -265,3 +266,6 @@ export function useClinicalQueue(
     refresh,
   }
 }
+
+/* Alias kept while older call sites are migrated. */
+export const useClinicalQueue = useStaffQueue

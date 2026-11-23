@@ -1,24 +1,24 @@
 /**
- * Patient-facing types. The backend uses the same Patient / Visit /
- * QueueTicket models as the staff workspaces.
+ * Client-facing types. The backend uses the same Client / Visit / QueueTicket
+ * models as the staff workspaces.
  */
 
 import type { AuthUser } from "@/types/auth"
 import type {
-  Patient,
+  Client,
   QueueAcquisition,
   QueueTicket,
   Visit,
   VisitDetail,
 } from "@/types/reception"
 
-export type PatientProfile = Patient
+export type ClientProfile = Client
 
-export type PatientAuthUser = AuthUser & {
-  profile?: PatientProfile | null
+export type ClientAuthUser = AuthUser & {
+  profile?: ClientProfile | null
 }
 
-export type PatientVisit = Visit
+export type ClientVisit = Visit
 
 export type QueueEvent = {
   id: number
@@ -32,12 +32,12 @@ export type QueueEvent = {
   updated_at?: string
 }
 
-export type PatientQueueTicket = QueueTicket & {
+export type ClientQueueTicket = QueueTicket & {
   events?: QueueEvent[]
 }
 
-export type PatientVisitDetail = Omit<VisitDetail, "queue_tickets"> & {
-  queue_tickets?: PatientQueueTicket[]
+export type ClientVisitDetail = Omit<VisitDetail, "queue_tickets"> & {
+  queue_tickets?: ClientQueueTicket[]
 }
 
 export type OnlineBookingResult = {
@@ -46,7 +46,7 @@ export type OnlineBookingResult = {
   ticket: null
 }
 
-export type PatientProfileInput = {
+export type ClientProfileInput = {
   name: string
   nik: string
   date_of_birth: string
@@ -55,3 +55,11 @@ export type PatientProfileInput = {
   email: string
   address: string
 }
+
+/* Aliases kept while older client pages are migrated. */
+export type PatientProfile = ClientProfile
+export type PatientAuthUser = ClientAuthUser
+export type PatientVisit = ClientVisit
+export type PatientQueueTicket = ClientQueueTicket
+export type PatientVisitDetail = ClientVisitDetail
+export type PatientProfileInput = ClientProfileInput

@@ -1,80 +1,50 @@
 /**
  * Admin workspace types. Master-data entities are shared with the operational
- * modules; this file adds admin-specific payloads and read models.
+ * modules; this file only adds admin-specific payloads and read models.
  */
 
-import type { QueueEvent } from "@/types/patient"
 import type {
+  Client,
   Department,
   Paginated,
-  Patient,
   Priority,
   QueueTicket,
   Station,
   Visit,
 } from "@/types/reception"
 
+export type {
+  AuditLog,
+  Department,
+  Paginated,
+  PublicQueueStation,
+  QueueTicket,
+  Referral,
+  ReferralStatus,
+  Station,
+  Visit,
+  Workflow,
+  WorkflowStep,
+} from "@/types/reception"
+
 export type AdminStation = Station & {
   department?: Department | null
 }
 
-export type WorkflowStep = {
-  id: number
-  workflow_id: number
-  station_id: number
-  name: string
-  sequence: number
-  is_active: boolean
-  is_optional: boolean
-  is_repeatable: boolean
-  can_skip: boolean
-  completion_requirements?: unknown
-  entry_conditions?: unknown
-  station?: AdminStation | null
-}
-
-export type Workflow = {
-  id: number
-  department_id: number
-  name: string
-  is_active: boolean
-  created_at?: string
-  updated_at?: string
-  department?: Department | null
-  steps?: WorkflowStep[]
-}
-
-export type AuditLog = {
-  id: number
-  user_id: string | null
-  action: string
-  entity_type: string
-  entity_id: string | null
-  metadata: unknown
-  ip_address: string | null
-  created_at?: string
-  updated_at?: string
-}
-
-export type PublicQueueStation = {
-  station_id: number
-  station_name: string
-  station_code: string
-  station_type: string
-  department_id: number
-  department_name: string
-  department_code: string
-  current_calling: {
-    queue_number: string
-    status: string
-    called_at?: string | null
-  } | null
-  waiting_count: number
-  upcoming_queue_numbers: string[]
-}
-
 export type AdminQueueTicket = QueueTicket & {
   events?: QueueEvent[]
+}
+
+export type QueueEvent = {
+  id: number
+  queue_ticket_id: number
+  event_type: string
+  from_status: string | null
+  to_status: string | null
+  user_id: string | null
+  payload: unknown
+  created_at?: string
+  updated_at?: string
 }
 
 export type AdminVisitDetail = Visit & {
@@ -115,7 +85,7 @@ export type WorkflowStepPayload = {
   can_skip?: boolean
 }
 
-export type PatientPayload = {
+export type ClientPayload = {
   name: string
   nik?: string
   mrn?: string
@@ -126,11 +96,14 @@ export type PatientPayload = {
   address?: string
 }
 
+/** @deprecated use `ClientPayload` — the API renamed patients to clients. */
+export type PatientPayload = ClientPayload
+
 export type VisitFilters = {
   search?: string
   department_id?: number
   status?: string
-  patient_id?: number
+  client_id?: number
   intake_channel?: string
   date?: string
   sort?: string
@@ -151,7 +124,7 @@ export type AuditFilters = {
   per_page?: number
 }
 
-export type PatientFilters = {
+export type ClientFilters = {
   search?: string
   nik?: string
   mrn?: string
@@ -160,6 +133,9 @@ export type PatientFilters = {
   page?: number
   per_page?: number
 }
+
+/** @deprecated use `ClientFilters`. */
+export type PatientFilters = ClientFilters
 
 export type TicketFilters = {
   search?: string
@@ -225,25 +201,19 @@ export type UserFilters = {
   per_page?: number
 }
 
-export type ReferralStatus = "PENDING" | "ACCEPTED" | "COMPLETED" | "CANCELLED"
-
-export type Referral = {
+export type ReferralDetail = {
   id: number
   source_visit_id: number
   target_department_id: number
   target_visit_id: number | null
   referred_by_user_id: string | null
-  status: ReferralStatus
+  status: string
   priority: Priority
   reason: string | null
   created_at?: string
   updated_at?: string
-  source_visit?: (Visit & { patient?: Patient | null }) | null
+  source_visit?: (Visit & { client?: Client | null }) | null
   target_department?: Department | null
-  target_visit?: Visit | null
-}
-
-export type ReferralDetail = Referral & {
   target_visit?: (Visit & { queue_tickets?: QueueTicket[] }) | null
 }
 
@@ -267,10 +237,9 @@ export type CreateReferralPayload = {
 }
 
 export type CreateReferralResult = {
-  referral: Referral
+  referral: ReferralDetail
   target_visit: Visit
   target_ticket: QueueTicket
 }
 
 export type AdminPage<T> = Paginated<T>
-export type { Patient, Visit }

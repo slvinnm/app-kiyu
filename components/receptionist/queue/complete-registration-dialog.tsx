@@ -23,16 +23,16 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import { NewPatientForm } from "@/components/receptionist/patient/new-patient-form"
+import { NewPatientForm } from "@/components/receptionist/client/new-client-form"
 import {
   PatientModeTabs,
   type PatientMode,
-} from "@/components/receptionist/patient/patient-mode-tabs"
-import { PatientSearch } from "@/components/receptionist/patient/patient-search"
-import { PatientSummary } from "@/components/receptionist/patient/patient-summary"
+} from "@/components/receptionist/client/client-mode-tabs"
+import { PatientSearch } from "@/components/receptionist/client/client-search"
+import { PatientSummary } from "@/components/receptionist/client/client-summary"
 import { CompleteRegistrationSuccess as CompleteRegistrationSuccessView } from "@/components/receptionist/queue/complete-registration-success"
 
-import { usePatientSearch } from "@/hooks/use-patient-search"
+import { usePatientSearch } from "@/hooks/use-client-search"
 
 import {
   getApiErrorMessage,
@@ -74,20 +74,20 @@ function toPatientData(input: PatientInput): CompleteRegistrationPatientData {
     name: input.name.trim(),
   }
 
-  const nik = input.nik.trim()
+  const nik = (input.nik ?? "").trim()
   if (nik) data.nik = nik
 
   if (input.date_of_birth) data.date_of_birth = input.date_of_birth
 
   if (input.gender) data.gender = input.gender
 
-  const phone = input.phone.trim()
+  const phone = (input.phone ?? "").trim()
   if (phone) data.phone = phone
 
-  const email = input.email.trim()
+  const email = (input.email ?? "").trim()
   if (email) data.email = email
 
-  const address = input.address.trim()
+  const address = (input.address ?? "").trim()
   if (address) data.address = address
 
   return data
@@ -121,7 +121,7 @@ export function CompleteRegistrationDialog({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [result, setResult] = useState<CompleteRegistrationResult | null>(null)
 
-  const existingPatient = ticket?.visit?.patient ?? null
+  const existingPatient = ticket?.visit?.client ?? null
   const searchEnabled =
     open && !existingPatient && mode === "existing" && search.trim().length >= 2
 
@@ -246,9 +246,9 @@ export function CompleteRegistrationDialog({
 
     if (!existingPatient) {
       if (mode === "existing" && selectedPatient) {
-        payload.patient_id = selectedPatient.id
+        payload.client_id = selectedPatient.id
       } else {
-        payload.patient_data = toPatientData(newPatient)
+        payload.client_data = toPatientData(newPatient)
       }
     }
 
@@ -268,7 +268,7 @@ export function CompleteRegistrationDialog({
       if (type === "BUSINESS_CONFLICT") {
         if (/nik/i.test(message)) {
           setMode("existing")
-          setSearch(newPatient.nik.trim())
+          setSearch(newPatient.nik ?? ''.trim())
           setFieldErrors({ nik: message })
           setSubmitError(message)
           toast.error(message)

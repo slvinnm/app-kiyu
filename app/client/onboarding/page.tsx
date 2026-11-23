@@ -15,12 +15,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientLoadError } from "@/components/patient/patient-notices"
-import { PatientProfileForm } from "@/components/patient/profile-form"
+import { PatientLoadError } from "@/components/client/client-notices"
+import { PatientProfileForm } from "@/components/client/profile-form"
 
 import { logout } from "@/lib/actions/auth"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getCurrentPatientServer } from "@/lib/api/patient-server"
+import { getCurrentClientServer } from "@/lib/api/clients-server"
 import { getSession } from "@/lib/auth/session"
 
 export default async function OnboardingPage() {
@@ -33,7 +33,7 @@ export default async function OnboardingPage() {
   let current
 
   try {
-    current = await getCurrentPatientServer()
+    current = await getCurrentClientServer()
   } catch (cause) {
     return (
       <OnboardingShell email={session.user.email}>
@@ -46,7 +46,7 @@ export default async function OnboardingPage() {
 
   // Already onboarded — send them to the dashboard.
   if (current.profile) {
-    redirect("/patient/dashboard")
+    redirect("/client/dashboard")
   }
 
   return (
@@ -72,7 +72,7 @@ export default async function OnboardingPage() {
               profile={null}
               defaultName={current.user.name}
               defaultEmail={current.user.email}
-              redirectTo="/patient/dashboard"
+              redirectTo="/client/dashboard"
             />
           </CardContent>
         </Card>

@@ -16,7 +16,7 @@ import {
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
 
-import { PatientDetailSheet } from "@/components/receptionist/patients/patient-detail-sheet"
+import { PatientDetailSheet } from "@/components/receptionist/clients/client-detail-sheet"
 
 import { useTableQuery } from "@/hooks/use-table-query"
 

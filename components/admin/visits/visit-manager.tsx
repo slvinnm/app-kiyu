@@ -85,10 +85,10 @@ export function VisitManager({
           header: "Pasien",
           cell: ({ row }) => (
             <div>
-              <p className="font-medium">{row.original.patient?.name ?? "-"}</p>
+              <p className="font-medium">{row.original.client?.name ?? "-"}</p>
 
               <p className="text-xs text-muted-foreground">
-                {row.original.patient?.mrn ?? "-"}
+                {row.original.client?.mrn ?? "-"}
               </p>
             </div>
           ),

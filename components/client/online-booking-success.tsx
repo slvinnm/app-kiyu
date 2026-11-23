@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { channelLabel, visitStatusLabel } from "@/lib/reception/format"
 
 import type { Department, Visit } from "@/types/reception"
-import type { OnlineBookingResult } from "@/types/patient"
+import type { OnlineBookingResult } from "@/types/client"
 
 export function OnlineBookingSuccess({
   result,

@@ -25,11 +25,11 @@ import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getStations, transferTicket } from "@/lib/api/clinical"
+import { getStations, transferTicket } from "@/lib/api/staff"
 
 import type { QueueTicket, Station } from "@/types/reception"
 
-export function ClinicalTransferDialog({
+export function StaffTransferDialog({
   ticket,
   departmentId,
   stationType,

@@ -1,64 +1,53 @@
 import "server-only"
 
-import { getLaravelAccessToken } from "@/lib/auth/server"
 import { ApiError } from "@/lib/api/error"
+import { getLaravelAccessToken } from "@/lib/auth/server"
 
 const API_BASE_URL = process.env.API_BASE_URL ?? ""
 
-if (API_BASE_URL.length === 0) {
+if (!API_BASE_URL) {
   throw new Error("API_BASE_URL is not configured.")
 }
 
+/**
+ * Server-side fetch straight to the Laravel API with the session's bearer
+ * token. Used by server components; never callable from the browser.
+ */
 export async function serverApiFetch<T>(
   path: string,
-  options?: RequestInit
+  init?: RequestInit
 ): Promise<T> {
-  const accessToken = await getLaravelAccessToken()
+  const token = await getLaravelAccessToken()
 
-  if (!accessToken) {
-    throw new ApiError("Unauthenticated.", 401, [])
+  if (!token) {
+    throw new ApiError(401, "Unauthenticated.", null)
   }
 
-  const url = `${API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`
+  const response = await fetch(
+    `${API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`,
+    {
+      ...init,
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        ...(init?.body ? { "Content-Type": "application/json" } : {}),
+        ...init?.headers,
+      },
+    }
+  )
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
-      ...options?.headers,
-    },
-    cache: "no-store",
-  })
-
-  const contentType = response.headers.get("content-type") ?? ""
-
-  const data = contentType.includes("application/json")
-    ? await response.json()
-    : await response.text()
+  const payload: unknown = await response
+    .json()
+    .catch(() => ({ message: "Respons tidak valid." }))
 
   if (!response.ok) {
-    const message =
-      typeof data === "object" &&
-      data !== null &&
-      "message" in data &&
-      typeof data.message === "string"
-        ? data.message
-        : `Request failed with status ${response.status}.`
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("[serverApiFetch]", {
-        path,
-        url,
-        status: response.status,
-        statusText: response.statusText,
-        message,
-        data,
-      })
-    }
-
-    throw new ApiError(message, response.status, data)
+    throw new ApiError(
+      response.status,
+      (payload as { message?: string })?.message ?? "Permintaan gagal.",
+      payload
+    )
   }
 
-  return data as T
+  return payload as T
 }

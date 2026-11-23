@@ -46,7 +46,7 @@ export function ManualIntakeSuccess({
           </p>
 
           <p className="mt-2 text-6xl font-black tracking-tight tabular-nums">
-            {ticket.queue_number}
+            {ticket?.queue_number ?? "-"}
           </p>
 
           <p className="mt-3 text-sm font-medium">
@@ -54,7 +54,7 @@ export function ManualIntakeSuccess({
           </p>
 
           <p className="mt-1 text-xs text-muted-foreground">
-            {ticket.station?.name ?? "Meja registrasi"}
+            {ticket?.station?.name ?? "Meja registrasi"}
           </p>
         </div>
 

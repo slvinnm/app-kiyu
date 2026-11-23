@@ -41,7 +41,7 @@ function TicketRow({
         </div>
 
         <p className="mt-1 truncate text-sm">
-          {ticket.visit?.patient?.name ?? "Pasien belum teridentifikasi"}
+          {ticket.visit?.client?.name ?? "Pasien belum teridentifikasi"}
         </p>
 
         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
@@ -60,7 +60,7 @@ function TicketRow({
   )
 }
 
-export function ClinicalLists({
+export function StaffLists({
   waiting,
   called,
   onHold,

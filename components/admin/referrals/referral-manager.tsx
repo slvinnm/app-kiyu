@@ -73,7 +73,7 @@ export function ReferralManager({
           cell: ({ row }) => (
             <div>
               <p className="font-medium">
-                {row.original.source_visit?.patient?.name ?? "-"}
+                {row.original.source_visit?.client?.name ?? "-"}
               </p>
 
               <p className="font-mono text-xs text-muted-foreground">
@@ -97,7 +97,8 @@ export function ReferralManager({
             </Badge>
           ),
         }),
-        columnHelper.accessor("priority", {
+        columnHelper.accessor("status", {
+          id: "priority",
           header: "Prioritas",
           cell: ({ row }) => priorityLabel(row.original.priority),
         }),

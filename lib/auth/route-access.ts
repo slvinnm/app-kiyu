@@ -7,49 +7,23 @@ type RouteRule = {
   roles: UserRole[]
 }
 
+/**
+ * Mirrors the API's `role:` middleware. Admin is allowed into the receptionist
+ * and staff workspaces because the API grants admin those routes too.
+ */
 export const routeRules: RouteRule[] = [
-  {
-    prefix: "/admin",
-    roles: ["admin"],
-  },
-  {
-    prefix: "/receptionist",
-    roles: ["receptionist"],
-  },
-  {
-    prefix: "/doctor",
-    roles: ["doctor"],
-  },
-  {
-    prefix: "/nurse",
-    roles: ["nurse"],
-  },
-  {
-    prefix: "/pharmacy",
-    roles: ["pharmacy"],
-  },
-  {
-    prefix: "/lab",
-    roles: ["lab"],
-  },
-  {
-    prefix: "/billing",
-    roles: ["billing"],
-  },
-  {
-    prefix: "/patient",
-    roles: ["patient"],
-  },
+  { prefix: "/admin", roles: ["admin"] },
+  { prefix: "/receptionist", roles: ["admin", "receptionist"] },
+  { prefix: "/staff", roles: ["admin", "staff"] },
+  { prefix: "/client", roles: ["client"] },
 ]
 
 export function getRouteRule(pathname: string): RouteRule | null {
-  const matchingRules = routeRules.filter(
+  const matching = routeRules.filter(
     (rule) => pathname === rule.prefix || pathname.startsWith(`${rule.prefix}/`)
   )
 
-  return (
-    matchingRules.sort((a, b) => b.prefix.length - a.prefix.length)[0] ?? null
-  )
+  return matching.sort((a, b) => b.prefix.length - a.prefix.length)[0] ?? null
 }
 
 export function isRoleAllowed(role: unknown, roles: UserRole[]): boolean {

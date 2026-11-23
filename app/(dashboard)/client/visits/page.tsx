@@ -3,20 +3,20 @@ import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
-import { PatientVisitsList } from "@/components/patient/patient-visits-list"
+import { PatientVisitsList } from "@/components/client/client-visits-list"
 import {
   PatientLoadError,
   ProfileRequired,
-} from "@/components/patient/patient-notices"
+} from "@/components/client/client-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import {
-  getCurrentPatientServer,
-  getPatientVisitsServer,
-} from "@/lib/api/patient-server"
+  getCurrentClientServer,
+  getClientVisitsServer,
+} from "@/lib/api/clients-server"
 import { getSession } from "@/lib/auth/session"
 
-import type { PatientVisit } from "@/types/patient"
+import type { PatientVisit } from "@/types/client"
 
 export default async function Page() {
   const session = await getSession()
@@ -28,7 +28,7 @@ export default async function Page() {
   let current
 
   try {
-    current = await getCurrentPatientServer()
+    current = await getCurrentClientServer()
   } catch (cause) {
     return (
       <div className="mx-auto w-full max-w-5xl p-4 md:p-6 lg:p-8">
@@ -53,7 +53,7 @@ export default async function Page() {
   let visits: PatientVisit[] = []
 
   try {
-    const page = await getPatientVisitsServer(current.profile.id, 50)
+    const page = await getClientVisitsServer(current.profile.id, 50)
     visits = page.data
   } catch (cause) {
     return (

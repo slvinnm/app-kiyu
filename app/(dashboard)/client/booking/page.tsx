@@ -3,14 +3,14 @@ import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
-import { OnlineBookingForm } from "@/components/patient/online-booking-form"
+import { OnlineBookingForm } from "@/components/client/online-booking-form"
 import {
   PatientLoadError,
   ProfileRequired,
-} from "@/components/patient/patient-notices"
+} from "@/components/client/client-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getCurrentPatientServer } from "@/lib/api/patient-server"
+import { getCurrentPatientServer } from "@/lib/api/clients-server"
 import { getActiveDepartmentsServer } from "@/lib/api/reception-server"
 import { getSession } from "@/lib/auth/session"
 
@@ -70,7 +70,7 @@ export default async function Page() {
 
       <div className="mt-6">
         <OnlineBookingForm
-          patientId={current.profile.id}
+          clientId={current.profile.id}
           departments={departments}
         />
       </div>

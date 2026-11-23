@@ -1,141 +1,152 @@
 import { apiFetch } from "@/lib/api/client"
+import { toQuery } from "@/lib/api/query"
 
-import type { ApiResponse } from "@/types/reception"
 import type {
-  CompleteTicketResult,
+  ApiResponse,
   QueueTicket,
   Station,
-  TransferTicketResult,
-} from "@/types/clinical"
-
-function postJson<T>(path: string, body: unknown): Promise<T> {
-  return apiFetch<T>(path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
-}
+  Visit,
+} from "@/types/reception"
 
 /* -------------------------------------------------------------------------- */
 /* Station queue                                                              */
 /* -------------------------------------------------------------------------- */
 
-export function getStationQueue(stationId: number, signal?: AbortSignal) {
-  return apiFetch<{ station: Station; data: QueueTicket[] }>(
-    `/stations/${stationId}/queue`,
-    { signal }
-  )
+export type StationQueueResponse = {
+  station: Station
+  data: QueueTicket[]
 }
 
-export function getStations(
+export function getStationQueue(
+  stationId: number,
+  signal?: AbortSignal
+): Promise<StationQueueResponse> {
+  return apiFetch(`/stations/${stationId}/queue`, { signal })
+}
+
+export function getStationOptions(
   filters: { department_id?: number; type?: string } = {},
   signal?: AbortSignal
 ) {
-  const search = new URLSearchParams()
-
-  if (filters.department_id !== undefined) {
-    search.set("department_id", String(filters.department_id))
-  }
-
-  if (filters.type) {
-    search.set("type", filters.type)
-  }
-
-  const query = search.toString()
-
-  return apiFetch<{ data: Station[] }>(
-    `/stations/options${query ? `?${query}` : ""}`,
-    { signal }
-  )
+  return apiFetch<{ data: Station[] }>(`/stations/options${toQuery(filters)}`, {
+    signal,
+  })
 }
 
 /* -------------------------------------------------------------------------- */
-/* Clinical queue actions                                                     */
+/* Queue actions                                                              */
 /* -------------------------------------------------------------------------- */
 
 export function callNextClinical(stationId: number, assignedTo?: string) {
-  return postJson<ApiResponse<QueueTicket | null>>("/clinical/call-next", {
-    station_id: stationId,
-    assigned_to: assignedTo,
+  return apiFetch<ApiResponse<QueueTicket | null>>("/clinical/call-next", {
+    method: "POST",
+    body: JSON.stringify({ station_id: stationId, assigned_to: assignedTo }),
   })
 }
 
 export function startTicket(ticketId: number, userId?: string) {
-  return postJson<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/start`, {
-    user_id: userId,
-  })
-}
-
-export function holdTicket(
-  ticketId: number,
-  payload?: { notes?: string; user_id?: string }
-) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/tickets/${ticketId}/hold`,
-    payload ?? {}
-  )
-}
-
-export function resumeTicket(ticketId: number, userId?: string) {
-  return postJson<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/resume`, {
-    user_id: userId,
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/start`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId }),
   })
 }
 
 export function completeTicket(
   ticketId: number,
-  payload?: { notes?: string; user_id?: string }
+  payload: { notes?: string; user_id?: string } = {}
 ) {
-  return postJson<ApiResponse<CompleteTicketResult>>(
+  return apiFetch<ApiResponse<CompleteTicketResult>>(
     `/tickets/${ticketId}/complete`,
-    payload ?? {}
+    { method: "POST", body: JSON.stringify(payload) }
   )
 }
 
+export function holdTicket(
+  ticketId: number,
+  payload: { notes?: string; user_id?: string } = {}
+) {
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/hold`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
+}
+
+export function resumeTicket(ticketId: number, userId?: string) {
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/resume`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId }),
+  })
+}
+
 export function recallTicket(ticketId: number, userId?: string) {
-  return postJson<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/recall`, {
-    user_id: userId,
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/recall`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId }),
   })
 }
 
 export function skipTicket(
   ticketId: number,
-  payload?: { notes?: string; user_id?: string }
+  payload: { notes?: string; user_id?: string } = {}
 ) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/tickets/${ticketId}/skip`,
-    payload ?? {}
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/skip`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
 
 export function noShowTicket(
   ticketId: number,
-  payload?: { notes?: string; user_id?: string }
+  payload: { notes?: string; user_id?: string } = {}
 ) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/tickets/${ticketId}/no-show`,
-    payload ?? {}
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/no-show`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
 
 export function cancelTicket(
   ticketId: number,
-  payload?: { notes?: string; user_id?: string }
+  payload: { notes?: string; user_id?: string } = {}
 ) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/tickets/${ticketId}/cancel`,
-    payload ?? {}
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/cancel`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
 
 export function transferTicket(
   ticketId: number,
   payload: { target_station_id: number; notes?: string; user_id?: string }
 ) {
-  return postJson<ApiResponse<TransferTicketResult>>(
-    `/tickets/${ticketId}/transfer`,
-    payload
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/tickets/${ticketId}/transfer`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
+
+export type CompleteTicketResult = {
+  ticket: QueueTicket
+  next_ticket: QueueTicket | null
+  visit: Visit
+}
+
+/* -------------------------------------------------------------------------- */
+/* Visit actions                                                              */
+/* -------------------------------------------------------------------------- */
+
+export function updateVisitPriority(visitId: number, priority: 1 | 2 | 3) {
+  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/priority`, {
+    method: "PATCH",
+    body: JSON.stringify({ priority }),
+  })
+}
+
+export function cancelVisit(visitId: number, reason?: string) {
+  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/cancel`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  })
+}
+
+export const getStations = getStationOptions

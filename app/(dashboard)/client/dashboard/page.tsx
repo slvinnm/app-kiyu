@@ -19,14 +19,14 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientLoadError } from "@/components/patient/patient-notices"
+import { PatientLoadError } from "@/components/client/client-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import {
-  getCurrentPatientServer,
-  getPatientVisitsServer,
+  getCurrentClientServer,
+  getClientVisitsServer,
   getVisitDetailServer,
-} from "@/lib/api/patient-server"
+} from "@/lib/api/clients-server"
 import { getSession } from "@/lib/auth/session"
 import {
   channelLabel,
@@ -37,7 +37,7 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientVisitDetail } from "@/types/patient"
+import type { PatientVisitDetail } from "@/types/client"
 import type { Visit } from "@/types/reception"
 
 const ACTIVE_VISIT_STATUSES = ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"]
@@ -54,7 +54,7 @@ export default async function Page() {
   let current
 
   try {
-    current = await getCurrentPatientServer()
+    current = await getCurrentClientServer()
   } catch (cause) {
     return (
       <PageShell>
@@ -66,7 +66,7 @@ export default async function Page() {
   }
 
   if (!current.profile) {
-    redirect("/patient/onboarding")
+    redirect("/client/onboarding")
   }
 
   const profile = current.profile
@@ -75,7 +75,7 @@ export default async function Page() {
   let visitsError: string | null = null
 
   try {
-    const page = await getPatientVisitsServer(profile.id, 50)
+    const page = await getClientVisitsServer(profile.id, 50)
     visits = page.data
   } catch (cause) {
     visitsError = getApiErrorMessage(cause, "Gagal memuat kunjungan.")
@@ -299,7 +299,7 @@ export default async function Page() {
               </div>
 
               <Link
-                href="/patient/profile"
+                href="/client/profile"
                 className={buttonVariants({ variant: "outline" })}
               >
                 Kelola Profil
@@ -316,7 +316,7 @@ export default async function Page() {
 
           <CardContent className="flex flex-wrap items-center gap-2">
             <Link
-              href="/patient/booking"
+              href="/client/booking"
               className={buttonVariants({ variant: "outline" })}
             >
               <CalendarPlusIcon />
@@ -324,7 +324,7 @@ export default async function Page() {
             </Link>
 
             <Link
-              href="/patient/visits"
+              href="/client/visits"
               className={buttonVariants({ variant: "outline" })}
             >
               <FileTextIcon />
@@ -332,7 +332,7 @@ export default async function Page() {
             </Link>
 
             <Link
-              href="/patient/profile"
+              href="/client/profile"
               className={buttonVariants({ variant: "outline" })}
             >
               <UserRoundIcon />

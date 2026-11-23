@@ -34,7 +34,7 @@ function StatCard({
   )
 }
 
-export function ClinicalStats({
+export function StaffStats({
   waiting,
   called,
   inProgress,
@@ -74,7 +74,7 @@ export function ClinicalStats({
   )
 }
 
-export function ClinicalCompletedBadge({ count }: { count: number }) {
+export function StaffCompletedBadge({ count }: { count: number }) {
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
       <CheckCircle2Icon className="size-4" />

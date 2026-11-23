@@ -43,14 +43,25 @@ export function getEcho(): EchoClient | null {
   return client
 }
 
-export const PUBLIC_QUEUE_CHANNEL = "public.queue"
-
-export function departmentChannel(departmentId: number): string {
-  return `department.${departmentId}`
+/** Public display channel, scoped per facility. No auth required. */
+export function publicFacilityChannel(facilityId: number | string): string {
+  return `public.facility.${facilityId}`
 }
 
-export function stationChannel(stationId: number): string {
-  return `station.${stationId}`
+/** Staff-only private channel. Requires broadcasting auth. */
+export function tenantDepartmentChannel(
+  tenantId: number | string,
+  departmentId: number | string
+): string {
+  return `tenant.${tenantId}.department.${departmentId}`
+}
+
+/** Staff-only private channel. Requires broadcasting auth. */
+export function tenantStationChannel(
+  tenantId: number | string,
+  stationId: number | string
+): string {
+  return `tenant.${tenantId}.station.${stationId}`
 }
 
 /** Returns true only when the Echo/Pusher socket is currently connected. */

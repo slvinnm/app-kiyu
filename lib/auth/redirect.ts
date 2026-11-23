@@ -1,26 +1,14 @@
 import { normalizeRole } from "@/types/auth"
 
+const ROLE_DASHBOARDS: Record<string, string> = {
+  admin: "/admin/dashboard",
+  receptionist: "/receptionist/dashboard",
+  staff: "/staff/dashboard",
+  client: "/client/dashboard",
+}
+
 export function getRoleRedirect(role: unknown): string {
   const normalizedRole = normalizeRole(role)
 
-  switch (normalizedRole) {
-    case "admin":
-      return "/admin/dashboard"
-    case "receptionist":
-      return "/receptionist/dashboard"
-    case "doctor":
-      return "/doctor/dashboard"
-    case "nurse":
-      return "/nurse/dashboard"
-    case "pharmacy":
-      return "/pharmacy/dashboard"
-    case "lab":
-      return "/lab/dashboard"
-    case "billing":
-      return "/billing/dashboard"
-    case "patient":
-      return "/patient/dashboard"
-    default:
-      return "/unauthorized"
-  }
+  return normalizedRole ? ROLE_DASHBOARDS[normalizedRole] : "/unauthorized"
 }

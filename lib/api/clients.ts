@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/api/client"
 
-import type { ApiResponse, Patient } from "@/types/reception"
-import type { OnlineBookingResult, PatientVisitDetail } from "@/types/patient"
+import type { ApiResponse, Client } from "@/types/reception"
+import type { ClientVisitDetail, OnlineBookingResult } from "@/types/client"
 
 function postJson<T>(path: string, body: unknown): Promise<T> {
   return apiFetch<T>(path, {
@@ -18,7 +18,7 @@ function postJson<T>(path: string, body: unknown): Promise<T> {
 /* -------------------------------------------------------------------------- */
 
 export type OnlineBookingPayload = {
-  patient_id: number
+  client_id: number
   department_id: number
   idempotency_key?: string
 }
@@ -31,7 +31,7 @@ export function createOnlineBooking(payload: OnlineBookingPayload) {
 /* Profile                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export type PatientProfilePayload = {
+export type ClientProfilePayload = {
   name: string
   nik?: string
   date_of_birth?: string
@@ -41,19 +41,19 @@ export type PatientProfilePayload = {
   address?: string
 }
 
-export type CreatePatientProfilePayload = PatientProfilePayload & {
+export type CreateClientProfilePayload = ClientProfilePayload & {
   user_id: number
 }
 
-export function createPatientProfile(payload: CreatePatientProfilePayload) {
-  return postJson<ApiResponse<Patient>>("/patients", payload)
+export function createClientProfile(payload: CreateClientProfilePayload) {
+  return postJson<ApiResponse<Client>>("/clients", payload)
 }
 
-export function updatePatientProfile(
-  patientId: number,
-  payload: PatientProfilePayload
+export function updateClientProfile(
+  clientId: number,
+  payload: ClientProfilePayload
 ) {
-  return apiFetch<ApiResponse<Patient>>(`/patients/${patientId}`, {
+  return apiFetch<ApiResponse<Client>>(`/clients/${clientId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +67,7 @@ export function updatePatientProfile(
 /* -------------------------------------------------------------------------- */
 
 export function getVisitDetail(visitId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<PatientVisitDetail>>(`/visits/${visitId}`, {
+  return apiFetch<ApiResponse<ClientVisitDetail>>(`/visits/${visitId}`, {
     signal,
   })
 }

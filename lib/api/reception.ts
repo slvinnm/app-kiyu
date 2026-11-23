@@ -1,134 +1,168 @@
 import { apiFetch } from "@/lib/api/client"
+import { toQuery } from "@/lib/api/query"
 
 import type {
   ApiResponse,
-  CompleteRegistrationPatientData,
-  CompleteRegistrationResult,
-  ManualIntakeResult,
-  PaginatedResponse,
-  Patient,
-  PatientDetail,
-  Priority,
+  Client,
+  Paginated,
   QueueAcquisition,
   QueueTicket,
   ReceptionQueueSnapshot,
 } from "@/types/reception"
 
-type QueryValue = string | number | boolean | null | undefined
+/* -------------------------------------------------------------------------- */
+/* Reception queue                                                            */
+/* -------------------------------------------------------------------------- */
 
-function toQuery(params: Record<string, QueryValue>): string {
-  const search = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === null || value === "") {
-      continue
-    }
-
-    search.set(key, String(value))
-  }
-
-  const query = search.toString()
-
-  return query ? `?${query}` : ""
-}
-
-function postJson<T>(path: string, body: unknown): Promise<T> {
-  return apiFetch<T>(path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
+export function getReceptionQueue(
+  departmentId: number,
+  signal?: AbortSignal
+): Promise<ApiResponse<ReceptionQueueSnapshot>> {
+  return apiFetch(`/reception/queue${toQuery({ department_id: departmentId })}`, {
+    signal,
   })
 }
+
+export function callNextReception(departmentId: number, assignedTo?: string) {
+  return apiFetch<ApiResponse<QueueTicket | null>>("/reception/call-next", {
+    method: "POST",
+    body: JSON.stringify({
+      department_id: departmentId,
+      assigned_to: assignedTo,
+    }),
+  })
+}
+
+export function recallReceptionTicket(ticketId: number, assignedTo?: string) {
+  return apiFetch<ApiResponse<QueueTicket>>(
+    `/reception/${ticketId}/recall`,
+    { method: "POST", body: JSON.stringify({ assigned_to: assignedTo }) }
+  )
+}
+
+export function skipReceptionTicket(
+  ticketId: number,
+  payload: { reason?: string; user_id?: string } = {}
+) {
+  return apiFetch<ApiResponse<QueueTicket>>(
+    `/reception/${ticketId}/skip`,
+    { method: "POST", body: JSON.stringify(payload) }
+  )
+}
+
+export function noShowReceptionTicket(
+  ticketId: number,
+  assignedTo?: string
+) {
+  return apiFetch<ApiResponse<QueueTicket>>(
+    `/reception/${ticketId}/no-show`,
+    { method: "POST", body: JSON.stringify({ user_id: assignedTo }) }
+  )
+}
+
+export type CompleteRegistrationPayload = {
+  acquisition_id: number
+  client_id?: number
+  registered_by?: string
+  client_data?: {
+    name: string
+    nik?: string
+    mrn?: string
+    date_of_birth?: string
+    gender?: string
+    phone?: string
+    email?: string
+    address?: string
+  }
+  priority?: 1 | 2 | 3
+}
+
+export function completeRegistration(input: CompleteRegistrationPayload) {
+  return apiFetch<ApiResponse<CompleteRegistrationResult>>(
+    "/reception/complete-registration",
+    { method: "POST", body: JSON.stringify(input) }
+  )
+}
+
+export type {
+  CompleteRegistrationResult,
+  ManualIntakeResult,
+} from "@/types/reception"
+
+import type {
+  CompleteRegistrationResult,
+  ManualIntakeResult,
+} from "@/types/reception"
 
 /* -------------------------------------------------------------------------- */
 /* Manual intake                                                              */
 /* -------------------------------------------------------------------------- */
 
-export type ManualIntakePayload = {
+export function createManualIntake(input: {
   department_id: number
-  priority?: Priority
+  priority?: 1 | 2 | 3
   idempotency_key?: string
   registered_by?: string
-}
-
-export function createManualIntake(payload: ManualIntakePayload) {
-  return postJson<ApiResponse<ManualIntakeResult>>("/intake/manual", payload)
-}
-
-/* -------------------------------------------------------------------------- */
-/* Reception queue                                                            */
-/* -------------------------------------------------------------------------- */
-
-export function getReceptionQueue(departmentId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<ReceptionQueueSnapshot>>(
-    `/reception/queue${toQuery({ department_id: departmentId })}`,
-    { signal }
-  )
-}
-
-export function callNext(departmentId: number, assignedTo?: string) {
-  return postJson<ApiResponse<QueueTicket | null>>("/reception/call-next", {
-    department_id: departmentId,
-    assigned_to: assignedTo,
-  })
-}
-
-export function recallTicket(ticketId: number, assignedTo?: string) {
-  return postJson<ApiResponse<QueueTicket>>(`/reception/${ticketId}/recall`, {
-    assigned_to: assignedTo,
-  })
-}
-
-export function skipTicket(
-  ticketId: number,
-  payload?: { reason?: string; user_id?: string }
-) {
-  return postJson<ApiResponse<QueueTicket>>(
-    `/reception/${ticketId}/skip`,
-    payload ?? {}
-  )
-}
-
-export function noShowTicket(ticketId: number, userId?: string) {
-  return postJson<ApiResponse<QueueTicket>>(`/reception/${ticketId}/no-show`, {
-    user_id: userId,
+}) {
+  return apiFetch<ApiResponse<ManualIntakeResult>>("/intake/manual", {
+    method: "POST",
+    body: JSON.stringify(input),
   })
 }
 
 /* -------------------------------------------------------------------------- */
-/* Registration completion                                                    */
+/* Clients                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export type CompleteRegistrationPayload = {
-  acquisition_id: number
-  patient_id?: number
-  patient_data?: CompleteRegistrationPatientData
-  priority?: Priority
-  registered_by?: string
+export type ClientSearchFilters = {
+  search?: string
+  page?: number
+  per_page?: number
 }
 
-export function completeRegistration(payload: CompleteRegistrationPayload) {
-  return postJson<ApiResponse<CompleteRegistrationResult>>(
-    "/reception/complete-registration",
-    payload
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* Visits & acquisitions                                                      */
-/* -------------------------------------------------------------------------- */
-
-/**
- * The acquisition awaiting registration for a visit. This is a dedicated
- * visit sub-resource; `/queue-acquisitions` is the management list and is not
- * meant to be used as a lookup.
- */
-export function getVisitAcquisition(
-  visitId: number,
+export function searchClients(
+  filters: ClientSearchFilters,
   signal?: AbortSignal
-) {
+): Promise<ApiResponse<Paginated<Client>>> {
+  return apiFetch(`/clients${toQuery(filters)}`, { signal })
+}
+
+export function getClient(id: number, signal?: AbortSignal) {
+  return apiFetch<ApiResponse<Client>>(`/clients/${id}`, { signal })
+}
+
+export type ClientInput = {
+  name: string
+  nik?: string
+  mrn?: string
+  date_of_birth?: string
+  gender?: string
+  phone?: string
+  email?: string
+  address?: string
+}
+
+export function createClient(input: ClientInput) {
+  return apiFetch<ApiResponse<Client>>("/clients", {
+    method: "POST",
+    body: JSON.stringify(input),
+  })
+}
+
+export function updateClient(id: number, input: Partial<ClientInput>) {
+  return apiFetch<ApiResponse<Client>>(`/clients/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(input),
+  })
+}
+
+/* -------------------------------------------------------------------------- */
+/* Visit acquisition                                                          */
+/* -------------------------------------------------------------------------- */
+
+export type VisitAcquisition = QueueAcquisition
+
+export function getVisitAcquisition(visitId: number, signal?: AbortSignal) {
   return apiFetch<ApiResponse<QueueAcquisition | null>>(
     `/visits/${visitId}/acquisition`,
     { signal }
@@ -136,26 +170,12 @@ export function getVisitAcquisition(
 }
 
 /* -------------------------------------------------------------------------- */
-/* Patients                                                                   */
+/* Aliases                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export type PatientSearchParams = {
-  search?: string
-  page?: number
-  per_page?: number
-}
-
-export function searchPatients(
-  params: PatientSearchParams = {},
-  signal?: AbortSignal
-) {
-  return apiFetch<PaginatedResponse<Patient>>(`/patients${toQuery(params)}`, {
-    signal,
-  })
-}
-
-export function getPatient(patientId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<PatientDetail>>(`/patients/${patientId}`, {
-    signal,
-  })
-}
+export const callNext = callNextReception
+export const recallTicket = recallReceptionTicket
+export const skipTicket = skipReceptionTicket
+export const noShowTicket = noShowReceptionTicket
+export const searchPatients = searchClients
+export const getPatient = getClient

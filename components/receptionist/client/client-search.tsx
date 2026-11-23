@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
-import { PatientSummary } from "@/components/receptionist/patient/patient-summary"
+import { PatientSummary } from "@/components/receptionist/client/client-summary"
 
 import type { Patient } from "@/types/reception"
 

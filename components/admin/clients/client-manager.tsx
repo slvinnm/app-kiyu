@@ -17,7 +17,7 @@ import {
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
 
-import { PatientFormDialog } from "@/components/admin/patients/patient-form-dialog"
+import { PatientFormDialog } from "@/components/admin/clients/client-form-dialog"
 
 import { useTableQuery } from "@/hooks/use-table-query"
 import { formatDate, genderLabel } from "@/lib/reception/format"

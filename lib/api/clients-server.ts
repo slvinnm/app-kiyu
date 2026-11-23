@@ -4,22 +4,22 @@ import { serverApiFetch } from "@/lib/api/server"
 
 import type { Paginated, Visit } from "@/types/reception"
 import type {
-  PatientAuthUser,
-  PatientProfile,
-  PatientVisitDetail,
-} from "@/types/patient"
+  ClientAuthUser,
+  ClientProfile,
+  ClientVisitDetail,
+} from "@/types/client"
 
-export type CurrentPatient = {
-  user: PatientAuthUser
-  profile: PatientProfile | null
+export type CurrentClient = {
+  user: ClientAuthUser
+  profile: ClientProfile | null
 }
 
 /**
  * Resolves the signed-in user and their linked Patient profile. The session
  * cookie intentionally omits patient PII, so the server fetches `/auth/me`.
  */
-export async function getCurrentPatientServer(): Promise<CurrentPatient> {
-  const response = await serverApiFetch<{ data: PatientAuthUser }>("/auth/me")
+export async function getCurrentClientServer(): Promise<CurrentClient> {
+  const response = await serverApiFetch<{ data: ClientAuthUser }>("/auth/me")
 
   return {
     user: response.data,
@@ -27,12 +27,12 @@ export async function getCurrentPatientServer(): Promise<CurrentPatient> {
   }
 }
 
-export async function getPatientVisitsServer(
-  patientId: number,
+export async function getClientVisitsServer(
+  clientId: number,
   perPage = 20
 ): Promise<Paginated<Visit>> {
   const response = await serverApiFetch<{ data: Paginated<Visit> }>(
-    `/visits?patient_id=${patientId}&per_page=${perPage}`
+    `/visits?client_id=${clientId}&per_page=${perPage}`
   )
 
   return response.data
@@ -40,10 +40,14 @@ export async function getPatientVisitsServer(
 
 export async function getVisitDetailServer(
   visitId: number
-): Promise<PatientVisitDetail> {
-  const response = await serverApiFetch<{ data: PatientVisitDetail }>(
+): Promise<ClientVisitDetail> {
+  const response = await serverApiFetch<{ data: ClientVisitDetail }>(
     `/visits/${visitId}`
   )
 
   return response.data
 }
+
+/* Aliases kept while older client pages are migrated. */
+export const getCurrentPatientServer = getCurrentClientServer
+export const getPatientVisitsServer = getClientVisitsServer

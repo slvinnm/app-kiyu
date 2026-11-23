@@ -1,40 +1,28 @@
 /**
- * Domain types for the receptionist workspace, aligned with the KIYU Laravel
- * API (see /home/slvinnm/Lerd/kiyu). Field names follow the backend's
- * snake_case serialization; `priority` is an integer and `station_id` is
- * always present on queue tickets.
+ * Domain types for the non-platform workspaces (admin, receptionist, staff,
+ * client). Field names follow the API's snake_case serialization.
  */
 
 export type ApiResponse<T> = {
   message?: string
   data: T
-  error_type?: string
-  errors?: Record<string, string[]>
 }
 
 export type Paginated<T> = {
   current_page: number
   data: T[]
-  first_page_url: string
   from: number | null
   last_page: number
-  last_page_url: string
-  links: Array<{ url: string | null; label: string; active: boolean }>
-  next_page_url: string | null
-  path: string
   per_page: number
-  prev_page_url: string | null
   to: number | null
   total: number
-}
-
-export type PaginatedResponse<T> = {
-  data: Paginated<T>
+  next_page_url: string | null
+  prev_page_url: string | null
 }
 
 export type Priority = 1 | 2 | 3
 
-export type IntakeChannel = "MANUAL" | "KIOSK" | "ONLINE"
+export type IntakeChannel = "KIOSK" | "MANUAL" | "ONLINE"
 
 export type QueueAcquisitionStatus = "ACQUIRED" | "REGISTERED" | "CANCELLED"
 
@@ -50,30 +38,45 @@ export type QueueTicketStatus =
   | "TRANSFERRED"
 
 export type VisitStatus =
-  "AWAITING_CHECKIN" | "WAITING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
+  | "AWAITING_CHECKIN"
+  | "WAITING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+
+export type StationType =
+  | "REGISTRATION"
+  | "NURSE"
+  | "DOCTOR"
+  | "LABORATORY"
+  | "PHARMACY"
+  | "BILLING"
 
 export type Station = {
   id: number
   department_id: number
-  code: string
   name: string
-  type: string
+  code: string
+  type: StationType | string
   queue_prefix: string
   is_active: boolean
+  department?: Department
 }
 
 export type Department = {
   id: number
+  facility_id: number
   code: string
   name: string
   is_active: boolean
-  display_in_kiosk?: boolean
+  display_in_kiosk: boolean
   stations?: Station[]
   stations_count?: number
 }
 
-export type Patient = {
+export type Client = {
   id: number
+  tenant_id: number
   user_id: number | null
   mrn: string | null
   nik: string | null
@@ -83,23 +86,60 @@ export type Patient = {
   phone: string | null
   email: string | null
   address: string | null
+  created_at?: string
+  updated_at?: string
 }
 
-export type WorkflowStepSummary = {
+export type ClientInput = {
+  name: string
+  nik?: string
+  mrn?: string
+  date_of_birth?: string
+  gender?: string
+  phone?: string
+  email?: string
+  address?: string
+}
+
+/** The API renamed `patient` to `client`; these aliases keep older call sites. */
+export type Patient = Client
+export type PatientDetail = Client & { visits?: Visit[] }
+export type PatientInput = ClientInput
+export type ClientDetail = Client & { visits?: Visit[] }
+
+export type WorkflowStep = {
   id: number
   workflow_id: number
   station_id: number
   name: string
   sequence: number
   is_active: boolean
+  is_optional: boolean
+  is_repeatable: boolean
+  can_skip: boolean
+  completion_requirements: unknown
+  entry_conditions: unknown
+  station?: Station
+}
+
+export type Workflow = {
+  id: number
+  department_id: number
+  name: string
+  is_active: boolean
+  department?: Department
+  steps?: WorkflowStep[]
 }
 
 export type Visit = {
   id: number
-  patient_id: number | null
+  tenant_id: number
+  facility_id: number
+  client_id: number | null
   department_id: number
-  workflow_id: number
+  workflow_id: number | null
   visit_number: string
+  visit_token: string
   priority: Priority
   intake_channel: IntakeChannel
   status: VisitStatus
@@ -110,8 +150,33 @@ export type Visit = {
   completed_at: string | null
   created_at?: string
   updated_at?: string
-  patient?: Patient | null
-  department?: Department | null
+  client?: Client | null
+  department?: Department
+  workflow?: Workflow | null
+  active_queue_ticket?: QueueTicket | null
+}
+
+export type QueueTicket = {
+  id: number
+  visit_id: number
+  workflow_step_id: number | null
+  station_id: number
+  queue_number: string
+  priority: Priority
+  internal_sequence: number | null
+  status: QueueTicketStatus
+  assigned_to: string | null
+  transferred_from_ticket_id: number | null
+  transferred_to_station_id: number | null
+  notes: string | null
+  called_at: string | null
+  started_at: string | null
+  completed_at: string | null
+  created_at?: string
+  updated_at?: string
+  visit?: Visit
+  station?: Station
+  workflow_step?: WorkflowStep
 }
 
 export type QueueAcquisition = {
@@ -124,31 +189,8 @@ export type QueueAcquisition = {
   registered_by: string | null
   created_at?: string
   updated_at?: string
-  visit?: Visit | null
-  department?: Department | null
-}
-
-export type QueueTicket = {
-  id: number
-  visit_id: number
-  workflow_step_id: number
-  station_id: number
-  queue_number: string
-  priority: Priority
-  internal_sequence: number
-  status: QueueTicketStatus
-  assigned_to: string | null
-  transferred_from_ticket_id: number | null
-  transferred_to_station_id: number | null
-  notes: string | null
-  called_at: string | null
-  started_at: string | null
-  completed_at: string | null
-  created_at?: string
-  updated_at?: string
-  station?: Station | null
-  workflow_step?: WorkflowStepSummary | null
-  visit?: Visit | null
+  visit?: Visit
+  department?: Department
 }
 
 export type ReceptionQueueSnapshot = {
@@ -162,26 +204,132 @@ export type ReceptionQueueSnapshot = {
 
 export type VisitDetail = Visit & {
   queue_acquisitions: QueueAcquisition[]
-  queue_tickets?: QueueTicket[]
+  queue_tickets: QueueTicket[]
+  outgoing_referrals: Referral[]
 }
 
-export type PatientVisit = Visit & {
-  active_queue_ticket?: QueueTicket | null
+export type ReferralStatus = "PENDING" | "ACCEPTED" | "COMPLETED" | "CANCELLED"
+
+export type Referral = {
+  id: number
+  source_visit_id: number
+  target_department_id: number
+  target_visit_id: number | null
+  referred_by_user_id: number | null
+  status: ReferralStatus
+  priority: Priority
+  reason: string | null
+  created_at?: string
+  updated_at?: string
+  source_visit?: Visit
+  target_department?: Department
+  target_visit?: Visit | null
 }
 
-export type PatientDetail = Patient & {
-  visits?: PatientVisit[]
-  active_queue_ticket?: QueueTicket | null
-}
-
-export type PatientInput = {
+export type Facility = {
+  id: number
+  tenant_id: number
   name: string
-  nik: string
-  date_of_birth: string
-  gender: "" | "male" | "female"
-  phone: string
-  email: string
-  address: string
+  code: string
+  address: string | null
+  phone: string | null
+  timezone: string | null
+  is_active: boolean
+}
+
+export type KioskDevice = {
+  id: number
+  tenant_id: number
+  facility_id: number
+  name: string
+  is_active: boolean
+  last_seen_at: string | null
+  expires_at: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type Subscription = {
+  id: number
+  tenant_id: number
+  plan_id: number
+  plan_price_id: number | null
+  status: string
+  billing_interval: string | null
+  provider: string | null
+  provider_customer_id: string | null
+  provider_subscription_id: string | null
+  current_period_start: string | null
+  current_period_end: string | null
+  trial_ends_at: string | null
+  cancelled_at: string | null
+  cancel_at_period_end: boolean
+  plan?: Plan
+}
+
+export type Plan = {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  is_active: boolean
+  entitlements?: PlanEntitlement[]
+}
+
+export type PlanEntitlement = {
+  id: number
+  plan_id: number
+  feature_code: string
+  value: unknown
+}
+
+export type AuditLog = {
+  id: number
+  tenant_id: number
+  user_id: number | null
+  action: string
+  entity_type: string
+  entity_id: string | null
+  metadata: Record<string, unknown> | null
+  ip_address: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type PublicQueueStation = {
+  station_id: number
+  station_name: string
+  station_code: string
+  station_type: string
+  department_id: number
+  department_name: string
+  department_code: string
+  current_calling: {
+    queue_number: string
+    status: string
+    called_at: string | null
+  } | null
+  waiting_count: number
+  upcoming_queue_numbers: string[]
+}
+
+/* -------------------------------------------------------------------------- */
+/* Intake results                                                             */
+/* -------------------------------------------------------------------------- */
+
+export type IntakeResult = {
+  visit: Visit
+  acquisition: QueueAcquisition
+  ticket: QueueTicket | null
+}
+
+export type ManualIntakeResult = IntakeResult
+
+export type CompleteRegistrationResult = {
+  visit: Visit
+  acquisition: QueueAcquisition
+  registration_ticket: QueueTicket
+  next_ticket: QueueTicket | null
 }
 
 export type CompleteRegistrationPatientData = {
@@ -193,17 +341,4 @@ export type CompleteRegistrationPatientData = {
   phone?: string
   email?: string
   address?: string
-}
-
-export type ManualIntakeResult = {
-  visit: Visit
-  acquisition: QueueAcquisition
-  ticket: QueueTicket
-}
-
-export type CompleteRegistrationResult = {
-  visit: Visit
-  acquisition: QueueAcquisition
-  registration_ticket: QueueTicket
-  next_ticket: QueueTicket | null
 }
