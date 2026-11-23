@@ -16,8 +16,10 @@ import { stationTypeLabel } from "@/lib/reception/format"
 
 export function DepartmentDisplay({
   departmentCode,
+  facilityId,
 }: {
   departmentCode: string
+  facilityId: number
 }) {
   const router = useRouter()
   const {
@@ -27,7 +29,7 @@ export function DepartmentDisplay({
     lastUpdatedAt,
     calledEvent,
     dismissCalled,
-  } = usePublicQueue()
+  } = usePublicQueue(facilityId)
 
   const filtered = useMemo(
     () =>

@@ -47,7 +47,7 @@ function summarize(stations: PublicQueueStation[]): DepartmentSummary[] {
   return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export function PublicDisplay() {
+export function PublicDisplay({ facilityId }: { facilityId: number }) {
   const {
     stations,
     loading,
@@ -55,7 +55,7 @@ export function PublicDisplay() {
     lastUpdatedAt,
     calledEvent,
     dismissCalled,
-  } = usePublicQueue()
+  } = usePublicQueue(facilityId)
 
   const departments = useMemo(() => summarize(stations), [stations])
 

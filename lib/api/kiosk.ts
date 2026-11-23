@@ -1,5 +1,3 @@
-import { kioskHeaders } from "@/lib/public-headers"
-
 import type {
   ApiResponse,
   Department,
@@ -8,17 +6,21 @@ import type {
   OnlineBookingLookup,
 } from "@/types/kiosk"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+/**
+ * Kiosk API calls.
+ *
+ * Every request goes through `/api/device/kiosk/...`, a same-origin proxy that
+ * attaches the device credential from an HttpOnly cookie. The credential never
+ * reaches this module, so an XSS on the kiosk page cannot read it.
+ */
 
-if (!API_BASE_URL) {
-  throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured.")
-}
+const DEVICE_BASE = "/api/device/kiosk"
 
 const DEFAULT_TIMEOUT = 15_000
 
 /**
  * The API answered but rejected the request. Kiosk callers branch on `status`
- * to tell "credential revoked" (403) from ordinary failures.
+ * to tell "credential revoked or expired" (403) from ordinary failures.
  */
 export class KioskApiError extends Error {
   status: number
@@ -31,7 +33,7 @@ export class KioskApiError extends Error {
 }
 
 async function request<T>(
-  input: RequestInfo | URL,
+  path: string,
   init?: RequestInit
 ): Promise<ApiResponse<T>> {
   const controller = new AbortController()
@@ -41,14 +43,15 @@ async function request<T>(
   }, DEFAULT_TIMEOUT)
 
   try {
-    const response = await fetch(input, {
+    const response = await fetch(`${DEVICE_BASE}/${path}`, {
       ...init,
       headers: {
+        Accept: "application/json",
         "Content-Type": "application/json",
-        ...kioskHeaders(),
         ...init?.headers,
       },
       signal: controller.signal,
+      cache: "no-store",
     })
 
     const payload = await response.json().catch(() => null)
@@ -60,11 +63,7 @@ async function request<T>(
       )
     }
 
-    if (
-      payload === null ||
-      typeof payload !== "object" ||
-      !("data" in payload)
-    ) {
+    if (payload === null || typeof payload !== "object" || !("data" in payload)) {
       throw new Error(payload?.message ?? "Respons server tidak valid.")
     }
 
@@ -88,35 +87,10 @@ async function request<T>(
 
 export const SUCCESS_RESET_DELAY = 10
 
-export type KioskPairingResult = {
-  credential: string
-  device: {
-    id: number
-    name: string
-    tenant: { id: number; name: string; slug: string }
-    facility: { id: number; name: string; code: string | null }
-  }
-}
-
-/**
- * Redeem a pairing code for a device credential. Called from the onboarding
- * screen; the credential is stored locally and never sent anywhere else.
- */
-export async function pairKioskDevice(
-  pairingCode: string
-): Promise<ApiResponse<KioskPairingResult>> {
-  return request<KioskPairingResult>(`${API_BASE_URL}/kiosk/pair`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pairing_code: pairingCode }),
-  })
-}
-
 export async function getDepartments(): Promise<Department[]> {
-  const response = await request<Department[]>(
-    `${API_BASE_URL}/departments/active`,
-    { method: "GET", headers: kioskHeaders() }
-  )
+  const response = await request<Department[]>("departments/active", {
+    method: "GET",
+  })
 
   return Array.isArray(response.data) ? response.data : []
 }
@@ -125,7 +99,7 @@ export async function acquireQueue(
   departmentId: number,
   idempotencyKey: string
 ): Promise<ApiResponse<KioskIntakeResult>> {
-  return request<KioskIntakeResult>(`${API_BASE_URL}/intake/kiosk`, {
+  return request<KioskIntakeResult>("intake/kiosk", {
     method: "POST",
     headers: {
       "Idempotency-Key": idempotencyKey,
@@ -141,17 +115,15 @@ export async function lookupOnlineBooking(
   identifier: string
 ): Promise<ApiResponse<OnlineBookingLookup>> {
   return request<OnlineBookingLookup>(
-    `${API_BASE_URL}/intake/online-lookup/${encodeURIComponent(identifier)}`,
-    {
-      method: "GET",
-    }
+    `intake/online-lookup/${encodeURIComponent(identifier)}`,
+    { method: "GET" }
   )
 }
 
 export async function checkinOnlineBooking(
   identifier: string
 ): Promise<ApiResponse<KioskCheckinResult>> {
-  return request<KioskCheckinResult>(`${API_BASE_URL}/intake/online-checkin`, {
+  return request<KioskCheckinResult>("intake/online-checkin", {
     method: "POST",
     body: JSON.stringify({
       booking_identifier: identifier,

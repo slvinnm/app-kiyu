@@ -1,29 +1,26 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { MonitorPlay } from "lucide-react"
 
 import { DisplayClock } from "@/components/display/display-clock"
 
-import { pairDisplayDevice } from "@/lib/api/display"
-import { saveDisplayDevice } from "@/lib/display/device"
-
-import type { DisplayPairedDevice } from "@/lib/display/device"
+import { pairDevice } from "@/lib/device/client"
 
 const CODE_LENGTH = 8
 
 /**
  * Shown when this screen has no display credential. The operator types the
- * pairing code an admin generated; the screen trades it for a credential and
- * stores it locally.
+ * pairing code an admin generated; the server trades it for a credential and
+ * stores it in an HttpOnly cookie. On success the page reloads as a paired
+ * display.
  *
  * Styled dark to match the display shell, so a TV never flashes a white screen.
  */
-export function DisplayOnboarding({
-  onPaired,
-}: {
-  onPaired: (device: DisplayPairedDevice) => void
-}) {
+export function DisplayOnboarding() {
+  const router = useRouter()
+
   const [code, setCode] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,14 +39,8 @@ export function DisplayOnboarding({
     setError(null)
 
     try {
-      const result = await pairDisplayDevice(normalized)
-      const paired = {
-        credential: result.credential,
-        device: result.device,
-      }
-
-      saveDisplayDevice(paired)
-      onPaired(paired)
+      await pairDevice("display", normalized)
+      router.refresh()
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -57,7 +48,6 @@ export function DisplayOnboarding({
           : "Gagal memasangkan layar display."
       )
       setCode("")
-    } finally {
       setSubmitting(false)
     }
   }

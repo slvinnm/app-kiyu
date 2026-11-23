@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { MonitorSmartphone } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -11,23 +12,19 @@ import { Spinner } from "@/components/ui/spinner"
 
 import { KioskClock } from "@/components/kiosk/kiosk-clock"
 
-import { pairKioskDevice } from "@/lib/api/kiosk"
-import { saveKioskDevice } from "@/lib/kiosk/device"
-
-import type { KioskPairedDevice } from "@/lib/kiosk/device"
+import { pairDevice } from "@/lib/device/client"
 
 const CODE_LENGTH = 8
 
 /**
  * Shown when this browser has no kiosk credential. The operator types the
- * pairing code an admin generated; the device trades it for a credential and
- * stores it locally.
+ * pairing code an admin generated; the server trades it for a credential and
+ * stores it in an HttpOnly cookie. On success the page reloads as a paired
+ * kiosk.
  */
-export function KioskOnboarding({
-  onPaired,
-}: {
-  onPaired: (device: KioskPairedDevice) => void
-}) {
+export function KioskOnboarding() {
+  const router = useRouter()
+
   const [code, setCode] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,14 +45,8 @@ export function KioskOnboarding({
     setError(null)
 
     try {
-      const response = await pairKioskDevice(normalized)
-      const paired = {
-        credential: response.data.credential,
-        device: response.data.device,
-      }
-
-      saveKioskDevice(paired)
-      onPaired(paired)
+      await pairDevice("kiosk", normalized)
+      router.refresh()
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -63,26 +54,24 @@ export function KioskOnboarding({
           : "Gagal memasangkan perangkat kiosk."
       )
       setCode("")
-    } finally {
       setSubmitting(false)
     }
   }
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-8">
+      <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-6 md:px-10 md:py-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-              <MonitorSmartphone className="size-5" />
+            <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <MonitorSmartphone className="size-6" />
             </div>
 
             <div>
-              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+              <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
                 ANJUNGAN
               </p>
-
-              <h1 className="text-xl font-bold tracking-tight">
+              <h1 className="text-2xl font-bold tracking-tight">
                 Pendaftaran Perangkat
               </h1>
             </div>
@@ -92,19 +81,15 @@ export function KioskOnboarding({
         </div>
 
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-md space-y-6 rounded-2xl border bg-card p-6 shadow-sm">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">
-                Perangkat ini belum terdaftar
-              </h2>
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8">
+            <h2 className="text-xl font-semibold">Perangkat ini belum terdaftar</h2>
 
-              <p className="text-sm text-muted-foreground">
-                Masukkan kode pairing 8 karakter yang dibuat admin melalui menu
-                Perangkat Kiosk. Kode hanya bisa dipakai sekali.
-              </p>
-            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Masukkan kode pairing 8 karakter yang dibuat admin di menu
+              Perangkat Kiosk. Kode hanya bisa dipakai sekali.
+            </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="pairing-code">Kode Pairing</Label>
 
@@ -124,11 +109,9 @@ export function KioskOnboarding({
                   autoComplete="off"
                   autoCapitalize="characters"
                   spellCheck={false}
-                  inputMode="text"
-                  className="text-center font-mono text-2xl tracking-[0.35em]"
-                  maxLength={CODE_LENGTH}
                   autoFocus
                   disabled={submitting}
+                  className="text-center font-mono text-2xl tracking-[0.35em]"
                 />
               </div>
 
@@ -155,7 +138,7 @@ export function KioskOnboarding({
               </Button>
             </form>
 
-            <p className="text-xs text-muted-foreground">
+            <p className="mt-4 text-xs text-muted-foreground">
               Kode kedaluwarsa setelah 30 menit. Minta admin membuat kode baru
               bila sudah lewat.
             </p>

@@ -1,9 +1,13 @@
 import { DepartmentDisplay } from "@/components/display/department-display"
-import { DisplayGate } from "@/components/display/display-gate"
+import { DisplayOnboarding } from "@/components/display/display-onboarding"
+
+import { readUsableDeviceCredential } from "@/lib/device/session"
 
 export const metadata = {
   title: "Antrian Departemen · Kiyu",
 }
+
+export const dynamic = "force-dynamic"
 
 export default async function DepartmentDisplayPage({
   params,
@@ -11,10 +15,16 @@ export default async function DepartmentDisplayPage({
   params: Promise<{ code: string }>
 }) {
   const { code } = await params
+  const device = await readUsableDeviceCredential("display")
+
+  if (!device) {
+    return <DisplayOnboarding />
+  }
 
   return (
-    <DisplayGate>
-      <DepartmentDisplay departmentCode={code} />
-    </DisplayGate>
+    <DepartmentDisplay
+      departmentCode={code}
+      facilityId={device.device.facility.id}
+    />
   )
 }

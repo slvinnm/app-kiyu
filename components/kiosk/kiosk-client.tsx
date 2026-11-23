@@ -4,7 +4,6 @@ import type { Department, KioskCheckinResult, KioskState } from "@/types/kiosk"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { KioskApiError, acquireQueue, getDepartments } from "@/lib/api/kiosk"
-import { Spinner } from "@/components/ui/spinner"
 import { KioskHeader } from "@/components/kiosk/kiosk-header"
 import { DepartmentGrid } from "@/components/kiosk/department-grid"
 import { KioskInformation } from "@/components/kiosk/kiosk-information"
@@ -12,21 +11,12 @@ import { OnlineCheckinPanel } from "@/components/kiosk/online-checkin-panel"
 import { SuccessScreen } from "@/components/kiosk/success-screen"
 import { ErrorScreen } from "@/components/kiosk/error-screen"
 import { SUCCESS_RESET_DELAY } from "@/lib/api/kiosk"
-import { KioskOnboarding } from "@/components/kiosk/kiosk-onboarding"
-import { clearKioskDevice, readKioskDevice } from "@/lib/kiosk/device"
-
-import type { KioskPairedDevice } from "@/lib/kiosk/device"
+import { useRouter } from "next/navigation"
 
 type KioskMode = "walk-in" | "online"
 
 export function KioskClient() {
-  /**
-   * `undefined` until the storage check runs. Rendering the kiosk before the
-   * check would flash the department grid on an unpaired device.
-   */
-  const [device, setDevice] = useState<KioskPairedDevice | null | undefined>(
-    undefined
-  )
+  const router = useRouter()
 
   const [departments, setDepartments] = useState<Department[]>([])
   const [loadingDepartments, setLoadingDepartments] = useState(true)
@@ -72,10 +62,9 @@ export function KioskClient() {
       setDepartments(data)
     } catch (error) {
       // A revoked or expired credential means this device must pair again.
-      // Drop the stored credential so the onboarding screen appears.
+      // The device proxy already dropped the cookie; refresh into onboarding.
       if (error instanceof KioskApiError && error.status === 403) {
-        clearKioskDevice()
-        setDevice(null)
+        router.refresh()
         return
       }
 
@@ -90,13 +79,7 @@ export function KioskClient() {
   }, [])
 
   useEffect(() => {
-    const paired = readKioskDevice()
-
-    setDevice(paired)
-
-    if (paired) {
-      void loadDepartments()
-    }
+    void loadDepartments()
 
     return () => {
       clearResetTimer()
@@ -164,6 +147,13 @@ export function KioskClient() {
           resetKiosk()
         }, SUCCESS_RESET_DELAY * 1000)
       } catch (error) {
+        // Revoked or expired credential: the proxy dropped the cookie, so
+        // refresh and let the server render the onboarding screen.
+        if (error instanceof KioskApiError && error.status === 403) {
+          router.refresh()
+          return
+        }
+
         setState({
           type: "error",
           message:
@@ -174,7 +164,7 @@ export function KioskClient() {
         })
       }
     },
-    [clearResetTimer, resetKiosk]
+    [clearResetTimer, resetKiosk, router]
   )
 
   const handleCheckedIn = useCallback(
@@ -202,25 +192,6 @@ export function KioskClient() {
           (department) => department.code === state.departmentCode
         ) ?? null)
       : null
-
-  if (device === undefined) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <Spinner className="size-6 text-muted-foreground" />
-      </main>
-    )
-  }
-
-  if (device === null) {
-    return (
-      <KioskOnboarding
-        onPaired={(paired) => {
-          setDevice(paired)
-          void loadDepartments()
-        }}
-      />
-    )
-  }
 
   return (
     <main className="min-h-screen bg-background">

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { DisplayApiError, fetchPublicQueue } from "@/lib/api/display"
-import { clearDisplayDevice, readDisplayDevice } from "@/lib/display/device"
 import { getEcho, publicFacilityChannel } from "@/lib/echo"
 
 import type { PublicQueueStation } from "@/types/admin"
@@ -70,16 +69,12 @@ function bindConnectionState(
   }
 }
 
-export function usePublicQueue() {
+export function usePublicQueue(facilityId: number) {
   const [stations, setStations] = useState<PublicQueueStation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
   const [calledEvent, setCalledEvent] = useState<CalledTicketEvent | null>(null)
-
-  const facilityIdRef = useRef<number | null>(
-    readDisplayDevice()?.device.facility.id ?? null
-  )
 
   const mountedRef = useRef(true)
   const inFlightRef = useRef(false)
@@ -180,9 +175,9 @@ export function usePublicQueue() {
       }
 
       // A revoked or expired display credential means this screen must pair
-      // again. Drop the stored credential and reload into onboarding.
+      // again. The device proxy already dropped the cookie; reload so the
+      // server renders the onboarding screen.
       if (cause instanceof DisplayApiError && cause.status === 403) {
-        clearDisplayDevice()
         window.location.reload()
         return
       }
@@ -201,12 +196,6 @@ export function usePublicQueue() {
 
   // WebSocket: instant refresh + popup whenever a ticket is called or recalled.
   useEffect(() => {
-    const facilityId = facilityIdRef.current
-
-    if (facilityId === null) {
-      return
-    }
-
     const echo = getEcho()
 
     if (!echo) {
@@ -246,7 +235,7 @@ export function usePublicQueue() {
       echo.leaveChannel(publicFacilityChannel(facilityId))
       unbind()
     }
-  }, [load, announceCall])
+  }, [load, announceCall, facilityId])
 
   // Fallback polling only while the socket is unavailable.
   useEffect(() => {
