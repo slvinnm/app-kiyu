@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import { getReceptionQueue } from "@/lib/api/reception"
 import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
-import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 
@@ -18,7 +17,7 @@ const POLL_INTERVAL_MS = 15_000
  */
 export function useReceptionQueue(
   departmentId: number | null,
-  options?: { paused?: boolean }
+  options?: { paused?: boolean; facilityId?: number | null }
 ) {
   const paused = options?.paused ?? false
 
@@ -37,6 +36,7 @@ export function useReceptionQueue(
   const inFlightRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
   const connectedRef = useRef(false)
+  const facilityIdRef = useRef<number | null>(options?.facilityId ?? null)
 
   useEffect(() => {
     departmentRef.current = departmentId
@@ -137,7 +137,15 @@ export function useReceptionQueue(
       return
     }
 
-    const channels = [publicFacilityChannel(PUBLIC_FACILITY_ID)]
+    const facilityId = facilityIdRef.current
+
+    if (facilityId === null) {
+      setIsConnected(false)
+      connectedRef.current = false
+      return
+    }
+
+    const channels = [publicFacilityChannel(facilityId)]
 
     const handler = () => {
       if (!pausedRef.current) {

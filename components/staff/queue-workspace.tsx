@@ -94,11 +94,13 @@ const NOTES_COPY: Record<
 export function StaffQueueWorkspace({
   stationId,
   departmentId,
+  facilityId,
   actorEmail,
   role,
 }: {
   stationId: number | null
   departmentId: number | null
+  facilityId: number | null
   actorEmail: string
   role: string
 }) {
@@ -123,6 +125,7 @@ export function StaffQueueWorkspace({
     refresh,
   } = useStaffQueue(stationId, {
     actorEmail,
+    facilityId,
     paused:
       notesAction !== null ||
       transferTarget !== null ||

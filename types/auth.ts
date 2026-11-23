@@ -28,6 +28,8 @@ export type AuthUser = {
   name: string
   email: string
   role: string
+  tenant_id?: number | null
+  facility_id?: number | null
   department_id?: number | null
   station_id?: number | null
   profile?: unknown
@@ -47,6 +49,8 @@ export function toSessionUser(user: AuthUser): AuthUser {
     name: user.name,
     email: user.email,
     role: user.role,
+    tenant_id: user.tenant_id ?? null,
+    facility_id: user.facility_id ?? null,
     department_id: user.department_id ?? null,
     station_id: user.station_id ?? null,
   }

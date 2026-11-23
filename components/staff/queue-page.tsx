@@ -15,6 +15,7 @@ export async function StaffQueuePage({ role }: { role: string }) {
     <StaffQueueWorkspace
       stationId={session.user.station_id ?? null}
       departmentId={session.user.department_id ?? null}
+      facilityId={session.user.facility_id ?? null}
       actorEmail={session.user.email}
       role={role}
     />

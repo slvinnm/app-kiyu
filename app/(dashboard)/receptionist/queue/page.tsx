@@ -16,6 +16,7 @@ export default async function Page() {
   return (
     <ReceptionQueueWorkspace
       departmentId={session.user.department_id ?? null}
+      facilityId={session.user.facility_id ?? null}
       actorEmail={session.user.email}
     />
   )

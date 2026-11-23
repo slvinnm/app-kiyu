@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { DisplayApiError, fetchPublicQueue } from "@/lib/api/display"
-import { clearDisplayDevice } from "@/lib/display/device"
+import { clearDisplayDevice, readDisplayDevice } from "@/lib/display/device"
 import { getEcho, publicFacilityChannel } from "@/lib/echo"
-import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { PublicQueueStation } from "@/types/admin"
 
@@ -77,6 +76,10 @@ export function usePublicQueue() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
   const [calledEvent, setCalledEvent] = useState<CalledTicketEvent | null>(null)
+
+  const facilityIdRef = useRef<number | null>(
+    readDisplayDevice()?.device.facility.id ?? null
+  )
 
   const mountedRef = useRef(true)
   const inFlightRef = useRef(false)
@@ -198,13 +201,19 @@ export function usePublicQueue() {
 
   // WebSocket: instant refresh + popup whenever a ticket is called or recalled.
   useEffect(() => {
+    const facilityId = facilityIdRef.current
+
+    if (facilityId === null) {
+      return
+    }
+
     const echo = getEcho()
 
     if (!echo) {
       return
     }
 
-    const channel = echo.channel(publicFacilityChannel(PUBLIC_FACILITY_ID))
+    const channel = echo.channel(publicFacilityChannel(facilityId))
 
     const handler = (payload: CalledPayload) => {
       announceCall(
@@ -234,7 +243,7 @@ export function usePublicQueue() {
 
     return () => {
       channel.stopListening(".queue.called")
-      echo.leaveChannel(publicFacilityChannel(PUBLIC_FACILITY_ID))
+      echo.leaveChannel(publicFacilityChannel(facilityId))
       unbind()
     }
   }, [load, announceCall])

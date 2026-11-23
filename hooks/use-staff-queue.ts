@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { getStationQueue } from "@/lib/api/staff"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
-import { PUBLIC_FACILITY_ID } from "@/lib/public-headers"
 
 import type { QueueTicket, Station } from "@/types/reception"
 
@@ -17,7 +16,11 @@ const POLL_INTERVAL_MS = 15_000
  */
 export function useStaffQueue(
   stationId: number | null,
-  options?: { paused?: boolean; actorEmail?: string | null }
+  options?: {
+    paused?: boolean
+    actorEmail?: string | null
+    facilityId?: number | null
+  }
 ) {
   const paused = options?.paused ?? false
   const actorEmail = options?.actorEmail ?? null
@@ -36,6 +39,7 @@ export function useStaffQueue(
   const inFlightRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
   const connectedRef = useRef(false)
+  const facilityIdRef = useRef<number | null>(options?.facilityId ?? null)
 
   useEffect(() => {
     stationRef.current = stationId
@@ -126,7 +130,15 @@ export function useStaffQueue(
       return
     }
 
-    const channels = [publicFacilityChannel(PUBLIC_FACILITY_ID)]
+    const facilityId = facilityIdRef.current
+
+    if (facilityId === null) {
+      setIsConnected(false)
+      connectedRef.current = false
+      return
+    }
+
+    const channels = [publicFacilityChannel(facilityId)]
 
     const handler = () => {
       if (!pausedRef.current) {

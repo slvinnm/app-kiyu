@@ -47,9 +47,11 @@ import type { QueueTicket } from "@/types/reception"
 
 export function ReceptionQueueWorkspace({
   departmentId,
+  facilityId,
   actorEmail,
 }: {
   departmentId: number | null
+  facilityId: number | null
   actorEmail: string
 }) {
   const [selectedTicket, setSelectedTicket] = useState<QueueTicket | null>(null)
@@ -77,6 +79,7 @@ export function ReceptionQueueWorkspace({
     isConnected,
     refresh,
   } = useReceptionQueue(departmentId, {
+    facilityId,
     paused:
       selectedTicket !== null || skipTarget !== null || noShowTarget !== null,
   })
