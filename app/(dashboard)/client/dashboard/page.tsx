@@ -27,7 +27,6 @@ import {
   getClientVisitsServer,
   getVisitDetailServer,
 } from "@/lib/api/clients-server"
-import { getSession } from "@/lib/auth/session"
 import {
   channelLabel,
   formatDate,
@@ -45,7 +44,6 @@ const ACTIVE_VISIT_STATUSES = ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"]
 const ACTIVE_TICKET_STATUSES = ["CREATED", "CALLED", "IN_PROGRESS", "ON_HOLD"]
 
 export default async function Page() {
-
   let current
 
   try {

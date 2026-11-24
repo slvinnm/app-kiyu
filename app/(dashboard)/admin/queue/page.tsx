@@ -1,5 +1,4 @@
 import { ListOrdered } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -15,14 +14,12 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
 import { getQueueMonitorServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 import { stationTypeLabel, ticketStatusLabel } from "@/lib/reception/format"
 
 import type { PublicQueueStation } from "@/types/admin"
 import type { QueueTicketStatus } from "@/types/reception"
 
 export default async function Page() {
-
   let stations: PublicQueueStation[] = []
   let error: string | null = null
 

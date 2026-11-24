@@ -93,10 +93,7 @@ function parsePayload(raw: string): DeviceCookiePayload | null {
   const expected = Buffer.from(signPayload(encoded), "base64url")
   const actual = Buffer.from(signature, "base64url")
 
-  if (
-    expected.length !== actual.length ||
-    !timingSafeEqual(expected, actual)
-  ) {
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
     return null
   }
 

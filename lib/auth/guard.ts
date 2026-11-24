@@ -23,15 +23,17 @@ import type { UserRole } from "@/types/auth"
  * `/auth/me` call per navigation. Returns `null` when unauthenticated or the
  * token was rejected; `undefined` when the API is unreachable.
  */
-const getVerifiedUser = cache(async (): Promise<VerifiedUser | null | undefined> => {
-  const session = await getSession()
+const getVerifiedUser = cache(
+  async (): Promise<VerifiedUser | null | undefined> => {
+    const session = await getSession()
 
-  if (!session) {
-    return null
+    if (!session) {
+      return null
+    }
+
+    return fetchVerifiedUser(session)
   }
-
-  return fetchVerifiedUser(session)
-})
+)
 
 /**
  * Server-component guard: asserts the signed-in user holds one of `roles`.

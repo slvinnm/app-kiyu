@@ -5,7 +5,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { VisitManager } from "@/components/admin/visits/visit-manager"
 
-import { getDepartmentOptionsServer, getVisitsServer } from "@/lib/api/admin-server"
+import {
+  getDepartmentOptionsServer,
+  getVisitsServer,
+} from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { requireRole } from "@/lib/auth/guard"
 import { numberFilter, parseTableParams } from "@/lib/table-params"

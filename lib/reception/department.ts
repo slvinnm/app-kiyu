@@ -35,16 +35,3 @@ export function resolveDepartmentId(
 
   return null
 }
-
-export function findDepartment(
-  departments: Department[],
-  departmentId: number | null
-): Department | null {
-  if (departmentId === null) {
-    return null
-  }
-
-  return (
-    departments.find((department) => department.id === departmentId) ?? null
-  )
-}

@@ -6,7 +6,6 @@ import type {
   Department,
   Paginated,
   Client,
-  ClientDetail,
   ReceptionQueueSnapshot,
 } from "@/types/reception"
 
@@ -49,18 +48,6 @@ export async function getClientCountServer(): Promise<number> {
   return response.data.total
 }
 
-export async function getClientServer(id: number): Promise<ClientDetail> {
-  const response = await serverApiFetch<{ data: ClientDetail }>(
-    `/clients/${id}`
-  )
-
-  return response.data
-}
-
-/**
- * Paginated patient directory for the receptionist workspace. The API does the
- * searching and sorting; the browser only ever receives the current page.
- */
 export async function getClientsTableServer(filters: {
   search?: string
   sort?: string

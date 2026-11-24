@@ -18,9 +18,12 @@ export function getReceptionQueue(
   departmentId: number,
   signal?: AbortSignal
 ): Promise<ApiResponse<ReceptionQueueSnapshot>> {
-  return apiFetch(`/reception/queue${toQuery({ department_id: departmentId })}`, {
-    signal,
-  })
+  return apiFetch(
+    `/reception/queue${toQuery({ department_id: departmentId })}`,
+    {
+      signal,
+    }
+  )
 }
 
 export function callNextReception(departmentId: number, assignedTo?: string) {
@@ -34,30 +37,27 @@ export function callNextReception(departmentId: number, assignedTo?: string) {
 }
 
 export function recallReceptionTicket(ticketId: number, assignedTo?: string) {
-  return apiFetch<ApiResponse<QueueTicket>>(
-    `/reception/${ticketId}/recall`,
-    { method: "POST", body: JSON.stringify({ assigned_to: assignedTo }) }
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/reception/${ticketId}/recall`, {
+    method: "POST",
+    body: JSON.stringify({ assigned_to: assignedTo }),
+  })
 }
 
 export function skipReceptionTicket(
   ticketId: number,
   payload: { reason?: string; user_id?: string } = {}
 ) {
-  return apiFetch<ApiResponse<QueueTicket>>(
-    `/reception/${ticketId}/skip`,
-    { method: "POST", body: JSON.stringify(payload) }
-  )
+  return apiFetch<ApiResponse<QueueTicket>>(`/reception/${ticketId}/skip`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
 
-export function noShowReceptionTicket(
-  ticketId: number,
-  assignedTo?: string
-) {
-  return apiFetch<ApiResponse<QueueTicket>>(
-    `/reception/${ticketId}/no-show`,
-    { method: "POST", body: JSON.stringify({ user_id: assignedTo }) }
-  )
+export function noShowReceptionTicket(ticketId: number, assignedTo?: string) {
+  return apiFetch<ApiResponse<QueueTicket>>(`/reception/${ticketId}/no-show`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: assignedTo }),
+  })
 }
 
 export type CompleteRegistrationPayload = {

@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import {
   Activity,
   Building2,
@@ -55,7 +54,6 @@ function metadataText(metadata: unknown): string {
 }
 
 export default async function Page() {
-
   const results = await Promise.allSettled([
     getDepartmentOptionsServer(),
     getWorkflowStatisticsServer(),

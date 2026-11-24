@@ -48,34 +48,6 @@ export function publicFacilityChannel(facilityId: number | string): string {
   return `public.facility.${facilityId}`
 }
 
-/** Staff-only private channel. Requires broadcasting auth. */
-export function tenantDepartmentChannel(
-  tenantId: number | string,
-  departmentId: number | string
-): string {
-  return `tenant.${tenantId}.department.${departmentId}`
-}
-
-/** Staff-only private channel. Requires broadcasting auth. */
-export function tenantStationChannel(
-  tenantId: number | string,
-  stationId: number | string
-): string {
-  return `tenant.${tenantId}.station.${stationId}`
-}
-
-/** Returns true only when the Echo/Pusher socket is currently connected. */
-export function isEchoConnected(echo: ReturnType<typeof getEcho>): boolean {
-  if (!echo) {
-    return false
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const connection = (echo as any)?.connector?.pusher?.connection
-
-  return connection?.state === "connected"
-}
-
 /** Binds to socket state changes; returns an unbind function. */
 export function bindEchoConnectionState(
   echo: ReturnType<typeof getEcho>,

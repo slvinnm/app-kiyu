@@ -1,5 +1,4 @@
 import { ScrollText } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
@@ -29,7 +28,6 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-
   const params = await searchParams
   const { table, filters } = parseTableParams(params, {
     sortable: SORTABLE,

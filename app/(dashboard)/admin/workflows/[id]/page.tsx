@@ -1,5 +1,5 @@
 import { GitBranch } from "lucide-react"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -7,7 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { WorkflowDetail } from "@/components/admin/workflows/workflow-detail"
 
-import { getStationOptionsServer, getWorkflowServer } from "@/lib/api/admin-server"
+import {
+  getStationOptionsServer,
+  getWorkflowServer,
+} from "@/lib/api/admin-server"
 import { ApiError, getApiErrorMessage } from "@/lib/api/error"
 
 import type { AdminStation, Workflow } from "@/types/admin"
@@ -17,7 +20,6 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>
 }) {
-
   const { id } = await params
   const workflowId = Number(id)
 

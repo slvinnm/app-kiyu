@@ -1,5 +1,4 @@
 import { Building2 } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -8,12 +7,10 @@ import { FacilityManager } from "@/components/admin/facilities/facility-manager"
 
 import { getFacilitiesServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 
 import type { Facility } from "@/types/reception"
 
 export default async function Page() {
-
   let facilities: Facility[] | null = null
   let error: string | null = null
 

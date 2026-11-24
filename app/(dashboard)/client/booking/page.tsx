@@ -1,5 +1,4 @@
 import { CalendarPlusIcon } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
@@ -12,12 +11,10 @@ import {
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getCurrentPatientServer } from "@/lib/api/clients-server"
 import { getActiveDepartmentsServer } from "@/lib/api/reception-server"
-import { getSession } from "@/lib/auth/session"
 
 import type { Department } from "@/types/reception"
 
 export default async function Page() {
-
   let current
 
   try {

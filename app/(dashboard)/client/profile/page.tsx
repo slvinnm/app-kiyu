@@ -1,5 +1,4 @@
 import { UserRoundIcon } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
@@ -8,10 +7,8 @@ import { PatientProfileForm } from "@/components/client/profile-form"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getCurrentClientServer } from "@/lib/api/clients-server"
-import { getSession } from "@/lib/auth/session"
 
 export default async function Page() {
-
   let current
 
   try {

@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation"
 import { UsersIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -8,7 +7,6 @@ import { PatientDirectory } from "@/components/receptionist/clients/client-direc
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getPatientsTableServer } from "@/lib/api/reception-server"
-import { getSession } from "@/lib/auth/session"
 import { parseTableParams } from "@/lib/table-params"
 
 import type { Paginated, Patient } from "@/types/reception"
@@ -20,7 +18,6 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-
   const params = await searchParams
   const { table } = parseTableParams(params, {
     sortable: SORTABLE,

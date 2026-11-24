@@ -1,5 +1,4 @@
 import { FileTextIcon } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 
@@ -14,12 +13,10 @@ import {
   getCurrentClientServer,
   getClientVisitsServer,
 } from "@/lib/api/clients-server"
-import { getSession } from "@/lib/auth/session"
 
 import type { PatientVisit } from "@/types/client"
 
 export default async function Page() {
-
   let current
 
   try {

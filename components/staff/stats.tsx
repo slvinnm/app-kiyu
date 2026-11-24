@@ -1,6 +1,5 @@
 import {
   BellRingIcon,
-  CheckCircle2Icon,
   CirclePauseIcon,
   LoaderCircleIcon,
   UsersIcon,
@@ -70,15 +69,6 @@ export function StaffStats({
         value={onHold}
         icon={<CirclePauseIcon className="size-4" />}
       />
-    </div>
-  )
-}
-
-export function StaffCompletedBadge({ count }: { count: number }) {
-  return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <CheckCircle2Icon className="size-4" />
-      {count} layanan selesai hari ini
     </div>
   )
 }

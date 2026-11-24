@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation"
-
 import { ReceptionQueueWorkspace } from "@/components/receptionist/queue/reception-queue-workspace"
 
 import { requireRole } from "@/lib/auth/guard"

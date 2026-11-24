@@ -1,5 +1,4 @@
 import { MonitorSmartphone } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -8,12 +7,10 @@ import { KioskDeviceManager } from "@/components/admin/kiosk-devices/kiosk-devic
 
 import { getKioskDevicesServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 
 import type { KioskDevice } from "@/types/reception"
 
 export default async function Page() {
-
   let devices: KioskDevice[] | null = null
   let error: string | null = null
 

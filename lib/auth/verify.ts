@@ -71,16 +71,13 @@ export async function fetchVerifiedUser(
   }
 
   try {
-    const response = await fetch(
-      `${API_BASE_URL.replace(/\/$/, "")}/auth/me`,
-      {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${session.token}`,
-        },
-        cache: "no-store",
-      }
-    )
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/auth/me`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${session.token}`,
+      },
+      cache: "no-store",
+    })
 
     if (response.status === 401 || response.status === 403) {
       return null
@@ -90,9 +87,9 @@ export async function fetchVerifiedUser(
       return undefined
     }
 
-    const payload = (await response.json().catch(() => null)) as
-      | MeResponse
-      | null
+    const payload = (await response
+      .json()
+      .catch(() => null)) as MeResponse | null
 
     return toVerifiedUser(payload?.data)
   } catch {

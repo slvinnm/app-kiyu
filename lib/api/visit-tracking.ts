@@ -28,9 +28,9 @@ export async function getVisitTracking(
     }
   )
 
-  const payload = (await response.json().catch(() => null)) as
-    | TrackingApiResponse
-    | null
+  const payload = (await response
+    .json()
+    .catch(() => null)) as TrackingApiResponse | null
 
   if (response.status === 404) {
     throw new Error(
@@ -39,13 +39,13 @@ export async function getVisitTracking(
   }
 
   if (!response.ok) {
-    throw new Error(
-      payload?.message ?? "Gagal mengambil informasi kunjungan."
-    )
+    throw new Error(payload?.message ?? "Gagal mengambil informasi kunjungan.")
   }
 
   if (!payload || !payload.data) {
-    throw new Error("Respons server tidak sesuai dengan format yang diharapkan.")
+    throw new Error(
+      "Respons server tidak sesuai dengan format yang diharapkan."
+    )
   }
 
   return payload.data

@@ -1,5 +1,4 @@
 import { FileText } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -8,7 +7,6 @@ import { ReportSummaryView } from "@/components/admin/reports/report-summary"
 
 import { getReportSummaryServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 
 import type { ReportSummary } from "@/lib/api/admin-server"
 
@@ -17,7 +15,6 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-
   const params = await searchParams
   const from = typeof params.from === "string" ? params.from : undefined
   const to = typeof params.to === "string" ? params.to : undefined

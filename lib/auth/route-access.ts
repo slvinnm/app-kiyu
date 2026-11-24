@@ -6,12 +6,7 @@
  * stale cookie claim cannot grant access. Keeping the role lists next to the
  * layouts that render the workspace avoids two sources of truth.
  */
-const GATED_PREFIXES = [
-  "/admin",
-  "/receptionist",
-  "/staff",
-  "/client",
-] as const
+const GATED_PREFIXES = ["/admin", "/receptionist", "/staff", "/client"] as const
 
 export function isGatedPath(pathname: string): boolean {
   return GATED_PREFIXES.some(

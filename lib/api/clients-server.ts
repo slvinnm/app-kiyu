@@ -48,6 +48,5 @@ export async function getVisitDetailServer(
   return response.data
 }
 
-/* Aliases kept while older client pages are migrated. */
+/* Alias kept while older client pages are migrated. */
 export const getCurrentPatientServer = getCurrentClientServer
-export const getPatientVisitsServer = getClientVisitsServer

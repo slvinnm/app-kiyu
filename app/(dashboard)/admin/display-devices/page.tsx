@@ -1,5 +1,4 @@
 import { MonitorPlay } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -8,12 +7,10 @@ import { DisplayDeviceManager } from "@/components/admin/display-devices/display
 
 import { getDisplayDevicesServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 
 import type { DisplayDevice } from "@/types/reception"
 
 export default async function Page() {
-
   let devices: DisplayDevice[] | null = null
   let error: string | null = null
 

@@ -63,7 +63,11 @@ async function request<T>(
       )
     }
 
-    if (payload === null || typeof payload !== "object" || !("data" in payload)) {
+    if (
+      payload === null ||
+      typeof payload !== "object" ||
+      !("data" in payload)
+    ) {
       throw new Error(payload?.message ?? "Respons server tidak valid.")
     }
 
