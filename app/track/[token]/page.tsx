@@ -5,6 +5,10 @@ import { VisitTrackingPage } from "@/components/visit-tracking/visit-tracking-pa
 export const metadata: Metadata = {
   title: "Pelacakan Kunjungan | KIYU",
   description: "Pantau status kunjungan dan antrean layanan Anda.",
+  // The tracking token lives in the URL and the page renders patient data.
+  // Keep it out of search indexes and referrer headers.
+  robots: { index: false, follow: false },
+  referrer: "no-referrer",
 }
 
 type PageProps = {

@@ -31,7 +31,22 @@ export function ReportSummaryView({ summary }: { summary: ReportSummary }) {
 
     try {
       const response = await requestReportExport("xlsx", { from, to })
-      window.open(response.data.download_url, "_blank", "noopener")
+
+      // The URL is API-supplied; only follow http(s) so a compromised response
+      // cannot turn this into a `javascript:` navigation.
+      const downloadUrl = new URL(
+        response.data.download_url,
+        window.location.href
+      )
+
+      if (
+        downloadUrl.protocol !== "https:" &&
+        downloadUrl.protocol !== "http:"
+      ) {
+        throw new Error("URL unduhan tidak valid.")
+      }
+
+      window.open(downloadUrl.toString(), "_blank", "noopener")
       toast.success("Ekspor siap diunduh.")
     } catch (cause) {
       toast.error(getApiErrorMessage(cause, "Gagal membuat ekspor."))
