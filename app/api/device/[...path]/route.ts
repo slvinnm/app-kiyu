@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { isSameOrigin, isStateChangingMethod } from "@/lib/auth/origin"
 import {
   deviceCookieName,
   deviceCookieOptions,
@@ -22,35 +23,6 @@ const ALLOWED_RESPONSE_HEADERS = [
   "cache-control",
 ]
 
-function isStateChangingMethod(method: string) {
-  return ["POST", "PUT", "PATCH", "DELETE"].includes(method)
-}
-
-function isSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin")
-
-  if (!origin) {
-    return true
-  }
-
-  let originHost: string
-
-  try {
-    originHost = new URL(origin).host
-  } catch {
-    return false
-  }
-
-  // Behind a reverse proxy `nextUrl.origin` is the internal address, so compare
-  // the host the browser actually used.
-  const host =
-    request.headers.get("x-forwarded-host") ??
-    request.headers.get("host") ??
-    request.nextUrl.host
-
-  return originHost === host
-}
-
 /**
  * Proxies a request to the API using the device credential held in the HttpOnly
  * cookie. The browser never sees the credential.
@@ -59,7 +31,7 @@ function isSameOrigin(request: NextRequest) {
  * credential to use; the rest of the path is forwarded verbatim.
  */
 async function proxy(request: NextRequest, kind: DeviceKind) {
-  if (isStateChangingMethod(request.method) && !isSameOrigin(request)) {
+  if (isStateChangingMethod(request) && !isSameOrigin(request)) {
     return NextResponse.json(
       { success: false, message: "Invalid request origin." },
       { status: 403 }

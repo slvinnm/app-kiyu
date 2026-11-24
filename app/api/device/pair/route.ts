@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { isSameOrigin } from "@/lib/auth/origin"
 import { writeDeviceCredential } from "@/lib/device/session"
 
 import type { DeviceKind } from "@/lib/device/session"
@@ -10,28 +11,7 @@ if (API_BASE_URL.length === 0) {
   throw new Error("API_BASE_URL is not configured.")
 }
 
-function isSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin")
-
-  if (!origin) {
-    return true
-  }
-
-  let originHost: string
-
-  try {
-    originHost = new URL(origin).host
-  } catch {
-    return false
-  }
-
-  const host =
-    request.headers.get("x-forwarded-host") ??
-    request.headers.get("host") ??
-    request.nextUrl.host
-
-  return originHost === host
-}
+const DEVICE_KINDS = new Set<DeviceKind>(["kiosk", "display"])
 
 /**
  * Redeems a pairing code and stores the resulting credential in an HttpOnly
@@ -47,12 +27,25 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => null)) as {
-    kind?: string
-    pairing_code?: string
+    kind?: unknown
+    pairing_code?: unknown
   } | null
 
-  const kind = body?.kind === "display" ? "display" : "kiosk"
-  const pairingCode = (body?.pairing_code ?? "").trim().toUpperCase()
+  const kind = body?.kind
+
+  // Only the two known kinds; an unknown value is a client bug, not a hint to
+  // silently fall back to kiosk (that would pair the wrong credential).
+  if (typeof kind !== "string" || !DEVICE_KINDS.has(kind as DeviceKind)) {
+    return NextResponse.json(
+      { message: "Jenis perangkat tidak dikenal." },
+      { status: 422 }
+    )
+  }
+
+  const pairingCode =
+    typeof body?.pairing_code === "string"
+      ? body.pairing_code.trim().toUpperCase()
+      : ""
 
   if (pairingCode.length === 0) {
     return NextResponse.json(

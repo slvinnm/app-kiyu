@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session-core"
+import { isSameOrigin, isStateChangingMethod } from "@/lib/auth/origin"
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
 
 const API_BASE_URL = process.env.API_BASE_URL ?? ""
@@ -17,37 +18,8 @@ const ALLOWED_RESPONSE_HEADERS = [
   "cache-control",
 ]
 
-function isStateChangingMethod(method: string) {
-  return ["POST", "PUT", "PATCH", "DELETE"].includes(method)
-}
-
-function isSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin")
-
-  if (!origin) {
-    return true
-  }
-
-  let originHost: string
-
-  try {
-    originHost = new URL(origin).host
-  } catch {
-    return false
-  }
-
-  // Behind a reverse proxy (nginx) `nextUrl.origin` is the internal address,
-  // so compare the request host the browser actually used instead.
-  const host =
-    request.headers.get("x-forwarded-host") ??
-    request.headers.get("host") ??
-    request.nextUrl.host
-
-  return originHost === host
-}
-
 async function proxy(request: NextRequest) {
-  if (isStateChangingMethod(request.method) && !isSameOrigin(request)) {
+  if (isStateChangingMethod(request) && !isSameOrigin(request)) {
     return NextResponse.json(
       {
         success: false,
