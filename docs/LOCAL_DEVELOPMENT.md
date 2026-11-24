@@ -38,10 +38,8 @@ or inactive tenant slugs are rejected by the API (`404 Tenant not found.`).
 | File | Purpose |
 | --- | --- |
 | `C:\laragon\etc\nginx\sites-enabled\00-upgrade-map.conf` | `$connection_upgrade` map for WebSocket proxying |
-| `C:\laragon\etc\nginx\sites-enabled\kiyu-frontend.conf` | frontend vhosts → `127.0.0.1:3000` |
+| `C:\laragon\etc\nginx\sites-enabled\00-kiyu-frontend.conf` | frontend vhosts → `127.0.0.1:3000` |
 | `C:\laragon\etc\nginx\sites-enabled\api.kiyu.test.conf` | Laravel vhost → `C:/laragon/www/kiyu/public` |
-| `C:\laragon\etc\nginx\sites-enabled\auto.kiyu.test.conf.disabled` | Laragon's generated vhost, disabled |
-| `C:\laragon\etc\nginx\sites-enabled\auto.app-kiyu.test.conf.disabled` | Laragon's generated vhost, disabled |
 | `app-kiyu/next.config.ts` | `allowedDevOrigins` for every frontend host |
 | `app-kiyu/lib/tenant/host.ts` | host → tenant slug |
 | `app-kiyu/proxy.ts` | marketing rewrite on the bare host |
@@ -134,6 +132,34 @@ cd /c/laragon/www/app-kiyu && npm run dev      # next dev on :3000
 `next dev` binds `0.0.0.0:3000`; nginx proxies to `127.0.0.1`. No browser URL
 needs a port.
 
+## Surviving a reboot
+
+Laragon regenerates `auto.*.conf` vhosts for every project (including
+`auto.kiyu.test.conf` → Laravel) whenever it starts, and it deletes renamed
+`.disabled` copies. The `00-` prefix keeps `00-kiyu-frontend.conf` ahead of them
+in nginx's `sites-enabled/*.conf` glob, so the frontend keeps winning.
+
+After any reboot or Laragon "Start All", check once:
+
+```bash
+cd /c/laragon/bin/nginx/nginx-1.31.9
+./nginx.exe -t 2>&1 | grep -i "conflict"   # silence = healthy
+```
+
+If it prints `conflicting server name "kiyu.test" ... ignored`, the duplicate
+Laravel vhost is loaded anyway; remove it:
+
+```bash
+rm /c/laragon/etc/nginx/sites-enabled/auto.kiyu.test.conf \
+   /c/laragon/etc/nginx/sites-enabled/auto.app-kiyu.test.conf
+cd /c/laragon/bin/nginx/nginx-1.31.9 && ./nginx.exe -s reload
+```
+
+Notes: Acrylic is a Windows service (`Automatic`) and starts itself; the adapter
+DNS override persists. `SSLEnabled=0` in `C:\laragon\usr\laragon.ini` means
+nothing listens on 443 — HTTP only, as on the initial setup. The `next dev`
+process does not auto-start: run `npm run dev` after each reboot.
+
 ## Verification
 
 ```bash
@@ -168,7 +194,7 @@ and the map passes `Connection: upgrade` only when the client requested it.
 | `502 Bad Gateway` on a frontend host | `next dev` is not running. Start it, then retry. |
 | `404` on a frontend host, `not found` | Tenant slug has no row / inactive, or the host is reserved. Check `select slug,status from tenants;` |
 | `Brand new tenant host does not resolve` | Acrylic service stopped or adapter DNS changed. `Restart-Service AcrylicDNSProxySvc`; verify adapter DNS is `127.0.0.1`. |
-| `Laragon regenerated auto.kiyu.test.conf` | Laragon rewrites auto vhosts when the project list changes. Rename it to `*.disabled` again and `nginx -s reload`. |
+| `Laragon regenerated auto.kiyu.test.conf` | Laragon rewrites auto vhosts on every Start All / reboot. The `00-` prefix on `00-kiyu-frontend.conf` makes nginx prefer it, but the duplicate still logs `conflicting server name` and Laragon's Laravel vhost would serve `*.kiyu.test` if the prefix were lost. Delete the generated `auto.kiyu.test.conf` and `auto.app-kiyu.test.conf`, then `nginx -s reload`. See "Surviving a reboot". |
 | `The environment file is invalid` | A backslash escape in a backend `.env` value. Use `[.]` in patterns. |
 | `CORS preflight blocked` | Origin missing from `CORS_ALLOWED_ORIGINS` or not matching the pattern; clear the backend config cache. |
 | `api.kiyu.test` serves Next.js | A stray vhost with a broader `server_name`. `nginx -T \| grep -n api.kiyu.test`; remove the duplicate. |
@@ -184,11 +210,10 @@ Everything above is reversible; nothing touches the database.
 
 ```powershell
 # 1. Nginx: remove the added vhosts, restore Laragon's generated ones.
-Remove-Item 'C:\laragon\etc\nginx\sites-enabled\kiyu-frontend.conf'
+Remove-Item 'C:\laragon\etc\nginx\sites-enabled\00-kiyu-frontend.conf'
 Remove-Item 'C:\laragon\etc\nginx\sites-enabled\api.kiyu.test.conf'
 Remove-Item 'C:\laragon\etc\nginx\sites-enabled\00-upgrade-map.conf'
-Rename-Item 'C:\laragon\etc\nginx\sites-enabled\auto.kiyu.test.conf.disabled' 'auto.kiyu.test.conf'
-Rename-Item 'C:\laragon\etc\nginx\sites-enabled\auto.app-kiyu.test.conf.disabled' 'auto.app-kiyu.test.conf'
+# Laragon recreates its own auto.*.conf vhosts on the next Start All.
 C:\laragon\bin\nginx\nginx-1.31.9\nginx.exe -t
 C:\laragon\bin\nginx\nginx-1.31.9\nginx.exe -s reload
 
