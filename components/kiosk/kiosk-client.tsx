@@ -76,7 +76,7 @@ export function KioskClient() {
     } finally {
       setLoadingDepartments(false)
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     void loadDepartments()

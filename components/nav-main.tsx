@@ -54,7 +54,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
       if (activeChild) {
         setOpen(true)
       }
-    }, [activeChild, pathname])
+    }, [activeChild])
 
     if (!hasChildren) {
       return (

@@ -408,6 +408,9 @@ export function VisitTrackingPage({
   const hasDataRef = useRef(false)
   const inFlightRef = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+  // Latest status, so the polling callback can skip completed visits without
+  // restarting the interval on every response.
+  const dataStatusRef = useRef<string | null>(null)
 
   const loadTracking = useCallback(async (background = false) => {
     if (inFlightRef.current) return
@@ -460,6 +463,8 @@ export function VisitTrackingPage({
     void loadTracking()
 
     const interval = window.setInterval(() => {
+      // Read from the ref inside the callback; the interval must not restart
+      // every time the status changes.
       const status = dataStatusRef.current
 
       if (status !== "COMPLETED" && status !== "CANCELLED") {
@@ -474,9 +479,11 @@ export function VisitTrackingPage({
   }, [loadTracking])
 
   // Keep the latest status available to the polling callback without
-  // restarting the interval every time a response is received.
-  const dataStatusRef = useRef<string | null>(null)
-  dataStatusRef.current = data?.visit.status ?? null
+  // restarting the interval every time a response is received. Assigned in an
+  // effect, never during render.
+  useEffect(() => {
+    dataStatusRef.current = data?.visit.status ?? null
+  }, [data])
 
   const updatedText = lastUpdated
     ? new Intl.DateTimeFormat("id-ID", {

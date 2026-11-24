@@ -180,6 +180,9 @@ export function CompleteRegistrationDialog({
     return () => {
       active = false
     }
+    // `ticket` is memoised by `id`/`visit_id`; depending on the object identity
+    // would reset the dialog on every parent render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, ticket?.id, ticket?.visit_id])
 
   function handleSwitchMode(nextMode: PatientMode) {
