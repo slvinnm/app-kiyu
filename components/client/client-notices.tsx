@@ -18,10 +18,10 @@ export function ProfileRequired() {
         </div>
 
         <div>
-          <CardTitle>Profil pasien belum terhubung</CardTitle>
+          <CardTitle>Profil belum terhubung</CardTitle>
 
           <CardDescription className="mt-2">
-            Lengkapi profil pasien untuk melakukan booking online dan melihat
+            Lengkapi profil untuk melakukan booking online dan melihat
             antrian.
           </CardDescription>
         </div>
@@ -37,7 +37,7 @@ export function ProfileRequired() {
   )
 }
 
-export function PatientLoadError({ message }: { message: string }) {
+export function CustomerLoadError({ message }: { message: string }) {
   return (
     <Card className="mt-6">
       <CardContent className="flex min-h-56 flex-col items-center justify-center gap-3 text-center">

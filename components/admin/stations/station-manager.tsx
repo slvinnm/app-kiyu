@@ -28,7 +28,7 @@ import {
 import { StationFormDialog } from "@/components/admin/stations/station-form-dialog"
 
 import { useTableQuery } from "@/hooks/use-table-query"
-import { stationTypeLabel } from "@/lib/reception/format"
+import { STATION_TYPES, stationTypeLabel } from "@/lib/reception/format"
 
 import type { AdminStation } from "@/types/admin"
 import type { Department } from "@/types/reception"
@@ -36,14 +36,6 @@ import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<AdminStation>()
 
-const STATION_TYPES = [
-  "REGISTRATION",
-  "NURSE",
-  "DOCTOR",
-  "LABORATORY",
-  "PHARMACY",
-  "BILLING",
-]
 
 export function StationManager({
   rows,
@@ -96,7 +88,7 @@ export function StationManager({
         }),
         columnHelper.display({
           id: "department",
-          header: "Poli",
+          header: "Departemen",
           cell: ({ row }) =>
             row.original.department?.name ??
             departments.find((d) => d.id === row.original.department_id)
@@ -161,7 +153,7 @@ export function StationManager({
               <CardTitle className="text-base">Daftar Station</CardTitle>
 
               <CardDescription>
-                Titik pelayanan yang terhubung dengan poli dan workflow.
+                Titik pelayanan yang terhubung dengan departemen dan workflow.
               </CardDescription>
             </div>
 
@@ -206,7 +198,7 @@ export function StationManager({
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="all">Semua Poli</SelectItem>
+                    <SelectItem value="all">Semua Departemen</SelectItem>
 
                     {departments.map((department) => (
                       <SelectItem

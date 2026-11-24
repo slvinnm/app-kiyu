@@ -4,7 +4,8 @@ import type { ReferralDetail } from "@/types/admin"
 
 import type {
   ApiResponse,
-  Client,
+  Customer,
+  CustomerInput,
   Department,
   DisplayDevice,
   Facility,
@@ -123,7 +124,8 @@ export type UserInput = {
   email: string
   password?: string
   role: string
-  department_id?: number | null
+  /** Required for facility-scoped roles; ignored for tenant_admin and client. */
+  facility_ids?: number[]
   station_id?: number | null
 }
 
@@ -132,10 +134,9 @@ export type AdminUser = {
   name: string
   email: string
   role: string
-  department_id: number | null
   station_id: number | null
-  department?: Department | null
   station?: Station | null
+  facilities?: { id: number; name: string; code: string | null }[]
 }
 
 export function createUser(input: UserInput) {
@@ -157,29 +158,18 @@ export function deleteUser(id: number) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Clients                                                                    */
+/* Customers                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export type ClientInput = {
-  name: string
-  nik?: string
-  mrn?: string
-  date_of_birth?: string
-  gender?: string
-  phone?: string
-  email?: string
-  address?: string
-}
-
-export function createClient(input: ClientInput) {
-  return apiFetch<ApiResponse<Client>>("/clients", {
+export function createCustomer(input: CustomerInput) {
+  return apiFetch<ApiResponse<Customer>>("/customers", {
     method: "POST",
     body: JSON.stringify(input),
   })
 }
 
-export function updateClient(id: number, input: Partial<ClientInput>) {
-  return apiFetch<ApiResponse<Client>>(`/clients/${id}`, {
+export function updateCustomer(id: number, input: Partial<CustomerInput>) {
+  return apiFetch<ApiResponse<Customer>>(`/customers/${id}`, {
     method: "PUT",
     body: JSON.stringify(input),
   })
@@ -193,7 +183,7 @@ export function updateVisitPriority(
   visitId: number,
   payload: { priority: 1 | 2 | 3; user_id?: string }
 ) {
-  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/priority`, {
+  return apiFetch<ApiResponse<Visit>>(`/queue-sessions/${visitId}/priority`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   })
@@ -203,14 +193,14 @@ export function cancelVisit(
   visitId: number,
   payload: { reason?: string; user_id?: string } = {}
 ) {
-  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/cancel`, {
+  return apiFetch<ApiResponse<Visit>>(`/queue-sessions/${visitId}/cancel`, {
     method: "POST",
     body: JSON.stringify(payload),
   })
 }
 
 export function getVisitDetail(visitId: number) {
-  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}`)
+  return apiFetch<ApiResponse<Visit>>(`/queue-sessions/${visitId}`)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -232,14 +222,14 @@ export type CreateReferralResult = {
 }
 
 export function createReferral(input: ReferralInput) {
-  return apiFetch<ApiResponse<CreateReferralResult>>("/referrals", {
+  return apiFetch<ApiResponse<CreateReferralResult>>("/service-transfers", {
     method: "POST",
     body: JSON.stringify(input),
   })
 }
 
 export function getReferral(id: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<ReferralDetail>>(`/referrals/${id}`, { signal })
+  return apiFetch<ApiResponse<ReferralDetail>>(`/service-transfers/${id}`, { signal })
 }
 
 /* -------------------------------------------------------------------------- */
@@ -386,7 +376,7 @@ export function requestReportExport(
   format: "xlsx" | "pdf",
   range: ReportRange = {}
 ) {
-  return apiFetch<ApiResponse<ReportExport>>("/reports/visits/export-file", {
+  return apiFetch<ApiResponse<ReportExport>>("/reports/queue-sessions/export-file", {
     method: "POST",
     body: JSON.stringify({ format, ...range }),
   })
@@ -396,5 +386,7 @@ export function requestReportExport(
 /* Aliases kept for existing call sites                                       */
 /* -------------------------------------------------------------------------- */
 
-export const createPatient = createClient
-export const updatePatient = updateClient
+export const createClient = createCustomer
+export const updateClient = updateCustomer
+export const createPatient = createCustomer
+export const updatePatient = updateCustomer

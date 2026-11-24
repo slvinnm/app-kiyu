@@ -24,7 +24,7 @@ export default async function Page() {
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Fasilitas"
-        description="Unit fisik tempat poli dan antrian berjalan."
+        description="Unit fisik tempat departemen dan antrian berjalan."
         icon={<Building2 className="size-5" />}
       />
 

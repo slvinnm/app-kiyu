@@ -212,14 +212,14 @@ export function VisitDetailSheet({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">Pasien</p>
+                  <p className="text-xs text-muted-foreground">Pelanggan</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {visit.client?.name ?? "-"}
                   </p>
 
                   <p className="text-xs text-muted-foreground">
-                    {visit.client?.mrn ?? "-"}
+                    {visit.client?.phone ?? "-"}
                   </p>
                 </div>
 
@@ -312,7 +312,7 @@ export function VisitDetailSheet({
                     <Label>Referral</Label>
 
                     <p className="text-xs text-muted-foreground">
-                      Rujuk pasien ke poli lain; kunjungan dan tiket tujuan
+                      Transfer pelanggan ke departemen lain; kunjungan dan tiket tujuan
                       dibuat otomatis.
                     </p>
 

@@ -30,23 +30,23 @@ export default async function Page({
   try {
     departments = await getDepartmentsTableServer({ ...table })
   } catch (cause) {
-    error = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
+    error = getApiErrorMessage(cause, "Gagal memuat daftar departemen.")
   }
 
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <AdminPageHeader
-        title="Poli"
-        description="Kelola unit pelayanan yang menjadi tujuan kunjungan pasien."
+        title="Departemen"
+        description="Kelola unit layanan yang menjadi tujuan antrean pelanggan."
         icon={<Building2 className="size-5" />}
       />
 
       {error || !departments ? (
         <Alert variant="destructive">
-          <AlertTitle>Daftar poli tidak tersedia</AlertTitle>
+          <AlertTitle>Daftar departemen tidak tersedia</AlertTitle>
 
           <AlertDescription>
-            {error ?? "Terjadi kesalahan saat memuat poli."}
+            {error ?? "Terjadi kesalahan saat memuat departemen."}
           </AlertDescription>
         </Alert>
       ) : (

@@ -50,7 +50,7 @@ export default async function Page({
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Referral"
-        description="Pantau rujukan antar-poli dan tiket tujuan yang dihasilkan."
+        description="Pantau rujukan antar-departemen dan tiket tujuan yang dihasilkan."
         icon={<ArrowRightLeft className="size-5" />}
       />
 

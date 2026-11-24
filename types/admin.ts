@@ -87,17 +87,13 @@ export type WorkflowStepPayload = {
 
 export type ClientPayload = {
   name: string
-  nik?: string
-  mrn?: string
-  date_of_birth?: string
-  gender?: string
   phone?: string
   email?: string
   address?: string
 }
 
-/** @deprecated use `ClientPayload` — the API renamed patients to clients. */
-export type PatientPayload = ClientPayload
+/** @deprecated use `ClientPayload`. */
+export type CustomerInput = ClientPayload
 
 export type VisitFilters = {
   search?: string
@@ -126,8 +122,7 @@ export type AuditFilters = {
 
 export type ClientFilters = {
   search?: string
-  nik?: string
-  mrn?: string
+  phone?: string
   sort?: string
   direction?: "asc" | "desc"
   page?: number
@@ -135,7 +130,7 @@ export type ClientFilters = {
 }
 
 /** @deprecated use `ClientFilters`. */
-export type PatientFilters = ClientFilters
+export type CustomerFilters = ClientFilters
 
 export type TicketFilters = {
   search?: string
@@ -173,12 +168,11 @@ export type AdminUser = {
   name: string
   email: string
   role: string
-  department_id: number | null
   station_id: number | null
   created_at?: string
   updated_at?: string
-  department?: Department | null
   station?: AdminStation | null
+  facilities?: { id: number; name: string; code: string | null }[]
 }
 
 export type UserPayload = {

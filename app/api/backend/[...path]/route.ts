@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { FACILITY_COOKIE_NAME } from "@/lib/facility/context"
+import { resolveFacilityId } from "@/lib/facility/selection"
+import { getVerifiedUser } from "@/lib/auth/guard"
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session-core"
 import { isSameOrigin, isStateChangingMethod } from "@/lib/auth/origin"
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
@@ -58,6 +61,15 @@ async function proxy(request: NextRequest) {
 
   headers.set("Accept", "application/json")
   headers.set("Authorization", `Bearer ${accessToken}`)
+
+  // The chosen facility is re-validated against the account before it is
+  // forwarded: a stale or tampered cookie must not be able to name a branch the
+  // user cannot reach. An explicit header on the browser request wins.
+  const facilityId = await resolveFacilityForRequest(request, accessToken)
+
+  if (facilityId !== null) {
+    headers.set("X-Facility-Id", String(facilityId))
+  }
 
   const contentType = request.headers.get("content-type")
 
@@ -128,4 +140,34 @@ export async function DELETE(request: NextRequest) {
 
 export async function HEAD(request: NextRequest) {
   return proxy(request)
+}
+
+/**
+ * The facility id to forward to the API.
+ *
+ * An explicit `X-Facility-Id` on the browser request is only forwarded after it
+ * is proven reachable by the signed-in account; otherwise the persisted
+ * selection is used. Returning `null` leaves the header off so single-facility
+ * tenants behave exactly as before.
+ */
+async function resolveFacilityForRequest(
+  request: NextRequest,
+  _accessToken: string
+): Promise<number | null> {
+  const user = await getVerifiedUser()
+
+  if (!user) {
+    return null
+  }
+
+  const explicit = request.headers.get("x-facility-id")
+  const validatedExplicit = resolveFacilityId(explicit, user.facility_ids)
+
+  if (validatedExplicit !== null) {
+    return validatedExplicit
+  }
+
+  const stored = request.cookies.get(FACILITY_COOKIE_NAME)?.value ?? null
+
+  return resolveFacilityId(stored, user.facility_ids)
 }

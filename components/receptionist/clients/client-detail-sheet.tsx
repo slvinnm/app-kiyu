@@ -14,34 +14,32 @@ import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getPatient } from "@/lib/api/reception"
+import { getCustomer } from "@/lib/api/reception"
 import {
   channelLabel,
-  formatDate,
   formatDateTime,
-  genderLabel,
   priorityLabel,
   ticketStatusLabel,
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientDetail } from "@/types/reception"
+import type { CustomerDetail } from "@/types/reception"
 
-export function PatientDetailSheet({
-  patientId,
+export function CustomerDetailSheet({
+  customerId,
   open,
   onOpenChange,
 }: {
-  patientId: number | null
+  customerId: number | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const [patient, setPatient] = useState<PatientDetail | null>(null)
+  const [customer, setCustomer] = useState<CustomerDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!open || patientId === null) {
+    if (!open || customerId === null) {
       return
     }
 
@@ -50,17 +48,17 @@ export function PatientDetailSheet({
 
     setLoading(true)
     setError(null)
-    setPatient(null)
+    setCustomer(null)
 
-    getPatient(patientId, controller.signal)
+    getCustomer(customerId, controller.signal)
       .then((response) => {
         if (active) {
-          setPatient(response.data)
+          setCustomer(response.data)
         }
       })
       .catch((cause) => {
         if (active && !controller.signal.aborted) {
-          setError(getApiErrorMessage(cause, "Gagal memuat data pasien."))
+          setError(getApiErrorMessage(cause, "Gagal memuat data pelanggan."))
         }
       })
       .finally(() => {
@@ -73,16 +71,18 @@ export function PatientDetailSheet({
       active = false
       controller.abort()
     }
-  }, [open, patientId])
+  }, [open, customerId])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{patient?.name ?? "Detail Pasien"}</DialogTitle>
+          <DialogTitle>{customer?.name ?? "Detail Pelanggan"}</DialogTitle>
 
           <DialogDescription>
-            {patient?.mrn ? `No. RM ${patient.mrn}` : "Memuat data pasien..."}
+            {customer
+              ? (customer.email ?? "Pelanggan tanpa email")
+              : "Memuat data pelanggan..."}
           </DialogDescription>
         </DialogHeader>
 
@@ -90,36 +90,20 @@ export function PatientDetailSheet({
           {loading && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Spinner />
-              Memuat data pasien...
+              Memuat data pelanggan...
             </div>
           )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          {patient && (
+          {customer && (
             <>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">NIK</p>
+                  <p className="text-xs text-muted-foreground">Alamat</p>
 
                   <p className="mt-1 text-sm font-medium">
-                    {patient.nik ?? "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">Tanggal Lahir</p>
-
-                  <p className="mt-1 text-sm font-medium">
-                    {formatDate(patient.date_of_birth)}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">Jenis Kelamin</p>
-
-                  <p className="mt-1 text-sm font-medium">
-                    {genderLabel(patient.gender)}
+                    {customer.address ?? "-"}
                   </p>
                 </div>
 
@@ -127,7 +111,7 @@ export function PatientDetailSheet({
                   <p className="text-xs text-muted-foreground">Telepon</p>
 
                   <p className="mt-1 text-sm font-medium">
-                    {patient.phone ?? "-"}
+                    {customer.phone ?? "-"}
                   </p>
                 </div>
 
@@ -135,7 +119,7 @@ export function PatientDetailSheet({
                   <p className="text-xs text-muted-foreground">Email</p>
 
                   <p className="mt-1 truncate text-sm font-medium">
-                    {patient.email ?? "-"}
+                    {customer.email ?? "-"}
                   </p>
                 </div>
 
@@ -143,7 +127,7 @@ export function PatientDetailSheet({
                   <p className="text-xs text-muted-foreground">Alamat</p>
 
                   <p className="mt-1 text-sm font-medium">
-                    {patient.address ?? "-"}
+                    {customer.address ?? "-"}
                   </p>
                 </div>
               </div>
@@ -153,13 +137,13 @@ export function PatientDetailSheet({
               <div>
                 <p className="text-sm font-medium">Riwayat Kunjungan</p>
 
-                {!patient.visits?.length ? (
+                {!customer.visits?.length ? (
                   <p className="mt-2 text-sm text-muted-foreground">
                     Belum ada kunjungan.
                   </p>
                 ) : (
                   <div className="mt-3 space-y-3">
-                    {patient.visits.map((visit) => (
+                    {customer.visits.map((visit) => (
                       <div
                         key={visit.id}
                         className="rounded-xl border p-4 text-sm"

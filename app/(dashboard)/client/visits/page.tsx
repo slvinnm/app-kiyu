@@ -2,9 +2,9 @@ import { FileTextIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 
-import { PatientVisitsList } from "@/components/client/client-visits-list"
+import { CustomerVisitsList } from "@/components/client/client-visits-list"
 import {
-  PatientLoadError,
+  CustomerLoadError,
   ProfileRequired,
 } from "@/components/client/client-notices"
 
@@ -14,7 +14,7 @@ import {
   getClientVisitsServer,
 } from "@/lib/api/clients-server"
 
-import type { PatientVisit } from "@/types/client"
+import type { CustomerVisit } from "@/types/client"
 
 export default async function Page() {
   let current
@@ -26,8 +26,8 @@ export default async function Page() {
       <div className="mx-auto w-full max-w-5xl p-4 md:p-6 lg:p-8">
         <PageHeader />
 
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat profil pelanggan.")}
         />
       </div>
     )
@@ -42,7 +42,7 @@ export default async function Page() {
     )
   }
 
-  let visits: PatientVisit[] = []
+  let visits: CustomerVisit[] = []
 
   try {
     const page = await getClientVisitsServer(current.profile.id, 50)
@@ -52,7 +52,7 @@ export default async function Page() {
       <div className="mx-auto w-full max-w-5xl p-4 md:p-6 lg:p-8">
         <PageHeader />
 
-        <PatientLoadError
+        <CustomerLoadError
           message={getApiErrorMessage(cause, "Gagal memuat kunjungan.")}
         />
       </div>
@@ -64,7 +64,7 @@ export default async function Page() {
       <PageHeader />
 
       <div className="mt-6">
-        <PatientVisitsList visits={visits} />
+        <CustomerVisitsList visits={visits} />
       </div>
     </div>
   )
@@ -74,7 +74,7 @@ function PageHeader() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <Badge variant="outline">Pasien</Badge>
+        <Badge variant="outline">Pelanggan</Badge>
 
         <span className="text-xs text-muted-foreground">Riwayat Layanan</span>
       </div>

@@ -46,7 +46,9 @@ const getVerifiedUser = cache(
  * own requests will surface the failure, and a transient blip must not bounce
  * every operator to the login screen.
  */
-export async function requireRole(roles: UserRole[]): Promise<VerifiedUser> {
+export async function requireRole(
+  roles: readonly UserRole[]
+): Promise<VerifiedUser> {
   const user = await getVerifiedUser()
 
   if (user === null) {
@@ -82,8 +84,7 @@ async function fallbackToCookieUser(): Promise<VerifiedUser> {
     email: session.user.email,
     role: session.user.role,
     tenant_id: session.user.tenant_id ?? null,
-    facility_id: session.user.facility_id ?? null,
-    department_id: session.user.department_id ?? null,
+    facility_ids: session.user.facility_ids ?? [],
     station_id: session.user.station_id ?? null,
   }
 }

@@ -2,8 +2,8 @@ import { UserRoundIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 
-import { PatientLoadError } from "@/components/client/client-notices"
-import { PatientProfileForm } from "@/components/client/profile-form"
+import { CustomerLoadError } from "@/components/client/client-notices"
+import { CustomerProfileForm } from "@/components/client/profile-form"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getCurrentClientServer } from "@/lib/api/clients-server"
@@ -18,8 +18,8 @@ export default async function Page() {
       <div className="mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8">
         <PageHeader />
 
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat profil pelanggan.")}
         />
       </div>
     )
@@ -30,7 +30,7 @@ export default async function Page() {
       <PageHeader />
 
       <div className="mt-6">
-        <PatientProfileForm
+        <CustomerProfileForm
           userId={current.user.id}
           profile={current.profile}
         />
@@ -43,7 +43,7 @@ function PageHeader() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <Badge variant="outline">Pasien</Badge>
+        <Badge variant="outline">Pelanggan</Badge>
 
         <span className="text-xs text-muted-foreground">Profil</span>
       </div>
@@ -57,7 +57,7 @@ function PageHeader() {
           <h1 className="text-2xl font-semibold tracking-tight">Profil</h1>
 
           <p className="text-sm text-muted-foreground">
-            Kelola identitas dan kontak profil pasien Anda.
+            Kelola data dan kontak profil Anda.
           </p>
         </div>
       </div>

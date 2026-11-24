@@ -6,7 +6,7 @@ import { toQuery } from "@/lib/api/query"
 import type { AdminUser } from "@/lib/api/admin"
 import type {
   AuditLog,
-  Client,
+  Customer,
   Department,
   DisplayDevice,
   Facility,
@@ -110,11 +110,11 @@ export async function getUsersServer(
   return response.data
 }
 
-export async function getClientsServer(
+export async function getCustomersServer(
   filters: TableFilters = {}
-): Promise<Paginated<Client>> {
-  const response = await serverApiFetch<{ data: Paginated<Client> }>(
-    `/clients${toQuery(filters)}`
+): Promise<Paginated<Customer>> {
+  const response = await serverApiFetch<{ data: Paginated<Customer> }>(
+    `/customers${toQuery(filters)}`
   )
   return response.data
 }
@@ -123,7 +123,7 @@ export async function getVisitsServer(
   filters: TableFilters = {}
 ): Promise<Paginated<Visit>> {
   const response = await serverApiFetch<{ data: Paginated<Visit> }>(
-    `/visits${toQuery(filters)}`
+    `/queue-sessions${toQuery(filters)}`
   )
   return response.data
 }
@@ -132,7 +132,7 @@ export async function getReferralsServer(
   filters: TableFilters = {}
 ): Promise<Paginated<Referral>> {
   const response = await serverApiFetch<{ data: Paginated<Referral> }>(
-    `/referrals${toQuery(filters)}`
+    `/service-transfers${toQuery(filters)}`
   )
   return response.data
 }
@@ -163,7 +163,7 @@ export async function getVisitStatisticsServer(
   filters: { date?: string; status?: string; department_id?: number } = {}
 ): Promise<CountStatistics> {
   const response = await serverApiFetch<{ data: CountStatistics }>(
-    `/visits/statistics${toQuery(filters)}`
+    `/queue-sessions/statistics${toQuery(filters)}`
   )
   return response.data
 }
@@ -177,9 +177,9 @@ export async function getTicketStatisticsServer(
   return response.data
 }
 
-export async function getClientStatisticsServer(): Promise<CountStatistics> {
+export async function getCustomerStatisticsServer(): Promise<CountStatistics> {
   const response = await serverApiFetch<{ data: CountStatistics }>(
-    "/clients/statistics"
+    "/customers/statistics"
   )
   return response.data
 }
@@ -211,8 +211,6 @@ export async function getSubscriptionServer(): Promise<SubscriptionView> {
 /* Aliases kept for existing pages                                            */
 /* -------------------------------------------------------------------------- */
 
-export const getPatientsServer = getClientsServer
-export const getPatientStatisticsServer = getClientStatisticsServer
 export const getDepartmentsTableServer = getDepartmentsServer
 export const getStationsTableServer = getStationsServer
 export const getWorkflowsTableServer = getWorkflowsServer

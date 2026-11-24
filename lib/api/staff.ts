@@ -38,7 +38,7 @@ export function getStationOptions(
 /* -------------------------------------------------------------------------- */
 
 export function callNextClinical(stationId: number, assignedTo?: string) {
-  return apiFetch<ApiResponse<QueueTicket | null>>("/clinical/call-next", {
+  return apiFetch<ApiResponse<QueueTicket | null>>("/queue/call-next", {
     method: "POST",
     body: JSON.stringify({ station_id: stationId, assigned_to: assignedTo }),
   })
@@ -136,14 +136,14 @@ export type CompleteTicketResult = {
 /* -------------------------------------------------------------------------- */
 
 export function updateVisitPriority(visitId: number, priority: 1 | 2 | 3) {
-  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/priority`, {
+  return apiFetch<ApiResponse<Visit>>(`/queue-sessions/${visitId}/priority`, {
     method: "PATCH",
     body: JSON.stringify({ priority }),
   })
 }
 
 export function cancelVisit(visitId: number, reason?: string) {
-  return apiFetch<ApiResponse<Visit>>(`/visits/${visitId}/cancel`, {
+  return apiFetch<ApiResponse<Visit>>(`/queue-sessions/${visitId}/cancel`, {
     method: "POST",
     body: JSON.stringify({ reason }),
   })

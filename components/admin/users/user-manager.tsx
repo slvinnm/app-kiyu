@@ -39,7 +39,7 @@ import {
 import { UserFormDialog } from "@/components/admin/users/user-form-dialog"
 
 import { useTableQuery } from "@/hooks/use-table-query"
-import { STAFF_ROLE_OPTIONS, staffRoleLabel } from "@/lib/admin/roles"
+import { ASSIGNABLE_ROLE_OPTIONS, staffRoleLabel } from "@/lib/admin/roles"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteUser } from "@/lib/api/admin"
 
@@ -120,15 +120,17 @@ export function UserManager({
           ),
         }),
         columnHelper.display({
-          id: "department",
-          header: "Department",
-          cell: ({ row }) => row.original.department?.name ?? "-",
+          id: "station",
+          header: "Loket",
+          cell: ({ row }) => row.original.station?.name ?? "-",
           enableSorting: false,
         }),
         columnHelper.display({
-          id: "station",
-          header: "Station",
-          cell: ({ row }) => row.original.station?.name ?? "-",
+          id: "facilities",
+          header: "Fasilitas",
+          cell: ({ row }) =>
+            row.original.facilities?.map((facility) => facility.name).join(", ") ||
+            "-",
           enableSorting: false,
         }),
         columnHelper.display({
@@ -218,7 +220,7 @@ export function UserManager({
                 <SelectContent>
                   <SelectItem value="all">Semua Role</SelectItem>
 
-                  {STAFF_ROLE_OPTIONS.map((option) => (
+                  {ASSIGNABLE_ROLE_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

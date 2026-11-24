@@ -27,7 +27,7 @@ import { AdminStatCard } from "@/components/admin/admin-stat-card"
 import {
   getAuditLogsServer,
   getDepartmentOptionsServer,
-  getPatientStatisticsServer,
+  getCustomerStatisticsServer,
   getTicketStatisticsServer,
   getVisitStatisticsServer,
   getWorkflowStatisticsServer,
@@ -57,7 +57,7 @@ export default async function Page() {
   const results = await Promise.allSettled([
     getDepartmentOptionsServer(),
     getWorkflowStatisticsServer(),
-    getPatientStatisticsServer(),
+    getCustomerStatisticsServer(),
     getVisitStatisticsServer({ date: todayJakarta() }),
     getTicketStatisticsServer({ status: "CREATED" }),
     getTicketStatisticsServer({ status: "IN_PROGRESS" }),
@@ -72,7 +72,7 @@ export default async function Page() {
 
   const departments = value<Department[]>(0)
   const workflowCount = value<CountStatistics>(1)
-  const patientCount = value<CountStatistics>(2)
+  const customerCount = value<CountStatistics>(2)
   const visitsToday = value<CountStatistics>(3)
   const waiting = value<CountStatistics>(4)
   const inProgress = value<CountStatistics>(5)
@@ -105,7 +105,7 @@ export default async function Page() {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <AdminStatCard
-          label="Poli"
+          label="Departemen"
           value={departments?.length ?? null}
           icon={<Building2 className="size-4" />}
           hint={`${departments?.filter((d) => d.is_active).length ?? 0} aktif`}
@@ -124,8 +124,8 @@ export default async function Page() {
         />
 
         <AdminStatCard
-          label="Pasien"
-          value={patientCount?.total ?? null}
+          label="Pelanggan"
+          value={customerCount?.total ?? null}
           icon={<Users className="size-4" />}
         />
       </div>
@@ -208,7 +208,7 @@ export default async function Page() {
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <CardTitle className="text-base">Poli & Station</CardTitle>
+                <CardTitle className="text-base">Departemen & Station</CardTitle>
 
                 <CardDescription>
                   Struktur organisasi yang terdaftar.
@@ -253,7 +253,7 @@ export default async function Page() {
               </div>
             ) : (
               <p className="p-6 text-center text-sm text-muted-foreground">
-                Belum ada poli.
+                Belum ada departemen.
               </p>
             )}
           </CardContent>
@@ -271,7 +271,7 @@ export default async function Page() {
             className={buttonVariants({ variant: "outline" })}
           >
             <Building2 />
-            Poli
+            Departemen
           </Link>
 
           <Link
@@ -303,7 +303,7 @@ export default async function Page() {
             className={buttonVariants({ variant: "outline" })}
           >
             <Users />
-            Pasien
+            Pelanggan
           </Link>
         </CardContent>
       </Card>

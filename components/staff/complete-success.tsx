@@ -32,10 +32,10 @@ export function StaffCompleteSuccess({
       <div className="rounded-xl border p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-xs text-muted-foreground">Pasien</p>
+            <p className="text-xs text-muted-foreground">Pelanggan</p>
 
             <p className="mt-1 font-medium">
-              {visit.client?.name ?? "Pasien terdaftar"}
+              {visit.client?.name ?? "Pelanggan terdaftar"}
             </p>
           </div>
 

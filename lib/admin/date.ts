@@ -1,5 +1,5 @@
 /**
- * Backend date filters use `whereDate`, so the frontend must send the clinic's
+ * Backend date filters use `whereDate`, so the frontend must send the tenant's
  * local date rather than a UTC date.
  */
 export function todayJakarta(): string {

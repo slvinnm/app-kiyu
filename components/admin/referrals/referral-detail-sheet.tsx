@@ -106,14 +106,14 @@ export function ReferralDetailSheet({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">Pasien Sumber</p>
+                  <p className="text-xs text-muted-foreground">Pelanggan Sumber</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {referral.source_visit?.client?.name ?? "-"}
                   </p>
 
                   <p className="text-xs text-muted-foreground">
-                    {referral.source_visit?.client?.mrn ?? "-"}
+                    {referral.source_visit?.client?.phone ?? "-"}
                   </p>
                 </div>
 

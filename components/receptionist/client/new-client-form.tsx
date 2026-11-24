@@ -2,44 +2,37 @@
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import type { PatientInput } from "@/types/reception"
+import type { CustomerInput } from "@/types/reception"
 
-export function NewPatientForm({
+/**
+ * Minimal customer intake.
+ *
+ * Only what the `customers` table stores: a name plus optional contact details.
+ * No national identity number, birth date or gender is collected (PRD §1.2).
+ */
+export function NewCustomerForm({
   value,
   errors,
   onChange,
 }: {
-  value: PatientInput
+  value: CustomerInput
   errors?: Record<string, string>
-  onChange: (value: Partial<PatientInput>) => void
+  onChange: (value: Partial<CustomerInput>) => void
 }) {
-  function handleGenderChange(nextValue: string | null) {
-    onChange({
-      gender: nextValue === "male" || nextValue === "female" ? nextValue : "",
-    })
-  }
-
   return (
     <div className="grid gap-5 md:grid-cols-2">
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="patient-name">
+        <Label htmlFor="customer-name">
           Nama Lengkap <span className="text-destructive">*</span>
         </Label>
 
         <Input
-          id="patient-name"
+          id="customer-name"
           value={value.name}
           onChange={(event) => onChange({ name: event.target.value })}
-          placeholder="Masukkan nama lengkap pasien"
+          placeholder="Nama lengkap pelanggan"
         />
 
         {errors?.name && (
@@ -48,28 +41,11 @@ export function NewPatientForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="patient-nik">NIK</Label>
+        <Label htmlFor="customer-phone">Telepon</Label>
 
         <Input
-          id="patient-nik"
-          value={value.nik}
-          onChange={(event) => onChange({ nik: event.target.value })}
-          placeholder="16 digit NIK"
-          inputMode="numeric"
-          maxLength={16}
-        />
-
-        {errors?.nik && (
-          <p className="text-xs text-destructive">{errors.nik}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="patient-phone">No. Telepon</Label>
-
-        <Input
-          id="patient-phone"
-          value={value.phone}
+          id="customer-phone"
+          value={value.phone ?? ""}
           onChange={(event) => onChange({ phone: event.target.value })}
           placeholder="08xxxxxxxxxx"
           inputMode="tel"
@@ -81,47 +57,12 @@ export function NewPatientForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="patient-dob">Tanggal Lahir</Label>
+        <Label htmlFor="customer-email">Email</Label>
 
         <Input
-          id="patient-dob"
-          type="date"
-          value={value.date_of_birth}
-          onChange={(event) => onChange({ date_of_birth: event.target.value })}
-        />
-
-        {errors?.date_of_birth && (
-          <p className="text-xs text-destructive">{errors.date_of_birth}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label>Jenis Kelamin</Label>
-
-        <Select value={value.gender} onValueChange={handleGenderChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Pilih jenis kelamin" />
-          </SelectTrigger>
-
-          <SelectContent>
-            <SelectItem value="male">Laki-laki</SelectItem>
-
-            <SelectItem value="female">Perempuan</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {errors?.gender && (
-          <p className="text-xs text-destructive">{errors.gender}</p>
-        )}
-      </div>
-
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="patient-email">Email</Label>
-
-        <Input
-          id="patient-email"
+          id="customer-email"
           type="email"
-          value={value.email}
+          value={value.email ?? ""}
           onChange={(event) => onChange({ email: event.target.value })}
           placeholder="nama@email.com"
         />
@@ -132,13 +73,13 @@ export function NewPatientForm({
       </div>
 
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="patient-address">Alamat</Label>
+        <Label htmlFor="customer-address">Alamat</Label>
 
         <Textarea
-          id="patient-address"
-          value={value.address}
+          id="customer-address"
+          value={value.address ?? ""}
           onChange={(event) => onChange({ address: event.target.value })}
-          placeholder="Masukkan alamat pasien"
+          placeholder="Alamat pelanggan"
           rows={3}
         />
 
@@ -146,10 +87,6 @@ export function NewPatientForm({
           <p className="text-xs text-destructive">{errors.address}</p>
         )}
       </div>
-
-      <p className="text-xs text-muted-foreground md:col-span-2">
-        Nomor rekam medis (MRN) dibuat otomatis oleh sistem jika dikosongkan.
-      </p>
     </div>
   )
 }

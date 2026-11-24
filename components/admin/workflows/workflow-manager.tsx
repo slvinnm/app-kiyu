@@ -71,7 +71,7 @@ export function WorkflowManager({
         }),
         columnHelper.display({
           id: "department",
-          header: "Poli",
+          header: "Departemen",
           cell: ({ row }) =>
             row.original.department?.name ??
             departments.find((d) => d.id === row.original.department_id)
@@ -125,7 +125,7 @@ export function WorkflowManager({
               <CardTitle className="text-base">Daftar Workflow</CardTitle>
 
               <CardDescription>
-                Urutan pelayanan per poli beserta langkah-langkahnya.
+                Urutan pelayanan per departemen beserta langkah-langkahnya.
               </CardDescription>
             </div>
 
@@ -141,7 +141,7 @@ export function WorkflowManager({
             columns={columns}
             data={rows}
             getRowId={(workflow) => String(workflow.id)}
-            emptyMessage="Workflow tidak ditemukan. Poli tanpa workflow tidak dapat menerima kunjungan."
+            emptyMessage="Workflow tidak ditemukan. Departemen tanpa workflow tidak dapat menerima kunjungan."
             pageCount={lastPage}
             pageIndex={state.page - 1}
             pageSize={state.perPage}
@@ -169,7 +169,7 @@ export function WorkflowManager({
                 </SelectTrigger>
 
                 <SelectContent>
-                  <SelectItem value="all">Semua Poli</SelectItem>
+                  <SelectItem value="all">Semua Departemen</SelectItem>
 
                   {departments.map((department) => (
                     <SelectItem

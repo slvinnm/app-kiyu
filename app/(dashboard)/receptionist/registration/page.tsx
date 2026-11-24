@@ -12,33 +12,41 @@ import {
 import { ManualIntakeForm } from "@/components/receptionist/registration/manual-intake-form"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getDepartmentOptionsServer } from "@/lib/api/reception-server"
+import {
+  getDepartmentOptionsServer,
+  getStationOptionsServer,
+} from "@/lib/api/reception-server"
 import { requireRole } from "@/lib/auth/guard"
 import { resolveDepartmentId } from "@/lib/reception/department"
 
-import type { Department } from "@/types/reception"
+import type { Department, Station } from "@/types/reception"
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ department_id?: string | string[] }>
 }) {
-  const user = await requireRole(["admin", "receptionist"])
+  const user = await requireRole(["tenant_admin", "facility_admin", "operator"])
 
   const params = await searchParams
 
   let departments: Department[] = []
+  let stations: Station[] = []
   let loadError: string | null = null
 
   try {
-    departments = await getDepartmentOptionsServer()
+    ;[departments, stations] = await Promise.all([
+      getDepartmentOptionsServer(),
+      getStationOptionsServer().catch(() => []),
+    ])
   } catch (cause) {
-    loadError = getApiErrorMessage(cause, "Gagal memuat daftar poli.")
+    loadError = getApiErrorMessage(cause, "Gagal memuat daftar departemen.")
   }
 
   const departmentId = resolveDepartmentId(
     params.department_id,
-    user.department_id,
+    stations,
+    user.station_id,
     departments
   )
 
@@ -48,7 +56,7 @@ export default async function Page({
         <div className="flex items-center gap-2">
           <Badge variant="outline">Reception</Badge>
 
-          <span className="text-xs text-muted-foreground">Patient Intake</span>
+          <span className="text-xs text-muted-foreground">Customer Intake</span>
         </div>
 
         <div className="flex items-start gap-3">
@@ -62,7 +70,7 @@ export default async function Page({
             </h1>
 
             <p className="text-sm text-muted-foreground">
-              Buat intake manual walk-in. Data pasien dilengkapi saat registrasi
+              Buat intake manual walk-in. Data pelanggan dilengkapi saat registrasi
               di meja reception.
             </p>
           </div>
@@ -73,7 +81,7 @@ export default async function Page({
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Daftar poli tidak tersedia
+              Daftar departemen tidak tersedia
             </CardTitle>
 
             <CardDescription>{loadError}</CardDescription>

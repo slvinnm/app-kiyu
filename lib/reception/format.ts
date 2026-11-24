@@ -37,13 +37,19 @@ const CHANNEL_LABELS: Record<IntakeChannel, string> = {
   ONLINE: "Online",
 }
 
-const STATION_TYPE_LABELS: Record<string, string> = {
-  REGISTRATION: "Registrasi",
-  NURSE: "Perawat",
-  DOCTOR: "Dokter",
-  LABORATORY: "Laboratorium",
-  PHARMACY: "Farmasi",
-  BILLING: "Kasir",
+/**
+ * Mirrors `App\Enums\StationType`. Neutral labels: the type says what kind of
+ * work a service point does, the station's own name says where.
+ */
+export const STATION_TYPES = ["INTAKE", "SERVICE", "CASHIER", "COUNTER"] as const
+
+export type StationTypeValue = (typeof STATION_TYPES)[number]
+
+const STATION_TYPE_LABELS: Record<StationTypeValue, string> = {
+  INTAKE: "Intake",
+  SERVICE: "Layanan",
+  CASHIER: "Kasir",
+  COUNTER: "Loket",
 }
 
 export function priorityLabel(priority: Priority | number): string {
@@ -67,25 +73,12 @@ export function stationTypeLabel(type: string | null | undefined): string {
     return "-"
   }
 
-  return STATION_TYPE_LABELS[type] ?? type
-}
-
-export function genderLabel(gender: string | null | undefined): string {
-  if (!gender) {
-    return "-"
-  }
-
-  const normalized = gender.toLowerCase()
-
-  if (normalized === "male" || normalized === "m" || normalized === "l") {
-    return "Laki-laki"
-  }
-
-  if (normalized === "female" || normalized === "f" || normalized === "p") {
-    return "Perempuan"
-  }
-
-  return gender
+  return (
+    STATION_TYPE_LABELS[type as StationTypeValue] ??
+    // An unrecognized value is shown verbatim rather than hidden, so a backend
+    // enum addition is visible instead of silently blank.
+    type
+  )
 }
 
 function parseDate(value: string | null | undefined): Date | null {

@@ -138,7 +138,7 @@ export function DepartmentManager({
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <CardTitle className="text-base">Daftar Poli</CardTitle>
+              <CardTitle className="text-base">Daftar Departemen</CardTitle>
 
               <CardDescription>
                 Kelola unit pelayanan beserta status aktifnya.
@@ -147,7 +147,7 @@ export function DepartmentManager({
 
             <Button onClick={openCreate}>
               <PlusIcon />
-              Tambah Poli
+              Tambah Departemen
             </Button>
           </div>
         </CardHeader>
@@ -157,7 +157,7 @@ export function DepartmentManager({
             columns={columns}
             data={rows}
             getRowId={(department) => String(department.id)}
-            emptyMessage="Poli tidak ditemukan."
+            emptyMessage="Departemen tidak ditemukan."
             pageCount={lastPage}
             pageIndex={state.page - 1}
             pageSize={state.perPage}
@@ -169,7 +169,7 @@ export function DepartmentManager({
             searchValue={tq.searchInput}
             onSearchChange={tq.setSearchInput}
             searching={tq.pending}
-            searchPlaceholder="Cari kode atau nama poli..."
+            searchPlaceholder="Cari kode atau nama departemen..."
           />
         </CardContent>
       </Card>

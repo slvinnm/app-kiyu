@@ -2,7 +2,7 @@ import { Ticket } from "lucide-react"
 import styles from "@/app/kiosk/kiosk-marquee.module.css"
 
 const messages = [
-  "Silakan pilih poliklinik sesuai dengan tujuan pelayanan Anda.",
+  "Silakan pilih departemen sesuai tujuan layanan Anda.",
   "Pastikan Anda mengambil satu nomor antrean untuk setiap kunjungan.",
   "Harap menunggu hingga nomor antrean Anda dipanggil.",
 ]

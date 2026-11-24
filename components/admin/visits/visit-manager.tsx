@@ -80,14 +80,14 @@ export function VisitManager({
           ),
         }),
         columnHelper.display({
-          id: "patient",
-          header: "Pasien",
+          id: "customer",
+          header: "Pelanggan",
           cell: ({ row }) => (
             <div>
               <p className="font-medium">{row.original.client?.name ?? "-"}</p>
 
               <p className="text-xs text-muted-foreground">
-                {row.original.client?.mrn ?? "-"}
+                {row.original.client?.phone ?? "-"}
               </p>
             </div>
           ),
@@ -95,7 +95,7 @@ export function VisitManager({
         }),
         columnHelper.display({
           id: "department",
-          header: "Poli",
+          header: "Departemen",
           cell: ({ row }) => row.original.department?.name ?? "-",
           enableSorting: false,
         }),
@@ -173,7 +173,7 @@ export function VisitManager({
             searchValue={tq.searchInput}
             onSearchChange={tq.setSearchInput}
             searching={tq.pending}
-            searchPlaceholder="Cari nomor kunjungan atau nama pasien..."
+            searchPlaceholder="Cari nomor antrean atau nama pelanggan..."
             toolbar={
               <>
                 <Select
@@ -190,7 +190,7 @@ export function VisitManager({
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="all">Semua Poli</SelectItem>
+                    <SelectItem value="all">Semua Departemen</SelectItem>
 
                     {departments.map((department) => (
                       <SelectItem

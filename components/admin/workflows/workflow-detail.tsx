@@ -198,7 +198,7 @@ export function WorkflowDetail({
               <CardTitle className="text-base">Langkah Workflow</CardTitle>
 
               <CardDescription>
-                {workflow.department?.name ?? "Poli"} · urutan pelayanan dari
+                {workflow.department?.name ?? "Departemen"} · urutan pelayanan dari
                 station ke station.
               </CardDescription>
             </div>

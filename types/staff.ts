@@ -1,12 +1,12 @@
 /**
- * Clinical workspace types (nurse, doctor, and other station-based roles).
+ * Station workspace types: queue tickets handled at a service point.
  * Domain entities are shared with the reception module because the backend
  * uses the same Visit / QueueTicket / Station models.
  */
 
 export type {
   IntakeChannel,
-  Patient,
+  Customer,
   Priority,
   QueueTicket,
   QueueTicketStatus,

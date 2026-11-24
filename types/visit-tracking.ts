@@ -85,9 +85,16 @@ export type TrackingReferral = {
   created_at: string | null
 }
 
+/**
+ * Public tracking payload for one queue session.
+ *
+ * Mirrors `QueueSessionService::getTrackingData`: the session is keyed
+ * `queue_session`, the person `customer`, and transfers `service_transfers`.
+ * Only the customer's name is exposed; the tracking token is all a visitor holds.
+ */
 export type VisitTrackingData = {
-  visit: {
-    visit_number: string
+  queue_session: {
+    session_number: number
     status: TrackingVisitStatus
     priority: number | null
     intake_channel: string | null
@@ -99,7 +106,7 @@ export type VisitTrackingData = {
     }
   }
 
-  patient: {
+  customer: {
     name: string | null
   }
 
@@ -119,7 +126,7 @@ export type VisitTrackingData = {
   journey: TrackingWorkflowStep[]
   timeline: TrackingTimelineEvent[]
   acquisitions: TrackingAcquisition[]
-  referrals: TrackingReferral[]
+  service_transfers: TrackingReferral[]
 
   summary: {
     status: TrackingVisitStatus

@@ -202,7 +202,7 @@ export function WorkflowStepFormDialog({
               id="step-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Contoh: Pemeriksaan Dokter"
+              placeholder="Contoh: Pemeriksaan Berkas"
               maxLength={255}
             />
 

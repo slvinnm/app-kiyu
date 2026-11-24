@@ -33,9 +33,6 @@ export function createOnlineBooking(payload: OnlineBookingPayload) {
 
 export type ClientProfilePayload = {
   name: string
-  nik?: string
-  date_of_birth?: string
-  gender?: string
   phone?: string
   email?: string
   address?: string
@@ -46,14 +43,14 @@ export type CreateClientProfilePayload = ClientProfilePayload & {
 }
 
 export function createClientProfile(payload: CreateClientProfilePayload) {
-  return postJson<ApiResponse<Client>>("/clients", payload)
+  return postJson<ApiResponse<Client>>("/customers", payload)
 }
 
 export function updateClientProfile(
   clientId: number,
   payload: ClientProfilePayload
 ) {
-  return apiFetch<ApiResponse<Client>>(`/clients/${clientId}`, {
+  return apiFetch<ApiResponse<Client>>(`/customers/${clientId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +64,7 @@ export function updateClientProfile(
 /* -------------------------------------------------------------------------- */
 
 export function getVisitDetail(visitId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<ClientVisitDetail>>(`/visits/${visitId}`, {
+  return apiFetch<ApiResponse<ClientVisitDetail>>(`/queue-sessions/${visitId}`, {
     signal,
   })
 }

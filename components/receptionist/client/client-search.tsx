@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
-import { PatientSummary } from "@/components/receptionist/client/client-summary"
+import { CustomerSummary } from "@/components/receptionist/client/client-summary"
 
-import type { Patient } from "@/types/reception"
+import type { Customer } from "@/types/reception"
 
-export function PatientSearch({
+export function CustomerSearch({
   search,
   results,
   selected,
@@ -23,22 +23,22 @@ export function PatientSearch({
   onClear,
 }: {
   search: string
-  results: Patient[]
-  selected: Patient | null
+  results: Customer[]
+  selected: Customer | null
   searching: boolean
   error: string | null
   minLength?: number
   onSearchChange: (value: string) => void
-  onSelect: (patient: Patient) => void
+  onSelect: (customer: Customer) => void
   onClear?: () => void
 }) {
   if (selected) {
     return (
       <div className="space-y-3">
-        <Label>Pasien Terpilih</Label>
+        <Label>Pelanggan Terpilih</Label>
 
-        <PatientSummary
-          patient={selected}
+        <CustomerSummary
+          customer={selected}
           action={
             onClear ? (
               <Button
@@ -61,16 +61,16 @@ export function PatientSearch({
 
   return (
     <div className="space-y-3">
-      <Label htmlFor="patient-search">Cari Pasien</Label>
+      <Label htmlFor="customer-search">Cari Pelanggan</Label>
 
       <div className="relative">
         <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
         <Input
-          id="patient-search"
+          id="customer-search"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Cari nama, No. RM, NIK, atau telepon..."
+          placeholder="Cari nama, email, atau telepon..."
           className="h-11 pr-10 pl-9"
           autoComplete="off"
         />
@@ -96,32 +96,32 @@ export function PatientSearch({
 
       {!searching && canSearch && results.length === 0 && !error && (
         <div className="rounded-xl border p-5 text-center">
-          <p className="text-sm font-medium">Pasien tidak ditemukan</p>
+          <p className="text-sm font-medium">Pelanggan tidak ditemukan</p>
 
           <p className="mt-1 text-xs text-muted-foreground">
-            Anda dapat mendaftarkan pasien sebagai pasien baru.
+            Anda dapat mendaftarkan pelanggan baru.
           </p>
         </div>
       )}
 
       {results.length > 0 && (
         <div className="overflow-hidden rounded-xl border">
-          {results.map((patient) => (
+          {results.map((customer) => (
             <button
-              key={patient.id}
+              key={customer.id}
               type="button"
-              onClick={() => onSelect(patient)}
+              onClick={() => onSelect(customer)}
               className="flex w-full items-center gap-3 border-b p-4 text-left transition-colors last:border-b-0 hover:bg-muted/50"
             >
               <div className="min-w-0 flex-1">
-                <p className="font-medium">{patient.name}</p>
+                <p className="font-medium">{customer.name}</p>
 
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>{patient.mrn ?? "Tanpa MRN"}</span>
+                  <span>{customer.phone ?? "Tanpa telepon"}</span>
 
-                  {patient.nik && <span>NIK {patient.nik}</span>}
+                  {customer.email && <span>{customer.email}</span>}
 
-                  {patient.phone && <span>{patient.phone}</span>}
+                  {customer.phone && <span>{customer.phone}</span>}
                 </div>
               </div>
             </button>

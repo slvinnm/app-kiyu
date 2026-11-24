@@ -52,10 +52,10 @@ export function StaffNotesDialog({
         </DialogHeader>
 
         <div className="space-y-2">
-          <Label htmlFor="clinical-notes">Catatan (opsional)</Label>
+          <Label htmlFor="ticket-notes">Catatan (opsional)</Label>
 
           <Textarea
-            id="clinical-notes"
+            id="ticket-notes"
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             placeholder="Tambahkan catatan bila perlu"

@@ -2,15 +2,14 @@ import { UserRoundIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 
-import { formatDate, genderLabel } from "@/lib/reception/format"
 
-import type { Patient } from "@/types/reception"
+import type { Customer } from "@/types/reception"
 
-export function PatientSummary({
-  patient,
+export function CustomerSummary({
+  customer,
   action,
 }: {
-  patient: Patient
+  customer: Customer
   action?: React.ReactNode
 }) {
   return (
@@ -22,18 +21,16 @@ export function PatientSummary({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium">{patient.name}</p>
-
-            {patient.mrn && <Badge variant="outline">{patient.mrn}</Badge>}
+            <p className="font-medium">{customer.name}</p>
           </div>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            NIK {patient.nik ?? "-"}
+            {customer.email ?? "Tanpa email"}
           </p>
 
-          {patient.phone && (
+          {customer.phone && (
             <p className="mt-1 text-xs text-muted-foreground">
-              {patient.phone}
+              {customer.phone}
             </p>
           )}
         </div>
@@ -41,28 +38,18 @@ export function PatientSummary({
         {action && <div className="shrink-0">{action}</div>}
       </div>
 
-      <div className="grid gap-4 border-t p-4 sm:grid-cols-3">
+      <div className="grid gap-4 border-t p-4 sm:grid-cols-2">
         <div>
-          <p className="text-xs text-muted-foreground">Tanggal Lahir</p>
+          <p className="text-xs text-muted-foreground">Alamat</p>
 
-          <p className="mt-1 text-sm font-medium">
-            {formatDate(patient.date_of_birth)}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-xs text-muted-foreground">Jenis Kelamin</p>
-
-          <p className="mt-1 text-sm font-medium">
-            {genderLabel(patient.gender)}
-          </p>
+          <p className="mt-1 text-sm font-medium">{customer.address ?? "-"}</p>
         </div>
 
         <div>
           <p className="text-xs text-muted-foreground">Email</p>
 
           <p className="mt-1 truncate text-sm font-medium">
-            {patient.email ?? "-"}
+            {customer.email ?? "-"}
           </p>
         </div>
       </div>

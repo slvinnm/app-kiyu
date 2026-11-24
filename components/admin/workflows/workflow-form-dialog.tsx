@@ -71,7 +71,7 @@ export function WorkflowFormDialog({
 
     const nextErrors: Record<string, string> = {}
 
-    if (!departmentId) nextErrors.department_id = "Pilih poli."
+    if (!departmentId) nextErrors.department_id = "Pilih departemen."
     if (!name.trim()) nextErrors.name = "Nama wajib diisi."
 
     if (Object.keys(nextErrors).length > 0) {
@@ -121,20 +121,20 @@ export function WorkflowFormDialog({
           <DialogTitle>Tambah Workflow</DialogTitle>
 
           <DialogDescription>
-            Workflow menentukan urutan pelayanan pada sebuah poli.
+            Workflow menentukan urutan pelayanan pada sebuah departemen.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Poli</Label>
+            <Label>Departemen</Label>
 
             <Select
               value={departmentId}
               onValueChange={(value) => setDepartmentId(value ?? "")}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih poli" />
+                <SelectValue placeholder="Pilih departemen" />
               </SelectTrigger>
 
               <SelectContent>

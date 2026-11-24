@@ -27,56 +27,76 @@ export type NavItem = {
   items?: NavItem[]
 }
 
-const navigation: Record<UserRole, NavItem[]> = {
-  admin: [
-    {
-      title: "Dasbor",
-      url: "/admin/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Organisasi",
-      icon: <Building2 />,
-      items: [
-        { title: "Poli", url: "/admin/departments", icon: <Building2 /> },
-        { title: "Station", url: "/admin/stations", icon: <MapPin /> },
-        { title: "Workflow", url: "/admin/workflows", icon: <GitBranch /> },
-        { title: "Staff", url: "/admin/users", icon: <UserCog /> },
-        { title: "Fasilitas", url: "/admin/facilities", icon: <Building2 /> },
-        { title: "Kiosk", url: "/admin/kiosk-devices", icon: <Ticket /> },
-        { title: "Display", url: "/admin/display-devices", icon: <MonitorPlay /> },
-      ],
-    },
-    {
-      title: "Operasional",
-      icon: <CalendarClock />,
-      items: [
-        { title: "Kunjungan", url: "/admin/visits", icon: <CalendarClock /> },
-        { title: "Referral", url: "/admin/referrals", icon: <ArrowRightLeft /> },
-        { title: "Antrian", url: "/admin/queue", icon: <ListOrdered /> },
-      ],
-    },
-    {
-      title: "Klien",
-      url: "/admin/clients",
-      icon: <Users />,
-    },
-    {
-      title: "Laporan",
-      icon: <FileText />,
-      items: [
-        { title: "Ringkasan", url: "/admin/reports", icon: <FileText /> },
-        { title: "Billing", url: "/admin/billing", icon: <ScrollText /> },
-      ],
-    },
-    {
-      title: "Audit Log",
-      url: "/admin/audit-logs",
-      icon: <ScrollText />,
-    },
-  ],
+/** Shared admin tree; billing is tenant-owner only, so it is added separately. */
+const adminNavBase: NavItem[] = [
+  {
+    title: "Dasbor",
+    url: "/admin/dashboard",
+    icon: <LayoutDashboardIcon />,
+  },
+  {
+    title: "Organisasi",
+    icon: <Building2 />,
+    items: [
+      { title: "Departemen", url: "/admin/departments", icon: <Building2 /> },
+      { title: "Loket", url: "/admin/stations", icon: <MapPin /> },
+      { title: "Alur Layanan", url: "/admin/workflows", icon: <GitBranch /> },
+      { title: "Pengguna", url: "/admin/users", icon: <UserCog /> },
+      { title: "Fasilitas", url: "/admin/facilities", icon: <Building2 /> },
+      { title: "Kiosk", url: "/admin/kiosk-devices", icon: <Ticket /> },
+      {
+        title: "Display",
+        url: "/admin/display-devices",
+        icon: <MonitorPlay />,
+      },
+    ],
+  },
+  {
+    title: "Operasional",
+    icon: <CalendarClock />,
+    items: [
+      { title: "Sesi Antrean", url: "/admin/visits", icon: <CalendarClock /> },
+      {
+        title: "Transfer Layanan",
+        url: "/admin/referrals",
+        icon: <ArrowRightLeft />,
+      },
+      { title: "Antrean", url: "/admin/queue", icon: <ListOrdered /> },
+    ],
+  },
+  {
+    title: "Pelanggan",
+    url: "/admin/clients",
+    icon: <Users />,
+  },
+  {
+    title: "Laporan",
+    url: "/admin/reports",
+    icon: <FileText />,
+  },
+  {
+    title: "Audit Log",
+    url: "/admin/audit-logs",
+    icon: <ScrollText />,
+  },
+]
 
-  receptionist: [
+/** Billing and subscription are owner-only (PRD §3.2). */
+const billingNavItem: NavItem = {
+  title: "Billing",
+  url: "/admin/billing",
+  icon: <ScrollText />,
+}
+
+const navigation: Record<UserRole, NavItem[]> = {
+  // The platform console is a separate area that does not exist yet.
+  platform_admin: [],
+
+  tenant_admin: [...adminNavBase, billingNavItem],
+
+  facility_admin: adminNavBase,
+
+  operator: [
     {
       title: "Dasbor",
       url: "/receptionist/dashboard",
@@ -88,12 +108,12 @@ const navigation: Record<UserRole, NavItem[]> = {
       icon: <UserPlus />,
     },
     {
-      title: "Antrian",
+      title: "Antrean",
       url: "/receptionist/queue",
       icon: <Ticket />,
     },
     {
-      title: "Klien",
+      title: "Pelanggan",
       url: "/receptionist/clients",
       icon: <Users />,
     },
@@ -106,7 +126,7 @@ const navigation: Record<UserRole, NavItem[]> = {
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Antrian",
+      title: "Antrean",
       url: "/staff/queue",
       icon: <Ticket />,
     },
@@ -119,7 +139,7 @@ const navigation: Record<UserRole, NavItem[]> = {
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Kunjungan",
+      title: "Sesi Antrean",
       url: "/client/visits",
       icon: <FileText />,
     },
@@ -151,19 +171,27 @@ export type BreadcrumbItem = {
   href?: string
 }
 
-const roleLabels: Record<string, string> = {
+/**
+ * Breadcrumb roots are keyed by URL prefix, not role: each workspace owns one
+ * prefix and several roles may share it (tenant_admin and facility_admin both
+ * live under `/admin`).
+ */
+const prefixLabels: Record<string, string> = {
   admin: "Admin",
-  receptionist: "Resepsionis",
+  receptionist: "Operator",
   staff: "Staff",
   client: "Klien",
 }
 
-const roleDashboardPaths: Record<string, string> = {
+const prefixDashboardPaths: Record<string, string> = {
   admin: "/admin/dashboard",
   receptionist: "/receptionist/dashboard",
   staff: "/staff/dashboard",
   client: "/client/dashboard",
 }
+
+const roleLabels = prefixLabels
+const roleDashboardPaths = prefixDashboardPaths
 
 function findNavigationPath(
   items: NavItem[],

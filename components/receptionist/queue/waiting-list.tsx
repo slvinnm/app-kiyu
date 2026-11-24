@@ -87,7 +87,7 @@ export function WaitingList({
               <CardTitle className="text-base">Antrian Menunggu</CardTitle>
 
               <CardDescription>
-                Daftar pasien yang siap dipanggil ke meja registrasi.
+                Daftar pelanggan yang siap dipanggil ke meja registrasi.
               </CardDescription>
             </div>
 

@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { searchPatients } from "@/lib/api/reception"
+import { searchCustomers } from "@/lib/api/reception"
 
-import type { Paginated, Patient } from "@/types/reception"
+import type { Paginated, Customer } from "@/types/reception"
 
 const DEBOUNCE_MS = 400
 
-export type PatientSearchOptions = {
+export type CustomerSearchOptions = {
   enabled?: boolean
   page?: number
   perPage?: number
@@ -19,9 +19,9 @@ export type PatientSearchOptions = {
   refreshKey?: number
 }
 
-export function usePatientSearch(
+export function useCustomerSearch(
   query: string,
-  options?: PatientSearchOptions
+  options?: CustomerSearchOptions
 ) {
   const enabled = options?.enabled ?? true
   const page = options?.page ?? 1
@@ -29,8 +29,8 @@ export function usePatientSearch(
   const enableEmptyQuery = options?.enableEmptyQuery ?? false
   const refreshKey = options?.refreshKey ?? 0
 
-  const [results, setResults] = useState<Patient[]>([])
-  const [pagination, setPagination] = useState<Paginated<Patient> | null>(null)
+  const [results, setResults] = useState<Customer[]>([])
+  const [pagination, setPagination] = useState<Paginated<Customer> | null>(null)
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,7 +61,7 @@ export function usePatientSearch(
       setError(null)
 
       try {
-        const response = await searchPatients(
+        const response = await searchCustomers(
           {
             search: keyword || undefined,
             page,

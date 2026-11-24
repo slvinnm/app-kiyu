@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge"
 
 import { OnlineBookingForm } from "@/components/client/online-booking-form"
 import {
-  PatientLoadError,
+  CustomerLoadError,
   ProfileRequired,
 } from "@/components/client/client-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getCurrentPatientServer } from "@/lib/api/clients-server"
+import { getCurrentCustomerServer } from "@/lib/api/clients-server"
 import { getActiveDepartmentsServer } from "@/lib/api/reception-server"
 
 import type { Department } from "@/types/reception"
@@ -18,14 +18,14 @@ export default async function Page() {
   let current
 
   try {
-    current = await getCurrentPatientServer()
+    current = await getCurrentCustomerServer()
   } catch (cause) {
     return (
       <div className="mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8">
         <PageHeader />
 
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat profil pelanggan.")}
         />
       </div>
     )
@@ -49,8 +49,8 @@ export default async function Page() {
       <div className="mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8">
         <PageHeader />
 
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat daftar poli.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat daftar departemen.")}
         />
       </div>
     )
@@ -74,7 +74,7 @@ function PageHeader() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <Badge variant="outline">Pasien</Badge>
+        <Badge variant="outline">Pelanggan</Badge>
 
         <span className="text-xs text-muted-foreground">Online Booking</span>
       </div>
@@ -90,7 +90,7 @@ function PageHeader() {
           </h1>
 
           <p className="text-sm text-muted-foreground">
-            Buat rencana kunjungan sebelum datang ke klinik.
+            Buat rencana kunjungan sebelum datang ke lokasi layanan.
           </p>
         </div>
       </div>

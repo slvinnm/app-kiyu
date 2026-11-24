@@ -193,7 +193,7 @@ export function ReceptionQueueWorkspace({
         <h1 className="text-2xl font-semibold tracking-tight">Antrian</h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Panggil pasien, selesaikan registrasi, dan teruskan ke layanan klinis.
+          Panggil pelanggan, selesaikan registrasi, dan teruskan ke layanan.
         </p>
       </div>
 
@@ -214,7 +214,7 @@ export function ReceptionQueueWorkspace({
         <Card className="mt-6">
           <CardContent className="flex min-h-64 flex-col items-center justify-center gap-4 text-center">
             <div>
-              <CardTitle>Akun belum ditugaskan ke poli</CardTitle>
+              <CardTitle>Akun belum ditugaskan ke departemen</CardTitle>
 
               <CardDescription className="mt-2">
                 Hubungi administrator untuk mengatur department dan station
@@ -234,11 +234,11 @@ export function ReceptionQueueWorkspace({
 
         {invalidWorkflow ? (
           <Alert variant="destructive" className="mt-6">
-            <AlertTitle>Poli belum siap menerima antrian</AlertTitle>
+            <AlertTitle>Departemen belum siap menerima antrian</AlertTitle>
 
             <AlertDescription>
               {error ??
-                "Poli ini belum memiliki workflow registrasi aktif. Pilih poli lain atau hubungi administrator."}
+                "Departemen ini belum memiliki workflow registrasi aktif. Pilih departemen lain atau hubungi administrator."}
             </AlertDescription>
           </Alert>
         ) : loading && !snapshot ? (
@@ -348,7 +348,7 @@ export function ReceptionQueueWorkspace({
 
             <AlertDialogDescription>
               {skipTarget?.queue_number ?? "Antrian ini"} akan ditandai
-              dilewati. Pasien tidak akan dipanggil lagi pada antrian ini.
+              dilewati. Pelanggan tidak akan dipanggil lagi pada antrean ini.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -359,7 +359,7 @@ export function ReceptionQueueWorkspace({
               id="skip-reason"
               value={skipReason}
               onChange={(event) => setSkipReason(event.target.value)}
-              placeholder="Misalnya: pasien tidak ada di ruang tunggu"
+              placeholder="Misalnya: pelanggan tidak ada di ruang tunggu"
               rows={3}
             />
           </div>

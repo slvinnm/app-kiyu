@@ -95,16 +95,16 @@ function VisitOverview({
             </p>
 
             <p className="mt-1 font-mono text-lg font-bold tracking-tight sm:text-xl">
-              {data.visit.visit_number}
+              {data.queue_session.session_number}
             </p>
           </div>
 
-          <StatusBadge status={data.visit.status} />
+          <StatusBadge status={data.queue_session.status} />
         </div>
 
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {data.patient.name || "Pasien"}
+            {data.customer.name || "Pelanggan"}
           </h1>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -117,12 +117,12 @@ function VisitOverview({
             )}
           </div>
 
-          {data.visit.timestamps.registered_at && (
+          {data.queue_session.timestamps.registered_at && (
   <div className="flex items-center gap-2 text-xs text-muted-foreground">
     <CalendarClock className="size-3.5 shrink-0" />
     <span>
       Terdaftar:{" "}
-      {formatDateTime(data.visit.timestamps.registered_at)}
+      {formatDateTime(data.queue_session.timestamps.registered_at)}
     </span>
   </div>
 )}
@@ -130,9 +130,9 @@ function VisitOverview({
 
         <div className="flex gap-3 rounded-lg bg-muted/60 p-3.5">
           <div className="mt-0.5 shrink-0">
-            {data.visit.status === "COMPLETED" ? (
+            {data.queue_session.status === "COMPLETED" ? (
               <CheckCircle2 className="size-5 text-emerald-600" />
-            ) : data.visit.status === "CANCELLED" ? (
+            ) : data.queue_session.status === "CANCELLED" ? (
               <AlertCircle className="size-5 text-destructive" />
             ) : (
               <Clock3 className="size-5 text-primary" />
@@ -261,11 +261,11 @@ function CurrentQueueCard({
             </p>
 
             <p className="mt-1 max-w-64 text-xs leading-relaxed text-muted-foreground">
-              {data.visit.status === "AWAITING_CHECKIN"
+              {data.queue_session.status === "AWAITING_CHECKIN"
                 ? "Selesaikan proses check-in terlebih dahulu."
-                : data.visit.status === "COMPLETED"
+                : data.queue_session.status === "COMPLETED"
                   ? "Seluruh proses kunjungan telah selesai."
-                  : data.visit.status === "CANCELLED"
+                  : data.queue_session.status === "CANCELLED"
                     ? "Kunjungan ini telah dibatalkan."
                     : "Informasi antrean akan muncul di sini setelah diterbitkan."}
             </p>
@@ -278,10 +278,10 @@ function CurrentQueueCard({
 
 function VisitDetails({
   acquisitions,
-  referrals,
+  serviceTransfers,
 }: {
   acquisitions: TrackingAcquisition[]
-  referrals: TrackingReferral[]
+  serviceTransfers: TrackingReferral[]
 }) {
   return (
     <div className="space-y-4">
@@ -326,7 +326,7 @@ function VisitDetails({
         </CardContent>
       </Card>
 
-      {referrals.length > 0 && (
+      {serviceTransfers.length > 0 && (
         <Card>
           <CardHeader className="border-b">
             <CardTitle className="text-base">
@@ -335,7 +335,7 @@ function VisitDetails({
           </CardHeader>
 
           <CardContent className="space-y-4 pt-4">
-            {referrals.map((referral, index) => (
+            {serviceTransfers.map((referral, index) => (
               <div
                 key={`${referral.created_at}-${index}`}
                 className="space-y-2"
@@ -482,7 +482,7 @@ export function VisitTrackingPage({
   // restarting the interval every time a response is received. Assigned in an
   // effect, never during render.
   useEffect(() => {
-    dataStatusRef.current = data?.visit.status ?? null
+    dataStatusRef.current = data?.queue_session.status ?? null
   }, [data])
 
   const updatedText = lastUpdated
@@ -609,7 +609,7 @@ export function VisitTrackingPage({
 
                 <VisitDetails
                   acquisitions={data.acquisitions}
-                  referrals={data.referrals}
+                  serviceTransfers={data.service_transfers}
                 />
               </div>
             </section>

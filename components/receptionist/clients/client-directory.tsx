@@ -16,24 +16,23 @@ import {
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
 
-import { PatientDetailSheet } from "@/components/receptionist/clients/client-detail-sheet"
+import { CustomerDetailSheet } from "@/components/receptionist/clients/client-detail-sheet"
 
 import { useTableQuery } from "@/hooks/use-table-query"
 
-import { formatDate, genderLabel } from "@/lib/reception/format"
 
 import type { TableQueryState } from "@/hooks/use-table-query"
-import type { Patient } from "@/types/reception"
+import type { Customer } from "@/types/reception"
 
-const columnHelper = createDataTableColumnHelper<Patient>()
+const columnHelper = createDataTableColumnHelper<Customer>()
 
-export function PatientDirectory({
+export function CustomerDirectory({
   rows,
   total,
   lastPage,
   state,
 }: {
-  rows: Patient[]
+  rows: Customer[]
   total: number
   lastPage: number
   state: TableQueryState
@@ -48,37 +47,28 @@ export function PatientDirectory({
     () =>
       columnHelper.columns([
         columnHelper.accessor("name", {
-          header: "Pasien",
+          header: "Pelanggan",
           cell: ({ row }) => (
             <div>
               <p className="font-medium">{row.original.name}</p>
 
               <p className="text-xs text-muted-foreground">
-                {row.original.mrn ?? "Tanpa MRN"}
+                {row.original.email ?? "Tanpa email"}
               </p>
             </div>
           ),
-        }),
-        columnHelper.accessor("nik", {
-          header: "NIK",
-          cell: ({ row }) => (
-            <span className="font-mono text-xs">{row.original.nik ?? "-"}</span>
-          ),
-        }),
-        columnHelper.accessor("date_of_birth", {
-          header: "Tanggal Lahir",
-          enableSorting: false,
-          cell: ({ row }) => formatDate(row.original.date_of_birth),
-        }),
-        columnHelper.accessor("gender", {
-          header: "Jenis Kelamin",
-          enableSorting: false,
-          cell: ({ row }) => genderLabel(row.original.gender),
         }),
         columnHelper.accessor("phone", {
           header: "Telepon",
           enableSorting: false,
           cell: ({ row }) => row.original.phone ?? "-",
+        }),
+        columnHelper.accessor("address", {
+          header: "Alamat",
+          enableSorting: false,
+          cell: ({ row }) => (
+            <span className="text-sm">{row.original.address ?? "-"}</span>
+          ),
         }),
         columnHelper.display({
           id: "actions",
@@ -105,14 +95,14 @@ export function PatientDirectory({
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <CardTitle className="text-base">Direktori Pasien</CardTitle>
+              <CardTitle className="text-base">Direktori Pelanggan</CardTitle>
 
               <CardDescription>
-                Cari pasien berdasarkan nama, No. RM, NIK, atau telepon.
+                Cari pelanggan berdasarkan nama, Telepon, email, atau telepon.
               </CardDescription>
             </div>
 
-            <Badge variant="outline">{total} pasien</Badge>
+            <Badge variant="outline">{total} pelanggan</Badge>
           </div>
         </CardHeader>
 
@@ -121,7 +111,7 @@ export function PatientDirectory({
             columns={columns}
             data={rows}
             getRowId={(row) => String(row.id)}
-            emptyMessage="Pasien tidak ditemukan."
+            emptyMessage="Pelanggan tidak ditemukan."
             pageCount={lastPage}
             pageIndex={state.page - 1}
             pageSize={state.perPage}
@@ -133,13 +123,13 @@ export function PatientDirectory({
             searchValue={tq.searchInput}
             onSearchChange={tq.setSearchInput}
             searching={tq.pending}
-            searchPlaceholder="Cari nama, No. RM, NIK, atau telepon…"
+            searchPlaceholder="Cari nama, email, atau telepon…"
           />
         </CardContent>
       </Card>
 
-      <PatientDetailSheet
-        patientId={selectedPatientId}
+      <CustomerDetailSheet
+        customerId={selectedPatientId}
         open={selectedPatientId !== null}
         onOpenChange={(open) => {
           if (!open) {

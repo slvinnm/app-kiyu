@@ -114,7 +114,7 @@ export function ReferralDialog({
 
       setError(
         type === "INVALID_WORKFLOW"
-          ? `${message} Pastikan poli tujuan memiliki workflow aktif.`
+          ? `${message} Pastikan departemen tujuan memiliki workflow aktif.`
           : message
       )
       toast.error(message)
@@ -130,7 +130,7 @@ export function ReferralDialog({
           <DialogTitle>Buat Referral</DialogTitle>
 
           <DialogDescription>
-            Rujuk {visit.visit_number} ke poli lain. Sistem membuat kunjungan
+            Rujuk {visit.visit_number} ke departemen lain. Sistem membuat kunjungan
             dan tiket antrian tujuan secara otomatis.
           </DialogDescription>
         </DialogHeader>
@@ -138,10 +138,10 @@ export function ReferralDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           {targets.length === 0 ? (
             <Alert>
-              <AlertTitle>Tidak ada poli tujuan</AlertTitle>
+              <AlertTitle>Tidak ada departemen tujuan</AlertTitle>
 
               <AlertDescription>
-                Tidak ada poli aktif lain yang dapat dijadikan tujuan referral.
+                Tidak ada departemen aktif lain yang dapat dijadikan tujuan referral.
               </AlertDescription>
             </Alert>
           ) : (
@@ -154,7 +154,7 @@ export function ReferralDialog({
                   onValueChange={(value) => setTargetDepartmentId(value ?? "")}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih poli tujuan" />
+                    <SelectValue placeholder="Pilih departemen tujuan" />
                   </SelectTrigger>
 
                   <SelectContent>

@@ -47,6 +47,7 @@ export async function StaffDashboard({ role }: { role: string }) {
   const queuePath = `${basePath}/queue`
   const label = roleLabel(role)
   const stationId = session.user.station_id ?? null
+  const facilityId = session.user.facility_ids?.[0] ?? null
 
   if (stationId === null) {
     return (
@@ -58,7 +59,7 @@ export async function StaffDashboard({ role }: { role: string }) {
             <CardTitle>Station belum ditugaskan</CardTitle>
 
             <CardDescription>
-              Akun Anda belum memiliki station klinis. Hubungi administrator
+              Akun Anda belum memiliki loket layanan. Hubungi administrator
               untuk mengatur station kerja.
             </CardDescription>
           </CardContent>
@@ -126,7 +127,7 @@ export async function StaffDashboard({ role }: { role: string }) {
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <LiveRefresh
-        departmentId={session.user.department_id ?? null}
+        facilityId={facilityId}
         stationId={stationId}
       />
       <DashboardHeader
@@ -159,10 +160,10 @@ export async function StaffDashboard({ role }: { role: string }) {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-base">Pasien Saat Ini</CardTitle>
+                  <CardTitle className="text-base">Pelanggan Saat Ini</CardTitle>
 
                   <CardDescription>
-                    Pasien yang sedang ditangani di station Anda.
+                    Pelanggan yang sedang ditangani di station Anda.
                   </CardDescription>
                 </div>
 
@@ -186,7 +187,7 @@ export async function StaffDashboard({ role }: { role: string }) {
 
                     <p className="mt-3 text-sm font-medium">
                       {current.visit?.client?.name ??
-                        "Pasien belum teridentifikasi"}
+                        "Pelanggan belum teridentifikasi"}
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -206,7 +207,7 @@ export async function StaffDashboard({ role }: { role: string }) {
                 <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
                   <BellRingIcon className="size-6 text-muted-foreground" />
 
-                  <p className="text-sm font-medium">Tidak ada pasien aktif</p>
+                  <p className="text-sm font-medium">Tidak ada pelanggan aktif</p>
 
                   <Link href={queuePath} className={buttonVariants()}>
                     Buka Antrian
@@ -224,7 +225,7 @@ export async function StaffDashboard({ role }: { role: string }) {
                   <CardTitle className="text-base">Menunggu</CardTitle>
 
                   <CardDescription>
-                    Pasien berikutnya di station Anda.
+                    Pelanggan berikutnya di station Anda.
                   </CardDescription>
                 </div>
 
@@ -247,7 +248,7 @@ export async function StaffDashboard({ role }: { role: string }) {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm">
                           {ticket.visit?.client?.name ??
-                            "Pasien belum teridentifikasi"}
+                            "Pelanggan belum teridentifikasi"}
                         </p>
 
                         <p className="mt-1 text-xs text-muted-foreground">

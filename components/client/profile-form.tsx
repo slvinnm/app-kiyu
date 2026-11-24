@@ -15,13 +15,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -31,39 +24,17 @@ import {
   updateClientProfile,
   type ClientProfilePayload,
 } from "@/lib/api/clients"
-import { formatDateInput } from "@/lib/reception/format"
 
 import type { ClientProfile, ClientProfileInput } from "@/types/client"
 
 const emptyProfile: ClientProfileInput = {
   name: "",
-  nik: "",
-  date_of_birth: "",
-  gender: "",
   phone: "",
   email: "",
   address: "",
 }
 
-function normalizeGender(
-  gender: string | null | undefined
-): "" | "male" | "female" {
-  if (!gender) return ""
-
-  const normalized = gender.toLowerCase()
-
-  if (normalized === "male" || normalized === "m" || normalized === "l") {
-    return "male"
-  }
-
-  if (normalized === "female" || normalized === "f" || normalized === "p") {
-    return "female"
-  }
-
-  return ""
-}
-
-export function ClientProfileForm({
+export function CustomerProfileForm({
   userId,
   profile,
   defaultName = "",
@@ -82,9 +53,6 @@ export function ClientProfileForm({
     profile
       ? {
           name: profile.name,
-          nik: profile.nik ?? "",
-          date_of_birth: formatDateInput(profile.date_of_birth),
-          gender: normalizeGender(profile.gender),
           phone: profile.phone ?? "",
           email: profile.email ?? "",
           address: profile.address ?? "",
@@ -101,12 +69,6 @@ export function ClientProfileForm({
 
   function update(patch: Partial<ClientProfileInput>) {
     setForm((current) => ({ ...current, ...patch }))
-  }
-
-  function handleGenderChange(value: string | null) {
-    update({
-      gender: value === "male" || value === "female" ? value : "",
-    })
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -130,13 +92,6 @@ export function ClientProfileForm({
       name: form.name.trim(),
     }
 
-    const nik = form.nik.trim()
-    if (nik) payload.nik = nik
-
-    if (form.date_of_birth) payload.date_of_birth = form.date_of_birth
-
-    if (form.gender) payload.gender = form.gender
-
     const phone = form.phone.trim()
     if (phone) payload.phone = phone
 
@@ -149,10 +104,10 @@ export function ClientProfileForm({
     try {
       if (profile) {
         await updateClientProfile(profile.id, payload)
-        toast.success("Profil pasien diperbarui.")
+        toast.success("Profil diperbarui.")
       } else {
         await createClientProfile({ ...payload, user_id: userId })
-        toast.success("Profil pasien berhasil dibuat.")
+        toast.success("Profil berhasil dibuat.")
       }
 
       if (redirectTo) {
@@ -189,13 +144,13 @@ export function ClientProfileForm({
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            {profile ? "Data Profil" : "Lengkapi Profil Pasien"}
+            {profile ? "Data Profil" : "Lengkapi Profil"}
           </CardTitle>
 
           <CardDescription>
             {profile
-              ? "Perbarui data identitas dan kontak Anda."
-              : "Profil pasien diperlukan untuk booking online dan melihat antrian."}
+              ? "Perbarui data kontak Anda."
+              : "Profil diperlukan untuk booking online dan melihat antrean."}
           </CardDescription>
         </CardHeader>
 
@@ -220,24 +175,7 @@ export function ClientProfileForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="profile-nik">NIK</Label>
-
-                <Input
-                  id="profile-nik"
-                  value={form.nik}
-                  onChange={(event) => update({ nik: event.target.value })}
-                  placeholder="16 digit NIK"
-                  inputMode="numeric"
-                  maxLength={16}
-                />
-
-                {errors.nik && (
-                  <p className="text-xs text-destructive">{errors.nik}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="profile-phone">No. Telepon</Label>
+                <Label htmlFor="profile-phone">Telepon</Label>
 
                 <Input
                   id="profile-phone"
@@ -249,45 +187,6 @@ export function ClientProfileForm({
 
                 {errors.phone && (
                   <p className="text-xs text-destructive">{errors.phone}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="profile-dob">Tanggal Lahir</Label>
-
-                <Input
-                  id="profile-dob"
-                  type="date"
-                  value={form.date_of_birth}
-                  onChange={(event) =>
-                    update({ date_of_birth: event.target.value })
-                  }
-                />
-
-                {errors.date_of_birth && (
-                  <p className="text-xs text-destructive">
-                    {errors.date_of_birth}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Jenis Kelamin</Label>
-
-                <Select value={form.gender} onValueChange={handleGenderChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih jenis kelamin" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="male">Laki-laki</SelectItem>
-
-                    <SelectItem value="female">Perempuan</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {errors.gender && (
-                  <p className="text-xs text-destructive">{errors.gender}</p>
                 )}
               </div>
 
@@ -341,7 +240,7 @@ export function ClientProfileForm({
               ) : profile ? (
                 "Simpan Perubahan"
               ) : (
-                "Buat Profil Pasien"
+                "Buat Profil"
               )}
             </Button>
           </form>
@@ -353,28 +252,18 @@ export function ClientProfileForm({
           <CardTitle className="text-base">Informasi</CardTitle>
 
           <CardDescription>
-            Profil ini menghubungkan akun Anda dengan rekam medis.
+            Profil ini menghubungkan akun Anda dengan data pelanggan.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          {profile?.mrn && (
-            <div>
-              <p className="text-xs text-muted-foreground">No. Rekam Medis</p>
-
-              <p className="mt-1 font-mono font-semibold text-foreground">
-                {profile.mrn}
-              </p>
-            </div>
-          )}
-
           <p>
-            Nomor rekam medis dibuat otomatis oleh sistem. Booking online dan
-            antrian memerlukan profil pasien yang terhubung.
+            Booking online dan antrean memerlukan profil yang terhubung dengan
+            akun Anda.
           </p>
 
           <p>
-            Jika data Anda sudah terdaftar di klinik, gunakan NIK yang sama agar
+            Jika data Anda sudah terdaftar, gunakan email yang sama agar
             tidak terjadi duplikasi.
           </p>
         </CardContent>
@@ -383,5 +272,3 @@ export function ClientProfileForm({
   )
 }
 
-/* Alias kept while older pages are migrated. */
-export const PatientProfileForm = ClientProfileForm

@@ -83,7 +83,7 @@ export function ManualIntakeForm({
     }
 
     if (!departmentId) {
-      toast.error("Pilih poli terlebih dahulu.")
+      toast.error("Pilih departemen terlebih dahulu.")
       return
     }
 
@@ -145,14 +145,14 @@ export function ManualIntakeForm({
 
           <CardContent className="space-y-5">
             <div className="space-y-2">
-              <Label>Poli / Department</Label>
+              <Label>Departemen / Department</Label>
 
               <Select
                 value={departmentId}
                 onValueChange={handleDepartmentChange}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih poli tujuan" />
+                  <SelectValue placeholder="Pilih departemen tujuan" />
                 </SelectTrigger>
 
                 <SelectContent>
@@ -168,7 +168,7 @@ export function ManualIntakeForm({
               </Select>
 
               <p className="text-xs text-muted-foreground">
-                Pasien akan mendapat nomor antrian di meja registrasi poli yang
+                Pelanggan akan mendapat nomor antrean di meja registrasi departemen yang
                 dipilih.
               </p>
             </div>
@@ -239,20 +239,20 @@ export function ManualIntakeForm({
             </CardTitle>
 
             <CardDescription>
-              Sesuai alur KIYU, intake manual tidak membuat data pasien.
+              Sesuai alur KIYU, intake manual tidak membuat data pelanggan.
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>
-              Pasien mendapat nomor antrian reception terlebih dahulu. Data
-              pasien dicari atau dibuat saat petugas menyelesaikan registrasi di
+              Pelanggan mendapat nomor antrean reception terlebih dahulu. Data
+              pelanggan dicari atau dibuat saat petugas menyelesaikan registrasi di
               halaman Antrian.
             </p>
 
             <p>
               Setelah registrasi selesai, sistem otomatis membuat tiket layanan
-              klinis berikutnya sesuai workflow poli.
+              klinis berikutnya sesuai workflow departemen.
             </p>
           </CardContent>
         </Card>

@@ -64,7 +64,7 @@ export function OnlineBookingForm({
     }
 
     if (!departmentId) {
-      toast.error("Pilih poli tujuan terlebih dahulu.")
+      toast.error("Pilih departemen tujuan terlebih dahulu.")
       return
     }
 
@@ -118,21 +118,21 @@ export function OnlineBookingForm({
           <CardTitle className="text-base">Booking Kunjungan Online</CardTitle>
 
           <CardDescription>
-            Pilih poli tujuan. Anda dapat check-in di kiosk saat tiba di klinik.
+            Pilih departemen tujuan. Anda dapat check-in di kiosk saat tiba di lokasi.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label>Poli / Department</Label>
+              <Label>Departemen / Department</Label>
 
               <Select
                 value={departmentId}
                 onValueChange={handleDepartmentChange}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih poli tujuan" />
+                  <SelectValue placeholder="Pilih departemen tujuan" />
                 </SelectTrigger>
 
                 <SelectContent>
@@ -194,14 +194,14 @@ export function OnlineBookingForm({
 
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Saat tiba di klinik, lakukan check-in di kiosk dengan kode booking.
+            Saat tiba di lokasi, lakukan check-in di kiosk dengan kode booking.
             Setelah check-in, Anda akan masuk antrian reception dan mendapatkan
             nomor antrian.
           </p>
 
           <p>
             Petugas reception akan memverifikasi data Anda di meja registrasi
-            sebelum layanan klinis dimulai.
+            sebelum layanan dimulai.
           </p>
         </CardContent>
       </Card>

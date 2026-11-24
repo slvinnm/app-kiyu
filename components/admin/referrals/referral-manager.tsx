@@ -171,7 +171,7 @@ export function ReferralManager({
             searchValue={tq.searchInput}
             onSearchChange={tq.setSearchInput}
             searching={tq.pending}
-            searchPlaceholder="Cari nama pasien atau nomor kunjungan..."
+            searchPlaceholder="Cari nama pelanggan atau nomor antrean..."
             toolbar={
               <>
                 <Select

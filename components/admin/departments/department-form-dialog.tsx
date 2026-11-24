@@ -91,16 +91,16 @@ export function DepartmentFormDialog({
     try {
       if (department) {
         await updateDepartment(department.id, payload)
-        toast.success("Poli berhasil diperbarui.")
+        toast.success("Departemen berhasil diperbarui.")
       } else {
         await createDepartment(payload)
-        toast.success("Poli berhasil dibuat.")
+        toast.success("Departemen berhasil dibuat.")
       }
 
       onOpenChange(false)
       onSaved()
     } catch (cause) {
-      const message = getApiErrorMessage(cause, "Gagal menyimpan poli.")
+      const message = getApiErrorMessage(cause, "Gagal menyimpan departemen.")
       setError(message)
       toast.error(message)
 
@@ -124,10 +124,10 @@ export function DepartmentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{department ? "Edit Poli" : "Tambah Poli"}</DialogTitle>
+          <DialogTitle>{department ? "Edit Departemen" : "Tambah Departemen"}</DialogTitle>
 
           <DialogDescription>
-            Poli adalah unit pelayanan yang memiliki station dan workflow.
+            Departemen adalah unit pelayanan yang memiliki station dan workflow.
           </DialogDescription>
         </DialogHeader>
 
@@ -155,7 +155,7 @@ export function DepartmentFormDialog({
               id="department-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Contoh: Poli Mata"
+              placeholder="Contoh: Departemen Mata"
               maxLength={255}
             />
 
@@ -200,7 +200,7 @@ export function DepartmentFormDialog({
             </Select>
 
             <p className="text-xs text-muted-foreground">
-              Unit internal seperti Apotek, Laboratorium, dan Kasir sebaiknya
+              Unit internal seperti gudang, ruang berkas, dan kasir sebaiknya
               tidak ditampilkan di kiosk.
             </p>
           </div>

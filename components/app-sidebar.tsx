@@ -1,7 +1,10 @@
+import { getFacilitiesServer } from "@/lib/api/admin-server"
 import { getSession } from "@/lib/auth/session"
+import { getFacilityContext } from "@/lib/facility/context"
 import { getNavigation } from "@/lib/navigation"
 import { normalizeRole } from "@/types/auth"
 
+import { FacilitySwitcher } from "@/components/facility-switcher"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -26,6 +29,22 @@ export async function AppSidebar({
   }
 
   const items = getNavigation(role)
+  const facilityContext = await getFacilityContext()
+
+  // Only an administrator may list facilities; an operator sees just their own
+  // assignment, so the switcher falls back to the numeric reference.
+  const facilities =
+    facilityContext.facilityIds.length > 1
+      ? await getFacilitiesServer()
+          .then((rows) =>
+            rows
+              .filter((row) => facilityContext.facilityIds.includes(row.id))
+              .map((row) => ({ id: row.id, name: row.name }))
+          )
+          .catch(() =>
+            facilityContext.facilityIds.map((id) => ({ id, name: `Fasilitas #${id}` }))
+          )
+      : facilityContext.facilityIds.map((id) => ({ id, name: "Fasilitas" }))
 
   const user = {
     name: session.user.name ?? "",
@@ -49,7 +68,12 @@ export async function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="gap-0">
+        <FacilitySwitcher
+          facilities={facilities}
+          activeId={facilityContext.activeId}
+        />
+
         <NavMain items={items} />
       </SidebarContent>
 

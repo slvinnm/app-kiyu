@@ -3,18 +3,25 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-import { bindEchoConnectionState, getEcho } from "@/lib/echo"
+import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
 
 /**
  * Re-runs the enclosing server component whenever a queue channel changes.
  * Used by server-rendered dashboards so their figures stay live without a
  * manual refresh button.
+ *
+ * The channel is the facility-scoped public one (`public.facility.{id}`), which
+ * is what the API broadcasts. The tenant-scoped department/station channels are
+ * private and require the Sanctum token, which lives in an HttpOnly cookie the
+ * browser cannot read — so they are not reachable from here. A facility feed is
+ * slightly broader (it also carries other stations' changes), which costs one
+ * extra refetch per event and leaks nothing: no PII is broadcast.
  */
 export function LiveRefresh({
-  departmentId,
+  facilityId,
   stationId,
 }: {
-  departmentId?: number | null
+  facilityId?: number | null
   stationId?: number | null
 }) {
   const router = useRouter()
@@ -22,18 +29,11 @@ export function LiveRefresh({
   useEffect(() => {
     const echo = getEcho()
 
-    if (!echo) {
+    if (!echo || !facilityId) {
       return
     }
 
-    const channels: string[] = []
-
-    if (departmentId) channels.push(`department.${departmentId}`)
-    if (stationId) channels.push(`station.${stationId}`)
-
-    if (channels.length === 0) {
-      return
-    }
+    const name = publicFacilityChannel(facilityId)
 
     let timer: number | null = null
     let first = true
@@ -54,10 +54,8 @@ export function LiveRefresh({
       }, 400)
     }
 
-    for (const name of channels) {
-      echo.channel(name).listen(".queue.updated", scheduleRefresh)
-      echo.channel(name).listen(".queue.called", scheduleRefresh)
-    }
+    echo.channel(name).listen(".queue.updated", scheduleRefresh)
+    echo.channel(name).listen(".queue.called", scheduleRefresh)
 
     const unbind = bindEchoConnectionState(echo, (connected) => {
       if (connected) {
@@ -65,17 +63,19 @@ export function LiveRefresh({
       }
     })
 
+    // `stationId` is kept in the dependency list because a station change
+    // remounts the page's data anyway; the channel itself does not vary by it.
+    void stationId
+
     return () => {
       if (timer !== null) window.clearTimeout(timer)
 
-      for (const name of channels) {
-        echo.channel(name).stopListening(".queue.updated", scheduleRefresh)
-        echo.channel(name).stopListening(".queue.called", scheduleRefresh)
-      }
+      echo.channel(name).stopListening(".queue.updated", scheduleRefresh)
+      echo.channel(name).stopListening(".queue.called", scheduleRefresh)
 
       unbind()
     }
-  }, [departmentId, stationId, router])
+  }, [facilityId, stationId, router])
 
   return null
 }

@@ -2,6 +2,7 @@ import "server-only"
 
 import { ApiError } from "@/lib/api/error"
 import { getLaravelAccessToken } from "@/lib/auth/server"
+import { getActiveFacilityId } from "@/lib/facility/server"
 
 const API_BASE_URL = process.env.API_BASE_URL ?? ""
 
@@ -23,6 +24,10 @@ export async function serverApiFetch<T>(
     throw new ApiError(401, "Unauthenticated.", null)
   }
 
+  // The API requires an unambiguous facility for facility-scoped routes when
+  // the account can reach several. An explicit `X-Facility-Id` in `init` wins.
+  const facilityId = await getActiveFacilityId()
+
   const response = await fetch(
     `${API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`,
     {
@@ -31,6 +36,7 @@ export async function serverApiFetch<T>(
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
+        ...(facilityId !== null ? { "X-Facility-Id": String(facilityId) } : {}),
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
         ...init?.headers,
       },

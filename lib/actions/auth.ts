@@ -17,6 +17,21 @@ if (!API_BASE_URL) {
 
 const AUTH_BASE_URL = API_BASE_URL.replace(/\/$/, "")
 
+/**
+ * Tenant locator for public endpoints.
+ *
+ * `POST /auth/register` is tenant-scoped: the backend resolves the tenant from
+ * `X-Tenant-Slug`, the host's first label, or a `{tenant}` route parameter. This
+ * app is served from one development host, so the slug is configuration, not
+ * something the visitor types (PRD §2.4: a slug is a context selector and never
+ * proof of authorization).
+ */
+const TENANT_SLUG = process.env.NEXT_PUBLIC_TENANT_SLUG ?? ""
+
+function tenantHeaders(): Record<string, string> {
+  return TENANT_SLUG ? { "X-Tenant-Slug": TENANT_SLUG } : {}
+}
+
 export type AuthActionState =
   | {
       id: string
@@ -149,6 +164,7 @@ export async function register(
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...tenantHeaders(),
       },
       body: JSON.stringify(parsed.data),
       cache: "no-store",

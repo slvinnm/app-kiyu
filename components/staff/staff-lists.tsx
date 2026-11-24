@@ -41,7 +41,7 @@ function TicketRow({
         </div>
 
         <p className="mt-1 truncate text-sm">
-          {ticket.visit?.client?.name ?? "Pasien belum teridentifikasi"}
+          {ticket.visit?.client?.name ?? "Pelanggan belum teridentifikasi"}
         </p>
 
         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
@@ -89,7 +89,7 @@ export function StaffLists({
                 <CardTitle className="text-base">Dipanggil</CardTitle>
 
                 <CardDescription>
-                  Pasien yang sudah dipanggil dan siap ditangani.
+                  Pelanggan yang sudah dipanggil dan siap ditangani.
                 </CardDescription>
               </div>
 
@@ -130,7 +130,7 @@ export function StaffLists({
               <CardTitle className="text-base">Antrian Menunggu</CardTitle>
 
               <CardDescription>
-                Pasien yang siap dipanggil di station ini.
+                Pelanggan yang siap dipanggil di station ini.
               </CardDescription>
             </div>
 
@@ -167,7 +167,7 @@ export function StaffLists({
                 <CardTitle className="text-base">Ditahan</CardTitle>
 
                 <CardDescription>
-                  Pasien yang ditahan dapat dilanjutkan kembali.
+                  Pelanggan yang ditahan dapat dilanjutkan kembali.
                 </CardDescription>
               </div>
 

@@ -24,7 +24,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const user = await requireRole(["admin"])
+  const user = await requireRole(["tenant_admin", "facility_admin"])
 
   const params = await searchParams
   const { table, filters } = parseTableParams(params, {

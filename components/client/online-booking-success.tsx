@@ -84,7 +84,7 @@ export function OnlineBookingSuccess({
           </div>
 
           <div>
-            <p className="text-xs text-muted-foreground">Poli</p>
+            <p className="text-xs text-muted-foreground">Departemen</p>
 
             <p className="mt-1 text-sm font-semibold">
               {department?.name ?? visit.department?.name ?? "-"}
@@ -106,7 +106,7 @@ export function OnlineBookingSuccess({
           <p className="font-medium text-foreground">Langkah selanjutnya</p>
 
           <ol className="mt-2 list-decimal space-y-1 pl-5">
-            <li>Datang ke klinik sesuai jadwal.</li>
+            <li>Datang ke lokasi sesuai jadwal.</li>
             <li>Lakukan check-in di kiosk dengan kode booking di atas.</li>
             <li>Tunggu panggilan reception untuk verifikasi data.</li>
           </ol>

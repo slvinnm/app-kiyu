@@ -21,7 +21,7 @@ export function DepartmentError({
       </div>
 
       <h3 className="text-xl font-bold text-foreground">
-        Data poliklinik tidak dapat dimuat
+        Data departemen tidak dapat dimuat
       </h3>
 
       <p className="mt-2 text-muted-foreground">{message}</p>
@@ -37,7 +37,7 @@ export function DepartmentError({
         />
 
         <TooltipContent>
-          <p>Muat ulang data poliklinik</p>
+          <p>Muat ulang data departemen</p>
         </TooltipContent>
       </Tooltip>
     </Card>

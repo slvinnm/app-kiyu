@@ -38,7 +38,7 @@ export function getApiErrorType(error: unknown): string | null {
 }
 
 /**
- * Laravel validation errors keyed by field (e.g. `client_data.nik`).
+ * Laravel validation errors keyed by field (e.g. `customer_data.name`).
  */
 export function getApiValidationErrors(
   error: unknown

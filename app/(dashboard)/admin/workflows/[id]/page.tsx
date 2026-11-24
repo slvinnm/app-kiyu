@@ -71,7 +71,7 @@ export default async function Page({
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <div className="mb-3 flex items-center gap-2">
-        <Badge variant="outline">{workflow.department?.code ?? "Poli"}</Badge>
+        <Badge variant="outline">{workflow.department?.code ?? "Departemen"}</Badge>
 
         <Badge variant={workflow.is_active ? "default" : "outline"}>
           {workflow.is_active ? "Aktif" : "Nonaktif"}
@@ -81,7 +81,7 @@ export default async function Page({
       <AdminPageHeader
         title={workflow.name}
         description={`Kelola langkah workflow untuk ${
-          workflow.department?.name ?? "poli ini"
+          workflow.department?.name ?? "departemen ini"
         }.`}
         icon={<GitBranch className="size-5" />}
       />

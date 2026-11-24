@@ -1,27 +1,36 @@
-export const STAFF_ROLE_OPTIONS = [
-  { value: "admin", label: "Admin" },
-  { value: "receptionist", label: "Resepsionis" },
-  { value: "nurse", label: "Perawat" },
-  { value: "doctor", label: "Dokter" },
-  { value: "pharmacist", label: "Farmasi" },
-  { value: "lab", label: "Laboratorium" },
-  { value: "billing", label: "Kasir" },
-  { value: "patient", label: "Pasien" },
-] as const
+import { USER_ROLES } from "@/types/auth"
+
+import type { UserRole } from "@/types/auth"
 
 /**
- * Backend seeds use `pharmacist`; the frontend normalises it to `pharmacy`.
- * The admin form uses `pharmacist` as the canonical staff value.
+ * Roles an administrator may assign from the user form.
+ *
+ * Mirrors `App\Enums\UserRole::tenantValues()` minus `tenant_admin`: the
+ * canonical owner is not created or re-roled through user management, and
+ * `platform_admin` never belongs to a tenant (PRD §3.2).
  */
-export function normalizeStaffRole(role: string): string {
-  return role === "pharmacy" ? "pharmacist" : role
+export const ASSIGNABLE_ROLE_OPTIONS = [
+  { value: "facility_admin", label: "Admin Fasilitas" },
+  { value: "operator", label: "Operator" },
+  { value: "staff", label: "Staff" },
+  { value: "client", label: "Klien" },
+] as const satisfies readonly { value: UserRole; label: string }[]
+
+/** Display labels for every API role, including the ones not assignable here. */
+const ROLE_LABELS: Record<UserRole, string> = {
+  platform_admin: "Platform",
+  tenant_admin: "Admin Tenant",
+  facility_admin: "Admin Fasilitas",
+  operator: "Operator",
+  staff: "Staff",
+  client: "Klien",
 }
 
 export function staffRoleLabel(role: string): string {
-  const normalized = normalizeStaffRole(role)
+  return ROLE_LABELS[role as UserRole] ?? role
+}
 
-  return (
-    STAFF_ROLE_OPTIONS.find((option) => option.value === normalized)?.label ??
-    role
-  )
+/** Type guard used where a raw API string must narrow to a known role. */
+export function isKnownRole(role: string): role is UserRole {
+  return (USER_ROLES as readonly string[]).includes(role)
 }

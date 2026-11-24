@@ -48,18 +48,15 @@ export type OnlineBookingResult = {
 
 export type ClientProfileInput = {
   name: string
-  nik: string
-  date_of_birth: string
-  gender: "" | "male" | "female"
   phone: string
   email: string
   address: string
 }
 
-/* Aliases kept while older client pages are migrated. */
-export type PatientProfile = ClientProfile
+export type CustomerVisit = ClientVisit
+export type CustomerVisitDetail = ClientVisitDetail
+
+/** Deprecated aliases: the API calls these "customers / queue sessions". */
+export type ClientProfileAlias = ClientProfile
 export type PatientAuthUser = ClientAuthUser
-export type PatientVisit = ClientVisit
-export type PatientQueueTicket = ClientQueueTicket
-export type PatientVisitDetail = ClientVisitDetail
 export type PatientProfileInput = ClientProfileInput

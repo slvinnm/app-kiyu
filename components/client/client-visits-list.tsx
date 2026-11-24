@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientVisitDetailSheet } from "@/components/client/client-visit-detail-sheet"
+import { CustomerVisitDetailSheet } from "@/components/client/client-visit-detail-sheet"
 
 import {
   channelLabel,
@@ -22,13 +22,13 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientVisit } from "@/types/client"
+import type { CustomerVisit } from "@/types/client"
 
 function isActive(status: string): boolean {
   return ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"].includes(status)
 }
 
-export function PatientVisitsList({ visits }: { visits: PatientVisit[] }) {
+export function CustomerVisitsList({ visits }: { visits: CustomerVisit[] }) {
   const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null)
 
   if (visits.length === 0) {
@@ -92,7 +92,7 @@ export function PatientVisitsList({ visits }: { visits: PatientVisit[] }) {
         ))}
       </div>
 
-      <PatientVisitDetailSheet
+      <CustomerVisitDetailSheet
         visitId={selectedVisitId}
         open={selectedVisitId !== null}
         onOpenChange={(open) => {

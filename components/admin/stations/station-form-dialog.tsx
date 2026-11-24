@@ -26,19 +26,11 @@ import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createStation, updateStation } from "@/lib/api/admin"
-import { stationTypeLabel } from "@/lib/reception/format"
+import { STATION_TYPES, stationTypeLabel } from "@/lib/reception/format"
 
 import type { AdminStation } from "@/types/admin"
 import type { Department } from "@/types/reception"
 
-const STATION_TYPES = [
-  "REGISTRATION",
-  "NURSE",
-  "DOCTOR",
-  "LABORATORY",
-  "PHARMACY",
-  "BILLING",
-]
 
 export function StationFormDialog({
   open,
@@ -58,7 +50,7 @@ export function StationFormDialog({
   const [departmentId, setDepartmentId] = useState("")
   const [name, setName] = useState("")
   const [code, setCode] = useState("")
-  const [type, setType] = useState("REGISTRATION")
+  const [type, setType] = useState<string>("INTAKE")
   const [queuePrefix, setQueuePrefix] = useState("")
   const [isActive, setIsActive] = useState("1")
   const [submitting, setSubmitting] = useState(false)
@@ -79,7 +71,7 @@ export function StationFormDialog({
     )
     setName(station?.name ?? "")
     setCode(station?.code ?? "")
-    setType(station?.type ?? "REGISTRATION")
+    setType(station?.type ?? "INTAKE")
     setQueuePrefix(station?.queue_prefix ?? "")
     setIsActive(station?.is_active === false ? "0" : "1")
     setError(null)
@@ -96,7 +88,7 @@ export function StationFormDialog({
 
     const nextErrors: Record<string, string> = {}
 
-    if (!departmentId) nextErrors.department_id = "Pilih poli."
+    if (!departmentId) nextErrors.department_id = "Pilih departemen."
     if (!name.trim()) nextErrors.name = "Nama wajib diisi."
     if (!code.trim()) nextErrors.code = "Kode wajib diisi."
 
@@ -159,20 +151,20 @@ export function StationFormDialog({
           </DialogTitle>
 
           <DialogDescription>
-            Station adalah titik pelayanan fisik/logis di dalam poli.
+            Station adalah titik pelayanan fisik/logis di dalam departemen.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Poli</Label>
+            <Label>Departemen</Label>
 
             <Select
               value={departmentId}
               onValueChange={(value) => setDepartmentId(value ?? "")}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih poli" />
+                <SelectValue placeholder="Pilih departemen" />
               </SelectTrigger>
 
               <SelectContent>
@@ -247,7 +239,7 @@ export function StationFormDialog({
 
               <Select
                 value={type}
-                onValueChange={(v) => setType(v ?? "REGISTRATION")}
+                onValueChange={(v) => setType(v ?? "INTAKE")}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />

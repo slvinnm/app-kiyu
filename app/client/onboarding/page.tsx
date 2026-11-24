@@ -15,8 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientLoadError } from "@/components/client/client-notices"
-import { PatientProfileForm } from "@/components/client/profile-form"
+import { CustomerLoadError } from "@/components/client/client-notices"
+import { CustomerProfileForm } from "@/components/client/profile-form"
 
 import { logout } from "@/lib/actions/auth"
 import { getApiErrorMessage } from "@/lib/api/error"
@@ -33,8 +33,8 @@ export default async function OnboardingPage() {
   } catch (cause) {
     return (
       <OnboardingShell email={user.email}>
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat profil pelanggan.")}
         />
       </OnboardingShell>
     )
@@ -54,7 +54,7 @@ export default async function OnboardingPage() {
               <ClipboardCheckIcon className="size-5" />
             </div>
 
-            <CardTitle className="mt-3 text-lg">Lengkapi Data Pasien</CardTitle>
+            <CardTitle className="mt-3 text-lg">Lengkapi Data Pelanggan</CardTitle>
 
             <CardDescription>
               Data ini diperlukan agar Anda dapat melakukan booking dan melihat
@@ -63,7 +63,7 @@ export default async function OnboardingPage() {
           </CardHeader>
 
           <CardContent>
-            <PatientProfileForm
+            <CustomerProfileForm
               userId={current.user.id}
               profile={null}
               defaultName={current.user.name}
@@ -83,19 +83,20 @@ export default async function OnboardingPage() {
               <CardTitle className="mt-2 text-base">Data Anda aman</CardTitle>
 
               <CardDescription>
-                Profil menghubungkan akun Anda dengan rekam medis di klinik.
+                Profil menghubungkan akun Anda dengan data pelanggan pada
+                organisasi ini.
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>
-                Nomor rekam medis (MRN) dibuat otomatis oleh sistem. Booking
-                online dan antrian memerlukan profil yang terhubung.
+                Booking online dan antrean memerlukan profil yang terhubung
+                dengan akun Anda.
               </p>
 
               <p>
-                Jika data Anda sudah terdaftar di klinik, gunakan NIK yang sama
-                agar tidak terjadi duplikasi.
+                Jika data Anda sudah terdaftar, gunakan email dan telepon yang
+                sama agar tidak terjadi duplikasi.
               </p>
             </CardContent>
           </Card>
@@ -140,7 +141,7 @@ function OnboardingShell({
             <div className="leading-tight">
               <p className="text-sm font-semibold">KIYU</p>
 
-              <p className="text-xs text-muted-foreground">Portal Pasien</p>
+              <p className="text-xs text-muted-foreground">Portal Pelanggan</p>
             </div>
           </div>
 

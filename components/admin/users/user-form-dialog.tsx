@@ -26,7 +26,7 @@ import { Spinner } from "@/components/ui/spinner"
 
 import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
 import { createUser, updateUser } from "@/lib/api/admin"
-import { STAFF_ROLE_OPTIONS, normalizeStaffRole } from "@/lib/admin/roles"
+import { ASSIGNABLE_ROLE_OPTIONS } from "@/lib/admin/roles"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
 import type { Department } from "@/types/reception"
@@ -49,7 +49,7 @@ export function UserFormDialog({
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("receptionist")
+  const [role, setRole] = useState<string>("operator")
   const [departmentId, setDepartmentId] = useState("none")
   const [stationId, setStationId] = useState("none")
   const [submitting, setSubmitting] = useState(false)
@@ -64,8 +64,8 @@ export function UserFormDialog({
     setName(user?.name ?? "")
     setEmail(user?.email ?? "")
     setPassword("")
-    setRole(normalizeStaffRole(user?.role ?? "receptionist"))
-    setDepartmentId(user?.department_id ? String(user.department_id) : "none")
+    setRole(user?.role ?? "operator")
+    setDepartmentId("none")
     setStationId(user?.station_id ? String(user.station_id) : "none")
     setError(null)
     setErrors({})
@@ -256,14 +256,14 @@ export function UserFormDialog({
 
             <Select
               value={role}
-              onValueChange={(v) => setRole(v ?? "receptionist")}
+              onValueChange={(v) => setRole(v ?? "operator")}
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
 
               <SelectContent>
-                {STAFF_ROLE_OPTIONS.map((option) => (
+                {ASSIGNABLE_ROLE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

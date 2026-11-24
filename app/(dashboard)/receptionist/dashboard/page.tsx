@@ -22,8 +22,9 @@ import { LiveRefresh } from "@/components/realtime/live-refresh"
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import {
-  getPatientCountServer,
+  getCustomerCountServer,
   getReceptionQueueServer,
+  getStationOptionsServer,
 } from "@/lib/api/reception-server"
 import { requireRole } from "@/lib/auth/guard"
 import { channelLabel, formatTime, priorityLabel } from "@/lib/reception/format"
@@ -31,10 +32,23 @@ import { channelLabel, formatTime, priorityLabel } from "@/lib/reception/format"
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 
 export default async function Page() {
-  const user = await requireRole(["admin", "receptionist"])
+  const user = await requireRole(["tenant_admin", "facility_admin", "operator"])
 
-  // Department comes from the signed-in operator's assignment.
-  const departmentId = user.department_id ?? null
+  // A user has no department of their own: the station assignment carries it.
+  // Resolving through stations keeps this working for an operator who moved
+  // between service points without re-logging in.
+  let departmentId: number | null = null
+
+  if (user.station_id !== null) {
+    try {
+      const stations = await getStationOptionsServer()
+      departmentId =
+        stations.find((station) => station.id === user.station_id)?.department_id ??
+        null
+    } catch {
+      departmentId = null
+    }
+  }
 
   let snapshot: ReceptionQueueSnapshot | null = null
   let queueError: string | null = null
@@ -44,17 +58,17 @@ export default async function Page() {
     try {
       snapshot = await getReceptionQueueServer(departmentId)
     } catch (cause) {
-      queueError = getApiErrorMessage(cause, "Gagal memuat antrian.")
+      queueError = getApiErrorMessage(cause, "Gagal memuat antrean.")
       invalidWorkflow = getApiErrorType(cause) === "INVALID_WORKFLOW"
     }
   }
 
-  let patientCount: number | null = null
+  let customerCount: number | null = null
 
   try {
-    patientCount = await getPatientCountServer()
+    customerCount = await getCustomerCountServer()
   } catch {
-    patientCount = null
+    customerCount = null
   }
 
   const queueHref = "/receptionist/queue"
@@ -68,7 +82,7 @@ export default async function Page() {
 
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
-      <LiveRefresh departmentId={departmentId} />
+      <LiveRefresh facilityId={user.facility_ids[0] ?? null} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -103,7 +117,7 @@ export default async function Page() {
         <Card className="mt-6">
           <CardContent className="flex min-h-52 flex-col items-center justify-center gap-4 text-center">
             <div>
-              <CardTitle>Akun belum ditugaskan ke poli</CardTitle>
+              <CardTitle>Akun belum ditugaskan ke departemen</CardTitle>
 
               <CardDescription className="mt-2">
                 Hubungi administrator untuk mengatur department dan station
@@ -116,11 +130,11 @@ export default async function Page() {
 
       {invalidWorkflow && (
         <Alert variant="destructive" className="mt-6">
-          <AlertTitle>Poli belum siap menerima antrian</AlertTitle>
+          <AlertTitle>Departemen belum siap menerima antrian</AlertTitle>
 
           <AlertDescription>
             {queueError ??
-              "Poli ini belum memiliki workflow registrasi aktif. Pilih poli lain atau hubungi administrator."}
+              "Departemen ini belum memiliki workflow registrasi aktif. Pilih departemen lain atau hubungi administrator."}
           </AlertDescription>
         </Alert>
       )}
@@ -144,7 +158,7 @@ export default async function Page() {
                     </CardTitle>
 
                     <CardDescription>
-                      Pasien yang sedang dipanggil ke meja registrasi.
+                      Pelanggan yang sedang dipanggil ke meja registrasi.
                     </CardDescription>
                   </div>
 
@@ -302,12 +316,12 @@ export default async function Page() {
                 className={buttonVariants({ variant: "outline" })}
               >
                 <SearchIcon />
-                Cari Pasien
+                Cari Pelanggan
               </Link>
 
-              {patientCount !== null && (
+              {customerCount !== null && (
                 <span className="self-center text-xs text-muted-foreground">
-                  Total pasien terdaftar: {patientCount}
+                  Total pelanggan terdaftar: {customerCount}
                 </span>
               )}
             </CardContent>

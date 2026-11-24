@@ -28,7 +28,7 @@ export function FacilityManager({ rows }: { rows: Facility[] }) {
         <div>
           <CardTitle>Fasilitas</CardTitle>
           <CardDescription>
-            Unit fisik tempat poli dan antrian berjalan.
+            Unit fisik tempat departemen dan antrian berjalan.
           </CardDescription>
         </div>
 

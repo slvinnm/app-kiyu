@@ -68,10 +68,10 @@ export function StaffCurrentTicket({
       <CardHeader className="border-b">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-base">Pasien Saat Ini</CardTitle>
+            <CardTitle className="text-base">Pelanggan Saat Ini</CardTitle>
 
             <CardDescription>
-              Pasien yang sedang ditangani di station ini.
+              Pelanggan yang sedang ditangani di loket ini.
             </CardDescription>
           </div>
 
@@ -89,7 +89,7 @@ export function StaffCurrentTicket({
             </div>
 
             <h2 className="mt-5 text-xl font-semibold">
-              Tidak ada pasien aktif
+              Tidak ada pelanggan aktif
             </h2>
 
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
@@ -135,16 +135,16 @@ export function StaffCurrentTicket({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Pasien</p>
+                  <p className="text-xs text-muted-foreground">Pelanggan</p>
 
                   <p className="mt-1 text-lg font-semibold">
                     {ticket.visit?.client?.name ??
-                      "Pasien belum teridentifikasi"}
+                      "Pelanggan belum teridentifikasi"}
                   </p>
 
-                  {ticket.visit?.client?.mrn && (
+                  {ticket.visit?.client?.phone && (
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {ticket.visit.client.mrn}
+                      {ticket.visit.client.phone}
                     </p>
                   )}
                 </div>

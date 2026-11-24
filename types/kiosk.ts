@@ -96,15 +96,19 @@ export type KioskCheckinResult = {
   ticket: QueueTicket
 }
 
+/**
+ * Preview returned by `GET /intake/online-lookup/{identifier}`.
+ *
+ * Mirrors `IntakeService::lookupOnlineBooking`. The name is masked and no other
+ * customer identifier is exposed: a bare booking code is enough to recognise the
+ * booking, and echoing more would let a code holder read PII.
+ */
 export type OnlineBookingLookup = {
-  visit_number: string
-  booking_identifier: string | null
-  patient_preview: {
+  session_number: number
+  customer_preview: {
     masked_name: string
-    mrn: string
   }
   department_name: string
-  priority: number
   status: string
   is_eligible_checkin: boolean
 }

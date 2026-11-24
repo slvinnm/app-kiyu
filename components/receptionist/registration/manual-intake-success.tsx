@@ -32,11 +32,11 @@ export function ManualIntakeSuccess({
           <Badge variant="outline">Antrian berhasil dibuat</Badge>
 
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">
-            Pasien masuk antrian reception
+            Pelanggan masuk antrean reception
           </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Pasien akan dipanggil petugas untuk melengkapi registrasi.
+            Pelanggan akan dipanggil petugas untuk melengkapi registrasi.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export function ManualIntakeSuccess({
         <Separator />
 
         <p className="text-xs text-muted-foreground">
-          Data pasien belum tercatat. Lengkapi saat registrasi di halaman
+          Data pelanggan belum tercatat. Lengkapi saat registrasi di halaman
           Antrian.
         </p>
 

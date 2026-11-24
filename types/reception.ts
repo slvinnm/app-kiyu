@@ -44,13 +44,8 @@ export type VisitStatus =
   | "COMPLETED"
   | "CANCELLED"
 
-export type StationType =
-  | "REGISTRATION"
-  | "NURSE"
-  | "DOCTOR"
-  | "LABORATORY"
-  | "PHARMACY"
-  | "BILLING"
+/** Mirrors `App\Enums\StationType`. */
+export type StationType = "INTAKE" | "SERVICE" | "CASHIER" | "COUNTER"
 
 export type Station = {
   id: number
@@ -74,15 +69,15 @@ export type Department = {
   stations_count?: number
 }
 
-export type Client = {
+/**
+ * A customer record (`customers` table). The only attributes are the name, the
+ * optional contact details and the linked login account.
+ */
+export type Customer = {
   id: number
   tenant_id: number
   user_id: number | null
-  mrn: string | null
-  nik: string | null
   name: string
-  date_of_birth: string | null
-  gender: string | null
   phone: string | null
   email: string | null
   address: string | null
@@ -90,22 +85,19 @@ export type Client = {
   updated_at?: string
 }
 
-export type ClientInput = {
+export type CustomerInput = {
   name: string
-  nik?: string
-  mrn?: string
-  date_of_birth?: string
-  gender?: string
   phone?: string
   email?: string
   address?: string
 }
 
-/** The API renamed `patient` to `client`; these aliases keep older call sites. */
-export type Patient = Client
-export type PatientDetail = Client & { visits?: Visit[] }
-export type PatientInput = ClientInput
-export type ClientDetail = Client & { visits?: Visit[] }
+export type CustomerDetail = Customer & { visits?: Visit[] }
+
+/** Deprecated aliases: the API calls these "customers". Remove once call sites migrate. */
+export type Client = Customer
+export type ClientInput = CustomerInput
+export type ClientDetail = CustomerDetail
 
 export type WorkflowStep = {
   id: number
@@ -348,13 +340,4 @@ export type CompleteRegistrationResult = {
   next_ticket: QueueTicket | null
 }
 
-export type CompleteRegistrationPatientData = {
-  name: string
-  nik?: string
-  mrn?: string
-  date_of_birth?: string
-  gender?: string
-  phone?: string
-  email?: string
-  address?: string
-}
+export type CompleteRegistrationPatientData = CustomerInput

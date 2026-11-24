@@ -23,16 +23,16 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 
-import { NewPatientForm } from "@/components/receptionist/client/new-client-form"
+import { NewCustomerForm } from "@/components/receptionist/client/new-client-form"
 import {
-  PatientModeTabs,
-  type PatientMode,
+  CustomerModeTabs,
+  type CustomerMode,
 } from "@/components/receptionist/client/client-mode-tabs"
-import { PatientSearch } from "@/components/receptionist/client/client-search"
-import { PatientSummary } from "@/components/receptionist/client/client-summary"
+import { CustomerSearch } from "@/components/receptionist/client/client-search"
+import { CustomerSummary } from "@/components/receptionist/client/client-summary"
 import { CompleteRegistrationSuccess as CompleteRegistrationSuccessView } from "@/components/receptionist/queue/complete-registration-success"
 
-import { usePatientSearch } from "@/hooks/use-client-search"
+import { useCustomerSearch } from "@/hooks/use-client-search"
 
 import {
   getApiErrorMessage,
@@ -52,34 +52,24 @@ import { channelLabel, priorityLabel } from "@/lib/reception/format"
 import type {
   CompleteRegistrationPatientData,
   CompleteRegistrationResult,
-  Patient,
-  PatientInput,
+  CustomerInput,
+  Customer,
   Priority,
   QueueAcquisition,
   QueueTicket,
 } from "@/types/reception"
 
-const initialPatient: PatientInput = {
+const initialPatient: CustomerInput = {
   name: "",
-  nik: "",
-  date_of_birth: "",
-  gender: "",
   phone: "",
   email: "",
   address: "",
 }
 
-function toPatientData(input: PatientInput): CompleteRegistrationPatientData {
+function toPatientData(input: CustomerInput): CompleteRegistrationPatientData {
   const data: CompleteRegistrationPatientData = {
     name: input.name.trim(),
   }
-
-  const nik = (input.nik ?? "").trim()
-  if (nik) data.nik = nik
-
-  if (input.date_of_birth) data.date_of_birth = input.date_of_birth
-
-  if (input.gender) data.gender = input.gender
 
   const phone = (input.phone ?? "").trim()
   if (phone) data.phone = phone
@@ -110,11 +100,11 @@ export function CompleteRegistrationDialog({
   const [loadingAcquisition, setLoadingAcquisition] = useState(false)
   const [acquisitionError, setAcquisitionError] = useState<string | null>(null)
 
-  const [mode, setMode] = useState<PatientMode>("existing")
+  const [mode, setMode] = useState<CustomerMode>("existing")
   const [priority, setPriority] = useState<Priority>(1)
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [search, setSearch] = useState("")
-  const [newPatient, setNewPatient] = useState<PatientInput>(initialPatient)
+  const [newPatient, setNewPatient] = useState<CustomerInput>(initialPatient)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const [submitting, setSubmitting] = useState(false)
@@ -129,7 +119,7 @@ export function CompleteRegistrationDialog({
     results,
     searching,
     error: searchError,
-  } = usePatientSearch(search, {
+  } = useCustomerSearch(search, {
     enabled: searchEnabled,
     perPage: 10,
   })
@@ -144,7 +134,7 @@ export function CompleteRegistrationDialog({
     setAcquisitionError(null)
     setMode("existing")
     setPriority(ticket.priority)
-    setSelectedPatient(null)
+    setSelectedCustomer(null)
     setSearch("")
     setNewPatient(initialPatient)
     setFieldErrors({})
@@ -185,24 +175,24 @@ export function CompleteRegistrationDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, ticket?.id, ticket?.visit_id])
 
-  function handleSwitchMode(nextMode: PatientMode) {
+  function handleSwitchMode(nextMode: CustomerMode) {
     setMode(nextMode)
     setFieldErrors({})
     setSubmitError(null)
 
     if (nextMode === "existing") {
       setSearch("")
-      setSelectedPatient(null)
+      setSelectedCustomer(null)
     }
   }
 
   function handleSearchChange(value: string) {
     setSearch(value)
-    setSelectedPatient(null)
+    setSelectedCustomer(null)
   }
 
-  function handleSelectPatient(patient: Patient) {
-    setSelectedPatient(patient)
+  function handleSelectCustomer(customer: Customer) {
+    setSelectedCustomer(customer)
     setSearch("")
     setFieldErrors({})
   }
@@ -215,7 +205,7 @@ export function CompleteRegistrationDialog({
     }
   }
 
-  function handleNewPatientChange(value: Partial<PatientInput>) {
+  function handleNewPatientChange(value: Partial<CustomerInput>) {
     setNewPatient((current) => ({ ...current, ...value }))
   }
 
@@ -225,14 +215,14 @@ export function CompleteRegistrationDialog({
     }
 
     if (!existingPatient) {
-      if (mode === "existing" && !selectedPatient) {
-        toast.error("Pilih pasien terlebih dahulu.")
+      if (mode === "existing" && !selectedCustomer) {
+        toast.error("Pilih pelanggan terlebih dahulu.")
         return
       }
 
       if (mode === "new" && !newPatient.name.trim()) {
-        setFieldErrors({ name: "Nama pasien wajib diisi." })
-        toast.error("Nama pasien wajib diisi.")
+        setFieldErrors({ name: "Nama pelanggan wajib diisi." })
+        toast.error("Nama pelanggan wajib diisi.")
         return
       }
     }
@@ -244,14 +234,13 @@ export function CompleteRegistrationDialog({
     const payload: CompleteRegistrationPayload = {
       acquisition_id: acquisition.id,
       priority,
-      registered_by: actorEmail,
     }
 
     if (!existingPatient) {
-      if (mode === "existing" && selectedPatient) {
-        payload.client_id = selectedPatient.id
+      if (mode === "existing" && selectedCustomer) {
+        payload.customer_id = selectedCustomer.id
       } else {
-        payload.client_data = toPatientData(newPatient)
+        payload.customer_data = toPatientData(newPatient)
       }
     }
 
@@ -269,10 +258,9 @@ export function CompleteRegistrationDialog({
       )
 
       if (type === "BUSINESS_CONFLICT") {
-        if (/nik/i.test(message)) {
+        if (/phone|email/i.test(message)) {
           setMode("existing")
-          setSearch((newPatient.nik ?? "").trim())
-          setFieldErrors({ nik: message })
+          setSearch((newPatient.phone ?? newPatient.email ?? "").trim())
           setSubmitError(message)
           toast.error(message)
         } else {
@@ -334,7 +322,7 @@ export function CompleteRegistrationDialog({
     !submitting &&
     (existingPatient !== null ||
       (mode === "existing"
-        ? selectedPatient !== null
+        ? selectedCustomer !== null
         : newPatient.name.trim() !== ""))
 
   return (
@@ -467,36 +455,36 @@ export function CompleteRegistrationDialog({
                       {existingPatient ? (
                         <div className="space-y-3">
                           <p className="text-sm font-medium">
-                            Pasien sudah terhubung
+                            Pelanggan sudah terhubung
                           </p>
 
-                          <PatientSummary patient={existingPatient} />
+                          <CustomerSummary customer={existingPatient} />
 
                           <p className="text-xs text-muted-foreground">
-                            Pasien dari booking online ini diverifikasi saat
+                            Pelanggan dari booking online ini diverifikasi saat
                             registrasi.
                           </p>
                         </div>
                       ) : (
                         <>
-                          <PatientModeTabs
+                          <CustomerModeTabs
                             value={mode}
                             onChange={handleSwitchMode}
                           />
 
                           {mode === "existing" ? (
-                            <PatientSearch
+                            <CustomerSearch
                               search={search}
                               results={results}
-                              selected={selectedPatient}
+                              selected={selectedCustomer}
                               searching={searching}
                               error={searchError}
                               onSearchChange={handleSearchChange}
-                              onSelect={handleSelectPatient}
-                              onClear={() => setSelectedPatient(null)}
+                              onSelect={handleSelectCustomer}
+                              onClear={() => setSelectedCustomer(null)}
                             />
                           ) : (
-                            <NewPatientForm
+                            <NewCustomerForm
                               value={newPatient}
                               errors={fieldErrors}
                               onChange={handleNewPatientChange}

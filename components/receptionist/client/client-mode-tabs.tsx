@@ -4,31 +4,31 @@ import { SearchIcon, UserRoundPlusIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-export type PatientMode = "existing" | "new"
+export type CustomerMode = "existing" | "new"
 
-export function PatientModeTabs({
+export function CustomerModeTabs({
   value,
   onChange,
 }: {
-  value: PatientMode
-  onChange: (value: PatientMode) => void
+  value: CustomerMode
+  onChange: (value: CustomerMode) => void
 }) {
   const options: Array<{
-    value: PatientMode
+    value: CustomerMode
     title: string
     description: string
     icon: React.ReactNode
   }> = [
     {
       value: "existing",
-      title: "Pasien Terdaftar",
-      description: "Cari dan hubungkan pasien yang sudah ada.",
+      title: "Pelanggan Terdaftar",
+      description: "Cari dan hubungkan pelanggan yang sudah ada.",
       icon: <SearchIcon className="size-4" />,
     },
     {
       value: "new",
-      title: "Pasien Baru",
-      description: "Buat data pasien baru saat registrasi.",
+      title: "Pelanggan Baru",
+      description: "Buat data pelanggan baru saat registrasi.",
       icon: <UserRoundPlusIcon className="size-4" />,
     },
   ]

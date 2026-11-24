@@ -15,57 +15,35 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 
 import { getApiErrorMessage, getApiValidationErrors } from "@/lib/api/error"
-import { createPatient, updatePatient } from "@/lib/api/admin"
-import { formatDateInput } from "@/lib/reception/format"
+import { createCustomer, updateCustomer } from "@/lib/api/admin"
 
-import type { PatientPayload } from "@/types/admin"
-import type { Patient } from "@/types/reception"
+import type { CustomerInput } from "@/types/reception"
+import type { Customer } from "@/types/reception"
 
-function normalizeGender(
-  gender: string | null | undefined
-): "" | "male" | "female" {
-  if (!gender) return ""
-
-  const normalized = gender.toLowerCase()
-
-  if (normalized === "male" || normalized === "m" || normalized === "l") {
-    return "male"
-  }
-
-  if (normalized === "female" || normalized === "f" || normalized === "p") {
-    return "female"
-  }
-
-  return ""
-}
-
-export function PatientFormDialog({
+/**
+ * Customer record form.
+ *
+ * The API stores exactly four optional attributes beyond the name: phone,
+ * email, address and the linked login account. No national identity number,
+ * medical record number, birth date or gender exists on the `customers` table,
+ * so none is collected here (PRD §1.2, §5.1).
+ */
+export function CustomerFormDialog({
   open,
   onOpenChange,
-  patient,
+  customer,
   onSaved,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  patient: Patient | null
+  customer: Customer | null
   onSaved: () => void
 }) {
   const [name, setName] = useState("")
-  const [nik, setNik] = useState("")
-  const [mrn, setMrn] = useState("")
-  const [dateOfBirth, setDateOfBirth] = useState("")
-  const [gender, setGender] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [address, setAddress] = useState("")
@@ -78,22 +56,14 @@ export function PatientFormDialog({
       return
     }
 
-    setName(patient?.name ?? "")
-    setNik(patient?.nik ?? "")
-    setMrn(patient?.mrn ?? "")
-    setDateOfBirth(formatDateInput(patient?.date_of_birth))
-    setGender(normalizeGender(patient?.gender))
-    setPhone(patient?.phone ?? "")
-    setEmail(patient?.email ?? "")
-    setAddress(patient?.address ?? "")
+    setName(customer?.name ?? "")
+    setPhone(customer?.phone ?? "")
+    setEmail(customer?.email ?? "")
+    setAddress(customer?.address ?? "")
     setError(null)
     setErrors({})
     setSubmitting(false)
-  }, [open, patient])
-
-  function handleGenderChange(value: string | null) {
-    setGender(value === "male" || value === "female" ? value : "")
-  }
+  }, [open, customer])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -111,29 +81,25 @@ export function PatientFormDialog({
     setError(null)
     setErrors({})
 
-    const payload: PatientPayload = { name: name.trim() }
+    const payload: CustomerInput = { name: name.trim() }
 
-    if (nik.trim()) payload.nik = nik.trim()
-    if (mrn.trim()) payload.mrn = mrn.trim()
-    if (dateOfBirth) payload.date_of_birth = dateOfBirth
-    if (gender) payload.gender = gender
     if (phone.trim()) payload.phone = phone.trim()
     if (email.trim()) payload.email = email.trim()
     if (address.trim()) payload.address = address.trim()
 
     try {
-      if (patient) {
-        await updatePatient(patient.id, payload)
-        toast.success("Data pasien diperbarui.")
+      if (customer) {
+        await updateCustomer(customer.id, payload)
+        toast.success("Data pelanggan diperbarui.")
       } else {
-        await createPatient(payload)
-        toast.success("Pasien berhasil dibuat.")
+        await createCustomer(payload)
+        toast.success("Pelanggan berhasil dibuat.")
       }
 
       onOpenChange(false)
       onSaved()
     } catch (cause) {
-      const message = getApiErrorMessage(cause, "Gagal menyimpan pasien.")
+      const message = getApiErrorMessage(cause, "Gagal menyimpan pelanggan.")
       setError(message)
       toast.error(message)
 
@@ -157,21 +123,23 @@ export function PatientFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{patient ? "Edit Pasien" : "Tambah Pasien"}</DialogTitle>
+          <DialogTitle>
+            {customer ? "Edit Pelanggan" : "Tambah Pelanggan"}
+          </DialogTitle>
 
           <DialogDescription>
-            Data identitas pasien. MRN dibuat otomatis jika dikosongkan.
+            Nama wajib diisi. Telepon, email dan alamat opsional.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="patient-name">
+            <Label htmlFor="customer-name">
               Nama Lengkap <span className="text-destructive">*</span>
             </Label>
 
             <Input
-              id="patient-name"
+              id="customer-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               maxLength={255}
@@ -184,77 +152,10 @@ export function PatientFormDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="patient-nik">NIK</Label>
+              <Label htmlFor="customer-phone">Telepon</Label>
 
               <Input
-                id="patient-nik"
-                value={nik}
-                onChange={(event) => setNik(event.target.value)}
-                maxLength={50}
-              />
-
-              {errors.nik && (
-                <p className="text-xs text-destructive">{errors.nik}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="patient-mrn">MRN</Label>
-
-              <Input
-                id="patient-mrn"
-                value={mrn}
-                onChange={(event) => setMrn(event.target.value)}
-                placeholder="Otomatis jika kosong"
-                maxLength={50}
-              />
-
-              {errors.mrn && (
-                <p className="text-xs text-destructive">{errors.mrn}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="patient-dob">Tanggal Lahir</Label>
-
-              <Input
-                id="patient-dob"
-                type="date"
-                value={dateOfBirth}
-                onChange={(event) => setDateOfBirth(event.target.value)}
-              />
-
-              {errors.date_of_birth && (
-                <p className="text-xs text-destructive">
-                  {errors.date_of_birth}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Jenis Kelamin</Label>
-
-              <Select value={gender} onValueChange={handleGenderChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="male">Laki-laki</SelectItem>
-                  <SelectItem value="female">Perempuan</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {errors.gender && (
-                <p className="text-xs text-destructive">{errors.gender}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="patient-phone">Telepon</Label>
-
-              <Input
-                id="patient-phone"
+                id="customer-phone"
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
                 maxLength={30}
@@ -266,13 +167,14 @@ export function PatientFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="patient-email">Email</Label>
+              <Label htmlFor="customer-email">Email</Label>
 
               <Input
-                id="patient-email"
+                id="customer-email"
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                maxLength={255}
               />
 
               {errors.email && (
@@ -282,13 +184,13 @@ export function PatientFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="patient-address">Alamat</Label>
+            <Label htmlFor="customer-address">Alamat</Label>
 
             <Textarea
-              id="patient-address"
+              id="customer-address"
               value={address}
               onChange={(event) => setAddress(event.target.value)}
-              rows={2}
+              rows={3}
             />
 
             {errors.address && (
@@ -315,14 +217,8 @@ export function PatientFormDialog({
             </Button>
 
             <Button type="submit" disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Spinner />
-                  Menyimpan...
-                </>
-              ) : (
-                "Simpan"
-              )}
+              {submitting && <Spinner className="size-4" />}
+              {customer ? "Simpan" : "Tambah"}
             </Button>
           </DialogFooter>
         </form>

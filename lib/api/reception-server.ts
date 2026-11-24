@@ -7,11 +7,24 @@ import type {
   Paginated,
   Client,
   ReceptionQueueSnapshot,
+  Station,
 } from "@/types/reception"
 
 export async function getActiveDepartmentsServer(): Promise<Department[]> {
   const response = await serverApiFetch<{ data: Department[] }>(
     "/departments/active"
+  )
+
+  return response.data
+}
+
+/**
+ * Service points the signed-in operator may work at. Used to translate the
+ * user's station assignment into the department it belongs to.
+ */
+export async function getStationOptionsServer(): Promise<Station[]> {
+  const response = await serverApiFetch<{ data: Station[] }>(
+    "/stations/options"
   )
 
   return response.data
@@ -42,7 +55,7 @@ export async function getReceptionQueueServer(
 
 export async function getClientCountServer(): Promise<number> {
   const response = await serverApiFetch<{ data: { total: number } }>(
-    "/clients/statistics"
+    "/customers/statistics"
   )
 
   return response.data.total
@@ -66,12 +79,12 @@ export async function getClientsTableServer(filters: {
   const query = params.toString()
 
   const response = await serverApiFetch<{ data: Paginated<Client> }>(
-    `/clients${query ? `?${query}` : ""}`
+    `/customers${query ? `?${query}` : ""}`
   )
 
   return response.data
 }
 
 /* Aliases kept while older pages are migrated. */
-export const getPatientsTableServer = getClientsTableServer
-export const getPatientCountServer = getClientCountServer
+export const getCustomersTableServer = getClientsTableServer
+export const getCustomerCountServer = getClientCountServer

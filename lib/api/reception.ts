@@ -3,7 +3,8 @@ import { toQuery } from "@/lib/api/query"
 
 import type {
   ApiResponse,
-  Client,
+  Customer,
+  CustomerInput,
   Paginated,
   QueueAcquisition,
   QueueTicket,
@@ -60,20 +61,17 @@ export function noShowReceptionTicket(ticketId: number, assignedTo?: string) {
   })
 }
 
+/**
+ * Body for `POST /reception/complete-registration`.
+ *
+ * The backend validates `customer_id` / `customer_data` only. The actor is
+ * derived from the authenticated user, never sent by the client
+ * (`Controller::actor()`), so there is no `registered_by` field.
+ */
 export type CompleteRegistrationPayload = {
   acquisition_id: number
-  client_id?: number
-  registered_by?: string
-  client_data?: {
-    name: string
-    nik?: string
-    mrn?: string
-    date_of_birth?: string
-    gender?: string
-    phone?: string
-    email?: string
-    address?: string
-  }
+  customer_id?: number
+  customer_data?: CustomerInput
   priority?: 1 | 2 | 3
 }
 
@@ -114,43 +112,32 @@ export function createManualIntake(input: {
 /* Clients                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export type ClientSearchFilters = {
+export type CustomerSearchFilters = {
   search?: string
   page?: number
   per_page?: number
 }
 
-export function searchClients(
-  filters: ClientSearchFilters,
+export function searchCustomers(
+  filters: CustomerSearchFilters,
   signal?: AbortSignal
-): Promise<ApiResponse<Paginated<Client>>> {
-  return apiFetch(`/clients${toQuery(filters)}`, { signal })
+): Promise<ApiResponse<Paginated<Customer>>> {
+  return apiFetch(`/customers${toQuery(filters)}`, { signal })
 }
 
-export function getClient(id: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<Client>>(`/clients/${id}`, { signal })
+export function getCustomer(id: number, signal?: AbortSignal) {
+  return apiFetch<ApiResponse<Customer>>(`/customers/${id}`, { signal })
 }
 
-export type ClientInput = {
-  name: string
-  nik?: string
-  mrn?: string
-  date_of_birth?: string
-  gender?: string
-  phone?: string
-  email?: string
-  address?: string
-}
-
-export function createClient(input: ClientInput) {
-  return apiFetch<ApiResponse<Client>>("/clients", {
+export function createCustomer(input: CustomerInput) {
+  return apiFetch<ApiResponse<Customer>>("/customers", {
     method: "POST",
     body: JSON.stringify(input),
   })
 }
 
-export function updateClient(id: number, input: Partial<ClientInput>) {
-  return apiFetch<ApiResponse<Client>>(`/clients/${id}`, {
+export function updateCustomer(id: number, input: Partial<CustomerInput>) {
+  return apiFetch<ApiResponse<Customer>>(`/customers/${id}`, {
     method: "PUT",
     body: JSON.stringify(input),
   })
@@ -164,7 +151,7 @@ export type VisitAcquisition = QueueAcquisition
 
 export function getVisitAcquisition(visitId: number, signal?: AbortSignal) {
   return apiFetch<ApiResponse<QueueAcquisition | null>>(
-    `/visits/${visitId}/acquisition`,
+    `/queue-sessions/${visitId}/acquisition`,
     { signal }
   )
 }
@@ -177,5 +164,5 @@ export const callNext = callNextReception
 export const recallTicket = recallReceptionTicket
 export const skipTicket = skipReceptionTicket
 export const noShowTicket = noShowReceptionTicket
-export const searchPatients = searchClients
-export const getPatient = getClient
+export const searchClients = searchCustomers
+export const getClient = getCustomer

@@ -60,20 +60,20 @@ const NOTES_COPY: Record<
   }
 > = {
   hold: {
-    title: "Tahan Pasien",
+    title: "Tahan Pelanggan",
     description:
-      "Pasien akan ditandai ditahan dan dapat dilanjutkan kembali nanti.",
+      "Pelanggan akan ditandai ditahan dan dapat dilanjutkan kembali nanti.",
     confirmLabel: "Tahan",
   },
   skip: {
-    title: "Lewati Pasien",
-    description: "Pasien akan dilewati dari antrian station ini.",
+    title: "Lewati Pelanggan",
+    description: "Pelanggan akan dilewati dari antrean loket ini.",
     confirmLabel: "Lewati",
     destructive: true,
   },
   "no-show": {
     title: "Tandai Tidak Hadir",
-    description: "Pasien akan ditandai tidak hadir dan antrian ditutup.",
+    description: "Pelanggan akan ditandai tidak hadir dan antrean ditutup.",
     confirmLabel: "Tandai Tidak Hadir",
     destructive: true,
   },
@@ -202,13 +202,13 @@ export function StaffQueueWorkspace({
     try {
       if (type === "hold") {
         const response = await holdTicket(ticket.id, payload)
-        toast.success(response.message ?? "Pasien ditahan.")
+        toast.success(response.message ?? "Pelanggan ditahan.")
       } else if (type === "skip") {
         const response = await skipTicket(ticket.id, payload)
-        toast.success(response.message ?? "Pasien dilewati.")
+        toast.success(response.message ?? "Pelanggan dilewati.")
       } else if (type === "no-show") {
         const response = await noShowTicket(ticket.id, payload)
-        toast.success(response.message ?? "Pasien ditandai tidak hadir.")
+        toast.success(response.message ?? "Pelanggan ditandai tidak hadir.")
       } else if (type === "cancel") {
         const response = await cancelTicket(ticket.id, payload)
         toast.success(response.message ?? "Tiket dibatalkan.")
@@ -247,7 +247,7 @@ export function StaffQueueWorkspace({
         </h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Kelola pasien pada station yang ditugaskan kepada Anda.
+          Kelola pelanggan pada station yang ditugaskan kepada Anda.
         </p>
       </div>
 
@@ -270,7 +270,7 @@ export function StaffQueueWorkspace({
             <CardTitle>Station belum ditugaskan</CardTitle>
 
             <CardDescription>
-              Akun Anda belum memiliki station klinis. Hubungi administrator
+              Akun Anda belum memiliki loket layanan. Hubungi administrator
               untuk mengatur station kerja.
             </CardDescription>
           </CardContent>
@@ -392,7 +392,7 @@ export function StaffQueueWorkspace({
                 processing={processing || !station.is_active}
                 focusDisabled={inProgress.length > 0}
                 onResume={(ticket) =>
-                  void runAction("Pasien dilanjutkan.", () =>
+                  void runAction("Pelanggan dilanjutkan.", () =>
                     resumeTicket(ticket.id, actorEmail)
                   )
                 }

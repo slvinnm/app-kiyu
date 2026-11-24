@@ -8,10 +8,12 @@ export type VerifiedUser = {
   name: string
   email: string
   role: string
-  tenant_id?: number | null
-  facility_id?: number | null
-  department_id?: number | null
-  station_id?: number | null
+  tenant_id: number | null
+  /** Every facility the account may act at. The API sends an array; there is
+   * no single `facility_id` on the payload. */
+  facility_ids: number[]
+  station_id: number | null
+  profile?: unknown
 }
 
 type MeResponse = {
@@ -21,8 +23,7 @@ type MeResponse = {
     email?: unknown
     role?: unknown
     tenant_id?: unknown
-    facility_id?: unknown
-    department_id?: unknown
+    facility_ids?: unknown
     station_id?: unknown
   }
 }
@@ -39,14 +40,19 @@ function toVerifiedUser(data: MeResponse["data"]): VerifiedUser | null {
   const optionalNumber = (value: unknown): number | null =>
     typeof value === "number" ? value : null
 
+  // The API sends `facility_ids`; anything else is an empty reachable set, which
+  // the facility selector reads as "no choice to make".
+  const facilityIds = Array.isArray(data.facility_ids)
+    ? data.facility_ids.filter((id): id is number => typeof id === "number")
+    : []
+
   return {
     id: typeof data.id === "number" ? data.id : Number(data.id),
     name: typeof data.name === "string" ? data.name : "",
     email: typeof data.email === "string" ? data.email : "",
     role: data.role,
     tenant_id: optionalNumber(data.tenant_id),
-    facility_id: optionalNumber(data.facility_id),
-    department_id: optionalNumber(data.department_id),
+    facility_ids: facilityIds,
     station_id: optionalNumber(data.station_id),
   }
 }

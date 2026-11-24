@@ -23,15 +23,15 @@ import {
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientQueueTicket, PatientVisitDetail } from "@/types/client"
+import type { ClientQueueTicket, CustomerVisitDetail } from "@/types/client"
 
-function activeTickets(tickets: PatientQueueTicket[]) {
+function activeTickets(tickets: ClientQueueTicket[]) {
   return tickets.filter((ticket) =>
     ["CREATED", "CALLED", "IN_PROGRESS", "ON_HOLD"].includes(ticket.status)
   )
 }
 
-export function PatientVisitDetailSheet({
+export function CustomerVisitDetailSheet({
   visitId,
   open,
   onOpenChange,
@@ -40,7 +40,7 @@ export function PatientVisitDetailSheet({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const [visit, setVisit] = useState<PatientVisitDetail | null>(null)
+  const [visit, setVisit] = useState<CustomerVisitDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

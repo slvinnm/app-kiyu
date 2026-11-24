@@ -104,7 +104,7 @@ export function FacilityFormDialog({
           <DialogTitle>Tambah Fasilitas</DialogTitle>
 
           <DialogDescription>
-            Fasilitas adalah unit fisik yang menaungi poli dan antrian.
+            Fasilitas adalah unit fisik yang menaungi departemen dan antrian.
           </DialogDescription>
         </DialogHeader>
 
@@ -116,7 +116,7 @@ export function FacilityFormDialog({
               id="facility-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Contoh: Klinik Cabang Selatan"
+              placeholder="Contoh: Cabang Selatan"
               maxLength={255}
             />
 

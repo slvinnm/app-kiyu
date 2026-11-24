@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { PatientLoadError } from "@/components/client/client-notices"
+import { CustomerLoadError } from "@/components/client/client-notices"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import {
@@ -29,14 +29,13 @@ import {
 } from "@/lib/api/clients-server"
 import {
   channelLabel,
-  formatDate,
   formatDateTime,
   priorityLabel,
   ticketStatusLabel,
   visitStatusLabel,
 } from "@/lib/reception/format"
 
-import type { PatientVisitDetail } from "@/types/client"
+import type { CustomerVisitDetail } from "@/types/client"
 import type { Visit } from "@/types/reception"
 
 const ACTIVE_VISIT_STATUSES = ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"]
@@ -51,8 +50,8 @@ export default async function Page() {
   } catch (cause) {
     return (
       <PageShell>
-        <PatientLoadError
-          message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
+        <CustomerLoadError
+          message={getApiErrorMessage(cause, "Gagal memuat profil pelanggan.")}
         />
       </PageShell>
     )
@@ -89,7 +88,7 @@ export default async function Page() {
   )
 
   const activeTickets = detailResults
-    .filter((detail): detail is PatientVisitDetail => detail !== null)
+    .filter((detail): detail is CustomerVisitDetail => detail !== null)
     .flatMap((detail) =>
       (detail.queue_tickets ?? [])
         .filter((ticket) => ACTIVE_TICKET_STATUSES.includes(ticket.status))
@@ -243,7 +242,7 @@ export default async function Page() {
                 <div>
                   <CardTitle className="text-base">Profil</CardTitle>
 
-                  <CardDescription>Identitas pasien terhubung.</CardDescription>
+                  <CardDescription>Data pelanggan terhubung.</CardDescription>
                 </div>
 
                 <UserRoundIcon className="size-4 text-muted-foreground" />
@@ -259,34 +258,18 @@ export default async function Page() {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">No. RM</p>
-
-                  <p className="mt-1 font-mono text-sm font-medium">
-                    {profile.mrn ?? "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">NIK</p>
-
-                  <p className="mt-1 font-mono text-sm font-medium">
-                    {profile.nik ?? "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">Tanggal Lahir</p>
-
-                  <p className="mt-1 text-sm font-medium">
-                    {formatDate(profile.date_of_birth)}
-                  </p>
-                </div>
-
-                <div>
                   <p className="text-xs text-muted-foreground">Telepon</p>
 
                   <p className="mt-1 text-sm font-medium">
                     {profile.phone ?? "-"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground">Email</p>
+
+                  <p className="mt-1 text-sm font-medium">
+                    {profile.email ?? "-"}
                   </p>
                 </div>
               </div>
@@ -380,9 +363,9 @@ function PageShell({ children }: { children: React.ReactNode }) {
     <div className="mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <Badge variant="outline">Pasien</Badge>
+          <Badge variant="outline">Pelanggan</Badge>
 
-          <span className="text-xs text-muted-foreground">Portal Pasien</span>
+          <span className="text-xs text-muted-foreground">Portal Pelanggan</span>
         </div>
 
         <div className="flex items-start gap-3">

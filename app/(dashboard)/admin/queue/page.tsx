@@ -33,7 +33,7 @@ export default async function Page() {
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Antrian"
-        description="Monitoring antrian per station tanpa menampilkan data pribadi pasien."
+        description="Pemantauan antrean per loket tanpa menampilkan data pribadi pelanggan."
         icon={<ListOrdered className="size-5" />}
       />
 

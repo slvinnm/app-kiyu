@@ -74,9 +74,9 @@ export function OnlineCheckinPanel({
     setPhase({ type: "checking-in", booking })
 
     try {
-      const response = await checkinOnlineBooking(
-        booking.booking_identifier ?? booking.visit_number
-      )
+      // The code the customer typed is the only identifier they hold; the
+      // preview deliberately does not echo it back.
+      const response = await checkinOnlineBooking(identifier.trim())
 
       onCheckedIn(response.data, response.message)
     } catch (error) {
@@ -226,14 +226,14 @@ function PreviewContent({
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">Pasien</p>
+          <p className="text-xs text-muted-foreground">Pelanggan</p>
 
           <p className="text-lg font-semibold">
-            {booking.patient_preview.masked_name}
+            {booking.customer_preview.masked_name}
           </p>
 
           <p className="text-sm text-muted-foreground">
-            {booking.patient_preview.mrn}
+            Sesi antrean #{booking.session_number}
           </p>
         </div>
 
@@ -247,23 +247,17 @@ function PreviewContent({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <p className="text-xs text-muted-foreground">Poli</p>
+          <p className="text-xs text-muted-foreground">Departemen</p>
 
           <p className="mt-1 font-medium">{booking.department_name}</p>
         </div>
 
         <div>
-          <p className="text-xs text-muted-foreground">Nomor Kunjungan</p>
+          <p className="text-xs text-muted-foreground">Nomor Sesi</p>
 
           <p className="mt-1 font-mono text-sm font-medium">
-            {booking.visit_number}
+            {booking.session_number}
           </p>
-        </div>
-
-        <div>
-          <p className="text-xs text-muted-foreground">Prioritas</p>
-
-          <p className="mt-1 font-medium">{priorityLabel(booking.priority)}</p>
         </div>
 
         <div>

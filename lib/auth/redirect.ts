@@ -1,8 +1,19 @@
 import { normalizeRole } from "@/types/auth"
 
-const ROLE_DASHBOARDS: Record<string, string> = {
-  admin: "/admin/dashboard",
-  receptionist: "/receptionist/dashboard",
+import type { UserRole } from "@/types/auth"
+
+/**
+ * Landing page per role, after login or a visit to `/redirect`.
+ *
+ * Order matters: the page and redirect both call this with whatever the API
+ * reported, and an unknown or platform role must land on the access-denied page
+ * rather than a workspace it cannot render.
+ */
+const ROLE_DASHBOARDS: Record<UserRole, string> = {
+  platform_admin: "/unauthorized",
+  tenant_admin: "/admin/dashboard",
+  facility_admin: "/admin/dashboard",
+  operator: "/receptionist/dashboard",
   staff: "/staff/dashboard",
   client: "/client/dashboard",
 }

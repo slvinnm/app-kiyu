@@ -17,23 +17,22 @@ import {
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
 
-import { PatientFormDialog } from "@/components/admin/clients/client-form-dialog"
+import { CustomerFormDialog } from "@/components/admin/clients/client-form-dialog"
 
 import { useTableQuery } from "@/hooks/use-table-query"
-import { formatDate, genderLabel } from "@/lib/reception/format"
 
-import type { Patient } from "@/types/reception"
+import type { Customer } from "@/types/reception"
 import type { TableQueryState } from "@/hooks/use-table-query"
 
-const columnHelper = createDataTableColumnHelper<Patient>()
+const columnHelper = createDataTableColumnHelper<Customer>()
 
-export function PatientManager({
+export function CustomerManager({
   rows,
   total,
   lastPage,
   state,
 }: {
-  rows: Patient[]
+  rows: Customer[]
   total: number
   lastPage: number
   filters: Record<string, string>
@@ -42,7 +41,7 @@ export function PatientManager({
   const router = useRouter()
   const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<Patient | null>(null)
+  const [editing, setEditing] = useState<Customer | null>(null)
 
   function openCreate() {
     setEditing(null)
@@ -58,31 +57,14 @@ export function PatientManager({
             <span className="font-medium">{row.original.name}</span>
           ),
         }),
-        columnHelper.accessor("mrn", {
-          header: "MRN",
-          cell: ({ row }) => (
-            <span className="font-mono text-xs">{row.original.mrn ?? "-"}</span>
-          ),
-        }),
-        columnHelper.accessor("nik", {
-          header: "NIK",
-          cell: ({ row }) => (
-            <span className="font-mono text-xs">{row.original.nik ?? "-"}</span>
-          ),
-        }),
-        columnHelper.accessor("date_of_birth", {
-          header: "Tanggal Lahir",
-          cell: ({ row }) => formatDate(row.original.date_of_birth),
-          enableSorting: false,
-        }),
-        columnHelper.accessor("gender", {
-          header: "Gender",
-          cell: ({ row }) => genderLabel(row.original.gender),
-          enableSorting: false,
-        }),
         columnHelper.accessor("phone", {
           header: "Telepon",
           cell: ({ row }) => row.original.phone ?? "-",
+          enableSorting: false,
+        }),
+        columnHelper.accessor("email", {
+          header: "Email",
+          cell: ({ row }) => row.original.email ?? "-",
           enableSorting: false,
         }),
         columnHelper.display({
@@ -115,16 +97,16 @@ export function PatientManager({
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <CardTitle className="text-base">Direktori Pasien</CardTitle>
+              <CardTitle className="text-base">Direktori Pelanggan</CardTitle>
 
               <CardDescription>
-                Cari, tambah, dan perbarui data identitas pasien.
+                Cari, tambah, dan perbarui data kontak pelanggan.
               </CardDescription>
             </div>
 
             <Button onClick={openCreate}>
               <PlusIcon />
-              Tambah Pasien
+              Tambah Pelanggan
             </Button>
           </div>
         </CardHeader>
@@ -134,7 +116,7 @@ export function PatientManager({
             columns={columns}
             data={rows}
             getRowId={(row) => String(row.id)}
-            emptyMessage="Pasien tidak ditemukan."
+            emptyMessage="Pelanggan tidak ditemukan."
             pageCount={lastPage}
             pageIndex={state.page - 1}
             pageSize={state.perPage}
@@ -146,15 +128,15 @@ export function PatientManager({
             searchValue={tq.searchInput}
             onSearchChange={tq.setSearchInput}
             searching={tq.pending}
-            searchPlaceholder="Cari nama, MRN, NIK, atau telepon..."
+            searchPlaceholder="Cari nama, email, atau telepon..."
           />
         </CardContent>
       </Card>
 
-      <PatientFormDialog
+      <CustomerFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        patient={editing}
+        customer={editing}
         onSaved={() => router.refresh()}
       />
     </>
