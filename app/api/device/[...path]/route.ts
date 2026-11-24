@@ -5,6 +5,7 @@ import {
   deviceCookieName,
   deviceCookieOptions,
   readDeviceCredentialFromRequest,
+  serializeDeviceCookie,
 } from "@/lib/device/session"
 
 import type { DeviceKind } from "@/lib/device/session"
@@ -109,7 +110,7 @@ async function proxy(request: NextRequest, kind: DeviceKind) {
   } else if (response.ok) {
     out.cookies.set(
       deviceCookieName(kind),
-      JSON.stringify(device),
+      serializeDeviceCookie(device),
       deviceCookieOptions()
     )
   }

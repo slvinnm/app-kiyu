@@ -1,5 +1,7 @@
 import "server-only"
 
+import { createHmac, timingSafeEqual } from "node:crypto"
+
 import { cookies } from "next/headers"
 
 import type { NextRequest } from "next/server"
@@ -49,9 +51,59 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null
 }
 
+/**
+ * HMAC over the device payload.
+ *
+ * The device cookie drives the display's Reverb channel (`public.facility.{id}`)
+ * and is otherwise re-validated by the API on every proxied request. Signing it
+ * stops a tampered cookie from pointing the display at another facility's public
+ * channel. Reuses the session secret — one secret to rotate.
+ */
+function signPayload(payload: string): string {
+  const secret = process.env.AUTH_SECRET ?? ""
+
+  if (secret.length === 0) {
+    throw new Error("AUTH_SECRET is not configured.")
+  }
+
+  return createHmac("sha256", secret).update(payload).digest("base64url")
+}
+
+function serializePayload(payload: DeviceCookiePayload): string {
+  const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString(
+    "base64url"
+  )
+
+  return `${encoded}.${signPayload(encoded)}`
+}
+
+/** Signed cookie value for a device payload. */
+export function serializeDeviceCookie(payload: DeviceCookiePayload): string {
+  return serializePayload(payload)
+}
+
 function parsePayload(raw: string): DeviceCookiePayload | null {
+  const [encoded, signature] = raw.split(".")
+
+  if (!encoded || !signature) {
+    return null
+  }
+
+  // Constant-time compare; a malformed signature is simply rejected.
+  const expected = Buffer.from(signPayload(encoded), "base64url")
+  const actual = Buffer.from(signature, "base64url")
+
+  if (
+    expected.length !== actual.length ||
+    !timingSafeEqual(expected, actual)
+  ) {
+    return null
+  }
+
   try {
-    const parsed: unknown = JSON.parse(raw)
+    const parsed: unknown = JSON.parse(
+      Buffer.from(encoded, "base64url").toString("utf8")
+    )
 
     if (!isRecord(parsed)) {
       return null
@@ -121,7 +173,7 @@ export async function writeDeviceCredential(
 ): Promise<void> {
   const store = await cookies()
 
-  store.set(cookieName(kind), JSON.stringify(payload), {
+  store.set(cookieName(kind), serializePayload(payload), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
