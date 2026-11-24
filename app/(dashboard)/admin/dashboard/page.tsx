@@ -35,7 +35,6 @@ import {
 } from "@/lib/api/admin-server"
 import type { CountStatistics } from "@/lib/api/admin-server"
 import { todayJakarta } from "@/lib/admin/date"
-import { getSession } from "@/lib/auth/session"
 import { formatDateTime } from "@/lib/reception/format"
 
 import type { AuditLog } from "@/types/admin"
@@ -56,11 +55,6 @@ function metadataText(metadata: unknown): string {
 }
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   const results = await Promise.allSettled([
     getDepartmentOptionsServer(),

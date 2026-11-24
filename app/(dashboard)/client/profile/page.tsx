@@ -11,11 +11,6 @@ import { getCurrentClientServer } from "@/lib/api/clients-server"
 import { getSession } from "@/lib/auth/session"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let current
 

@@ -1,33 +1,20 @@
-import { normalizeRole } from "@/types/auth"
-
-import type { UserRole } from "@/types/auth"
-
-type RouteRule = {
-  prefix: string
-  roles: UserRole[]
-}
-
 /**
- * Mirrors the API's `role:` middleware. Admin is allowed into the receptionist
- * and staff workspaces because the API grants admin those routes too.
+ * Route prefixes that require a signed-in session.
+ *
+ * This only decides *whether* to gate — the *role* check lives in each
+ * workspace layout (`requireRole`), which reads the account from the API so a
+ * stale cookie claim cannot grant access. Keeping the role lists next to the
+ * layouts that render the workspace avoids two sources of truth.
  */
-export const routeRules: RouteRule[] = [
-  { prefix: "/admin", roles: ["admin"] },
-  { prefix: "/receptionist", roles: ["admin", "receptionist"] },
-  { prefix: "/staff", roles: ["admin", "staff"] },
-  { prefix: "/client", roles: ["client"] },
-]
+const GATED_PREFIXES = [
+  "/admin",
+  "/receptionist",
+  "/staff",
+  "/client",
+] as const
 
-export function getRouteRule(pathname: string): RouteRule | null {
-  const matching = routeRules.filter(
-    (rule) => pathname === rule.prefix || pathname.startsWith(`${rule.prefix}/`)
+export function isGatedPath(pathname: string): boolean {
+  return GATED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   )
-
-  return matching.sort((a, b) => b.prefix.length - a.prefix.length)[0] ?? null
-}
-
-export function isRoleAllowed(role: unknown, roles: UserRole[]): boolean {
-  const normalizedRole = normalizeRole(role)
-
-  return normalizedRole !== null && roles.includes(normalizedRole)
 }

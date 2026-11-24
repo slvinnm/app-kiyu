@@ -1,5 +1,4 @@
 import { ClipboardPlusIcon } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -14,7 +13,7 @@ import { ManualIntakeForm } from "@/components/receptionist/registration/manual-
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getDepartmentOptionsServer } from "@/lib/api/reception-server"
-import { getSession } from "@/lib/auth/session"
+import { requireRole } from "@/lib/auth/guard"
 import { resolveDepartmentId } from "@/lib/reception/department"
 
 import type { Department } from "@/types/reception"
@@ -24,11 +23,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ department_id?: string | string[] }>
 }) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
+  const user = await requireRole(["admin", "receptionist"])
 
   const params = await searchParams
 
@@ -43,7 +38,7 @@ export default async function Page({
 
   const departmentId = resolveDepartmentId(
     params.department_id,
-    session.user.department_id,
+    user.department_id,
     departments
   )
 
@@ -95,7 +90,7 @@ export default async function Page({
         <ManualIntakeForm
           departments={departments}
           defaultDepartmentId={departmentId}
-          actorEmail={session.user.email}
+          actorEmail={user.email}
         />
       )}
     </div>

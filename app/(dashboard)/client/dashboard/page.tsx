@@ -45,11 +45,6 @@ const ACTIVE_VISIT_STATUSES = ["AWAITING_CHECKIN", "WAITING", "IN_PROGRESS"]
 const ACTIVE_TICKET_STATUSES = ["CREATED", "CALLED", "IN_PROGRESS", "ON_HOLD"]
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let current
 

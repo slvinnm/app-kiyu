@@ -26,20 +26,16 @@ import {
   getPatientCountServer,
   getReceptionQueueServer,
 } from "@/lib/api/reception-server"
-import { getSession } from "@/lib/auth/session"
+import { requireRole } from "@/lib/auth/guard"
 import { channelLabel, formatTime, priorityLabel } from "@/lib/reception/format"
 
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
+  const user = await requireRole(["admin", "receptionist"])
 
   // Department comes from the signed-in operator's assignment.
-  const departmentId = session.user.department_id ?? null
+  const departmentId = user.department_id ?? null
 
   let snapshot: ReceptionQueueSnapshot | null = null
   let queueError: string | null = null

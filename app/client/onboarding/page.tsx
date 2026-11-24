@@ -21,14 +21,10 @@ import { PatientProfileForm } from "@/components/client/profile-form"
 import { logout } from "@/lib/actions/auth"
 import { getApiErrorMessage } from "@/lib/api/error"
 import { getCurrentClientServer } from "@/lib/api/clients-server"
-import { getSession } from "@/lib/auth/session"
+import { requireRole } from "@/lib/auth/guard"
 
 export default async function OnboardingPage() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
+  const user = await requireRole(["client"])
 
   let current
 
@@ -36,7 +32,7 @@ export default async function OnboardingPage() {
     current = await getCurrentClientServer()
   } catch (cause) {
     return (
-      <OnboardingShell email={session.user.email}>
+      <OnboardingShell email={user.email}>
         <PatientLoadError
           message={getApiErrorMessage(cause, "Gagal memuat profil pasien.")}
         />

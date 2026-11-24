@@ -11,7 +11,6 @@ import {
   getStationsTableServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 import { numberFilter, parseTableParams } from "@/lib/table-params"
 
 import type { AdminStation } from "@/types/admin"
@@ -31,11 +30,6 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   const params = await searchParams
   const { table, filters } = parseTableParams(params, {

@@ -1,5 +1,4 @@
 import { UserCog } from "lucide-react"
-import { redirect } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -12,7 +11,7 @@ import {
   getUsersServer,
 } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
+import { requireRole } from "@/lib/auth/guard"
 import { parseTableParams } from "@/lib/table-params"
 
 import type { AdminStation, AdminUser } from "@/types/admin"
@@ -25,11 +24,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
+  const user = await requireRole(["admin"])
 
   const params = await searchParams
   const { table, filters } = parseTableParams(params, {
@@ -86,7 +81,7 @@ export default async function Page({
           }}
           departments={departments}
           stations={stations}
-          currentUserId={session.user.id}
+          currentUserId={user.id}
         />
       )}
     </div>

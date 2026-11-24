@@ -15,7 +15,6 @@ import { AuditTable } from "@/components/admin/audit-logs/audit-table"
 
 import { getAuditLogsServer } from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 import { parseTableParams } from "@/lib/table-params"
 
 import type { AuditLog } from "@/types/admin"
@@ -30,11 +29,6 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   const params = await searchParams
   const { table, filters } = parseTableParams(params, {

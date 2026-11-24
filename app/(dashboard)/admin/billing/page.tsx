@@ -13,11 +13,6 @@ import { getSession } from "@/lib/auth/session"
 import type { SubscriptionView } from "@/lib/api/admin-server"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let view: SubscriptionView | null = null
   let error: string | null = null

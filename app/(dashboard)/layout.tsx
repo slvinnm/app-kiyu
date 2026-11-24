@@ -4,24 +4,17 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-import { getSession } from "@/lib/auth/session"
-import { isSessionTokenValid } from "@/lib/auth/verify"
+import { getVerifiedUser } from "@/lib/auth/guard"
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
-
-  // The Proxy already checks this; repeating it here means a revoked token can
-  // never render the dashboard shell even when the Proxy is bypassed (server
-  // actions, cached navigations, or a Proxy matcher miss).
-  if (!(await isSessionTokenValid(session))) {
+  // The API is the only authority on whether this account still exists and
+  // what role it holds. Memoised, so the per-role layouts and pages share this
+  // one `/auth/me` call per navigation.
+  if (!(await getVerifiedUser())) {
     redirect("/login")
   }
 

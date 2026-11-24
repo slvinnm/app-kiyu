@@ -17,11 +17,6 @@ import { getSession } from "@/lib/auth/session"
 import type { Department } from "@/types/reception"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let current
 

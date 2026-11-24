@@ -22,11 +22,6 @@ import type { PublicQueueStation } from "@/types/admin"
 import type { QueueTicketStatus } from "@/types/reception"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let stations: PublicQueueStation[] = []
   let error: string | null = null

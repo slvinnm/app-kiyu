@@ -13,11 +13,6 @@ import { getSession } from "@/lib/auth/session"
 import type { Facility } from "@/types/reception"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let facilities: Facility[] | null = null
   let error: string | null = null

@@ -9,7 +9,6 @@ import { WorkflowDetail } from "@/components/admin/workflows/workflow-detail"
 
 import { getStationOptionsServer, getWorkflowServer } from "@/lib/api/admin-server"
 import { ApiError, getApiErrorMessage } from "@/lib/api/error"
-import { getSession } from "@/lib/auth/session"
 
 import type { AdminStation, Workflow } from "@/types/admin"
 
@@ -18,11 +17,6 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   const { id } = await params
   const workflowId = Number(id)

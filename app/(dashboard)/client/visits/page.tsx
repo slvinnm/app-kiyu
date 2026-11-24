@@ -19,11 +19,6 @@ import { getSession } from "@/lib/auth/session"
 import type { PatientVisit } from "@/types/client"
 
 export default async function Page() {
-  const session = await getSession()
-
-  if (!session?.user?.role) {
-    redirect("/login")
-  }
 
   let current
 
