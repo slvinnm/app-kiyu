@@ -60,8 +60,8 @@ function toVerifiedUser(data: MeResponse["data"]): VerifiedUser | null {
  * from the API, which is the only authority on the current account state.
  *
  * Returns `null` when the API rejects the token (401/403); `undefined` when the
- * API is unreachable, so callers can decide between "fail open" (the gated page
- * will fail on its own requests) and "fail closed".
+ * API is unreachable or returns an unusable payload, so callers can fall back
+ * to the cookie claims instead of signing everyone out on a transient failure.
  */
 export async function fetchVerifiedUser(
   session: Session
@@ -91,7 +91,7 @@ export async function fetchVerifiedUser(
       .json()
       .catch(() => null)) as MeResponse | null
 
-    return toVerifiedUser(payload?.data)
+    return toVerifiedUser(payload?.data) ?? undefined
   } catch {
     return undefined
   }

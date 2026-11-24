@@ -42,23 +42,50 @@ const getVerifiedUser = cache(
  * `/unauthorized` when the role is wrong. Returns the API-verified user so the
  * page can read department/station from the authoritative source.
  *
- * An API outage fails open here (the page's own data requests will surface the
- * problem).
+ * An API outage (`undefined`) fails open on the cookie's snapshot: the page's
+ * own requests will surface the failure, and a transient blip must not bounce
+ * every operator to the login screen.
  */
 export async function requireRole(roles: UserRole[]): Promise<VerifiedUser> {
   const user = await getVerifiedUser()
 
-  if (!user) {
+  if (user === null) {
     redirect("/login")
   }
 
-  const role = normalizeRole(user.role)
+  const verifiedUser = user ?? (await fallbackToCookieUser())
+
+  const role = normalizeRole(verifiedUser.role)
 
   if (!role || !roles.includes(role)) {
     redirect("/unauthorized")
   }
 
-  return user
+  return verifiedUser
+}
+
+/**
+ * Builds a user from the signed cookie claims. Only used when the API is
+ * unreachable; the claims are a login-time snapshot, so they gate the render
+ * but every real data request still goes through the API's own authorization.
+ */
+async function fallbackToCookieUser(): Promise<VerifiedUser> {
+  const session = await getSession()
+
+  if (!session) {
+    redirect("/login")
+  }
+
+  return {
+    id: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+    role: session.user.role,
+    tenant_id: session.user.tenant_id ?? null,
+    facility_id: session.user.facility_id ?? null,
+    department_id: session.user.department_id ?? null,
+    station_id: session.user.station_id ?? null,
+  }
 }
 
 export { getVerifiedUser }

@@ -13,8 +13,9 @@ export default async function DashboardLayout({
 }>) {
   // The API is the only authority on whether this account still exists and
   // what role it holds. Memoised, so the per-role layouts and pages share this
-  // one `/auth/me` call per navigation.
-  if (!(await getVerifiedUser())) {
+  // one `/auth/me` call per navigation. A transient API outage (`undefined`)
+  // renders the shell; the page's own requests surface the failure.
+  if ((await getVerifiedUser()) === null) {
     redirect("/login")
   }
 
