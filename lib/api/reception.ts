@@ -5,11 +5,21 @@ import type {
   ApiResponse,
   Customer,
   CustomerInput,
+  Department,
   Paginated,
   QueueAcquisition,
   QueueTicket,
   ReceptionQueueSnapshot,
 } from "@/types/reception"
+
+/* -------------------------------------------------------------------------- */
+/* Master data                                                                */
+/* -------------------------------------------------------------------------- */
+
+/** Departments selectable for manual intake (client-side, current facility). */
+export function getDepartmentOptions(): Promise<ApiResponse<Department[]>> {
+  return apiFetch("/departments/options")
+}
 
 /* -------------------------------------------------------------------------- */
 /* Reception queue                                                            */

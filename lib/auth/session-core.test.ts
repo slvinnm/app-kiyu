@@ -16,6 +16,7 @@ const {
 
 const session = {
   token: "1|plain-text-token",
+  context: "tenant_workspace" as const,
   user: {
     id: 7,
     name: "Test Operator",
@@ -31,6 +32,7 @@ describe("session cookie", () => {
     const parsed = parseSession(serializeSession(session))
 
     expect(parsed?.token).toBe(session.token)
+    expect(parsed?.context).toBe("tenant_workspace")
     expect(parsed?.user.role).toBe("operator")
     expect(parsed?.user.tenant_id).toBe(3)
   })
@@ -52,6 +54,12 @@ describe("session cookie", () => {
 
   it("rejects a signature that is not the payload's HMAC", () => {
     expect(parseSession("eyJ0b2tlbiI6IngifQ.not-a-signature")).toBeNull()
+  })
+
+  it("rejects a session without a known application context", () => {
+    const { context: _context, ...withoutContext } = session
+
+    expect(parseSession(serializeSession(withoutContext as never))).toBeNull()
   })
 })
 

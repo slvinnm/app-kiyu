@@ -1,41 +1,79 @@
 import { describe, expect, it } from "vitest"
 
-import { isMarketingHost, tenantSlugFromHost } from "./host"
+import {
+  classifyHost,
+  isMarketingHost,
+  isPortalHost,
+  tenantSlugFromHost,
+} from "./host"
 
-describe("tenantSlugFromHost", () => {
-  it("takes the single label of a tenant host", () => {
-    expect(tenantSlugFromHost("acme.kiyu.test")).toBe("acme")
-    expect(tenantSlugFromHost("beta.kiyu.test")).toBe("beta")
-    expect(tenantSlugFromHost("kiyu-demo.kiyu.test")).toBe("kiyu-demo")
+describe("classifyHost", () => {
+  it("classifies the application hosts", () => {
+    expect(classifyHost("kiyu.test")).toEqual({ kind: "marketing" })
+    expect(classifyHost("app.kiyu.test")).toEqual({ kind: "portal" })
+    expect(classifyHost("api.kiyu.test")).toEqual({ kind: "api" })
+  })
+
+  it("extracts a tenant slug from a single-label subdomain", () => {
+    expect(classifyHost("acme.kiyu.test")).toEqual({
+      kind: "tenant",
+      slug: "acme",
+    })
+    expect(classifyHost("kiyu-demo.kiyu.test")).toEqual({
+      kind: "tenant",
+      slug: "kiyu-demo",
+    })
   })
 
   it("ignores ports and case", () => {
-    expect(tenantSlugFromHost("Acme.KIYU.test:80")).toBe("acme")
+    expect(classifyHost("Acme.KIYU.test:80")).toEqual({
+      kind: "tenant",
+      slug: "acme",
+    })
+    expect(classifyHost("APP.KIYU.TEST")).toEqual({ kind: "portal" })
   })
 
-  it("treats application hosts as non-tenant", () => {
-    expect(tenantSlugFromHost("kiyu.test")).toBeNull()
+  it("reserves infrastructure labels so they are never tenants", () => {
+    for (const label of [
+      "www",
+      "admin",
+      "support",
+      "docs",
+      "status",
+      "static",
+      "assets",
+    ]) {
+      expect(classifyHost(`${label}.kiyu.test`)).toEqual({ kind: "unknown" })
+    }
+  })
+
+  it("rejects foreign, nested and malformed hosts", () => {
+    expect(classifyHost("acme.kiyu.test.evil.com")).toEqual({ kind: "unknown" })
+    expect(classifyHost("acme.example.test")).toEqual({ kind: "unknown" })
+    expect(classifyHost("a.b.kiyu.test")).toEqual({ kind: "unknown" })
+    expect(classifyHost("acme_1.kiyu.test")).toEqual({ kind: "unknown" })
+    expect(classifyHost("localhost:3000")).toEqual({ kind: "unknown" })
+    expect(classifyHost(null)).toEqual({ kind: "unknown" })
+    expect(classifyHost("")).toEqual({ kind: "unknown" })
+  })
+})
+
+describe("tenantSlugFromHost", () => {
+  it("returns the slug only for a tenant host", () => {
+    expect(tenantSlugFromHost("acme.kiyu.test")).toBe("acme")
     expect(tenantSlugFromHost("app.kiyu.test")).toBeNull()
-    expect(tenantSlugFromHost("api.kiyu.test")).toBeNull()
-    expect(tenantSlugFromHost("www.kiyu.test")).toBeNull()
-    expect(tenantSlugFromHost("localhost:3000")).toBeNull()
+    expect(tenantSlugFromHost("kiyu.test")).toBeNull()
     expect(tenantSlugFromHost(null)).toBeNull()
   })
-
-  it("rejects foreign or nested hosts", () => {
-    expect(tenantSlugFromHost("acme.kiyu.test.evil.com")).toBeNull()
-    expect(tenantSlugFromHost("acme.example.test")).toBeNull()
-    expect(tenantSlugFromHost("a.b.kiyu.test")).toBeNull()
-    expect(tenantSlugFromHost("acme_1.kiyu.test")).toBeNull()
-  })
 })
 
-describe("isMarketingHost", () => {
-  it("is true only for the bare host", () => {
+describe("host predicates", () => {
+  it("separates marketing and portal hosts", () => {
     expect(isMarketingHost("kiyu.test")).toBe(true)
-    expect(isMarketingHost("kiyu.test:80")).toBe(true)
     expect(isMarketingHost("app.kiyu.test")).toBe(false)
-    expect(isMarketingHost("acme.kiyu.test")).toBe(false)
-    expect(isMarketingHost("localhost:3000")).toBe(false)
+    expect(isPortalHost("app.kiyu.test")).toBe(true)
+    expect(isPortalHost("acme.kiyu.test")).toBe(false)
+    expect(isPortalHost("kiyu.test")).toBe(false)
   })
 })
+

@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest"
 
-import { isGatedPath } from "@/lib/auth/route-access"
+import { isGatedPath, routeContextOf } from "@/lib/auth/route-access"
 
 describe("isGatedPath", () => {
-  it("gates the workspace roots and their children", () => {
+  it("gates the portal and workspace roots and their children", () => {
     for (const path of [
-      "/admin",
-      "/admin/users",
-      "/receptionist",
-      "/receptionist/queue",
+      "/platform",
+      "/platform/tenants",
+      "/portal",
+      "/portal/dashboard",
+      "/facility",
+      "/facility/users",
+      "/operator",
+      "/operator/queue",
       "/staff",
       "/staff/dashboard",
       "/client",
@@ -28,13 +32,23 @@ describe("isGatedPath", () => {
       "/display/MAIN",
       "/track/abc123",
       "/unauthorized",
+      "/marketing",
     ]) {
       expect(isGatedPath(path), path).toBe(false)
     }
   })
 
+  it("classifies the application context of a path", () => {
+    expect(routeContextOf("/platform/dashboard")).toBe("portal")
+    expect(routeContextOf("/portal/facilities")).toBe("portal")
+    expect(routeContextOf("/facility/dashboard")).toBe("workspace")
+    expect(routeContextOf("/staff/queue")).toBe("workspace")
+    expect(routeContextOf("/login")).toBeNull()
+  })
+
   it("matches on a segment boundary, not a prefix", () => {
-    expect(isGatedPath("/administrator")).toBe(false)
+    expect(isGatedPath("/platformx")).toBe(false)
+    expect(isGatedPath("/portals")).toBe(false)
     expect(isGatedPath("/clients")).toBe(false)
     expect(isGatedPath("/staffing")).toBe(false)
   })

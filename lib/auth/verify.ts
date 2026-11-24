@@ -9,6 +9,14 @@ export type VerifiedUser = {
   email: string
   role: string
   tenant_id: number | null
+  /** Public tenant context; present for tenant users, `null` for platform. */
+  tenant: {
+    id: number
+    name: string
+    slug: string
+    status: string | null
+    timezone: string | null
+  } | null
   /** Every facility the account may act at. The API sends an array; there is
    * no single `facility_id` on the payload. */
   facility_ids: number[]
@@ -23,8 +31,29 @@ type MeResponse = {
     email?: unknown
     role?: unknown
     tenant_id?: unknown
+    tenant?: unknown
     facility_ids?: unknown
     station_id?: unknown
+  }
+}
+
+function toTenant(value: unknown): VerifiedUser["tenant"] {
+  if (typeof value !== "object" || value === null) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  if (typeof record.id !== "number" || typeof record.slug !== "string") {
+    return null
+  }
+
+  return {
+    id: record.id,
+    name: typeof record.name === "string" ? record.name : "",
+    slug: record.slug,
+    status: typeof record.status === "string" ? record.status : null,
+    timezone: typeof record.timezone === "string" ? record.timezone : null,
   }
 }
 
@@ -52,6 +81,7 @@ function toVerifiedUser(data: MeResponse["data"]): VerifiedUser | null {
     email: typeof data.email === "string" ? data.email : "",
     role: data.role,
     tenant_id: optionalNumber(data.tenant_id),
+    tenant: toTenant(data.tenant),
     facility_ids: facilityIds,
     station_id: optionalNumber(data.station_id),
   }

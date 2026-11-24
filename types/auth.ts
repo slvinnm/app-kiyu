@@ -50,7 +50,7 @@ export const CAPABILITIES = {
     "operator",
     "staff",
   ],
-  "transfers.create": ["tenant_admin", "facility_admin", "staff"],
+  "transfers.create": ["staff"],
   "reports.summary": ["tenant_admin", "operator"],
   "reports.export": ["tenant_admin"],
   "portal.use": ["client"],
@@ -85,12 +85,22 @@ export function normalizeRole(role: unknown): UserRole | null {
     : null
 }
 
+/** Public tenant context attached to an authenticated user (PRD §7). */
+export type AuthTenant = {
+  id: number
+  name: string
+  slug: string
+  status: string | null
+  timezone: string | null
+}
+
 export type AuthUser = {
   id: number
   name: string
   email: string
   role: string
   tenant_id?: number | null
+  tenant?: AuthTenant | null
   facility_ids?: number[]
   station_id?: number | null
   profile?: unknown
@@ -100,6 +110,7 @@ export type AuthResponse = {
   message: string
   data: {
     token: string
+    context?: string | null
     user: AuthUser
   }
 }
@@ -111,6 +122,7 @@ export function toSessionUser(user: AuthUser): AuthUser {
     email: user.email,
     role: user.role,
     tenant_id: user.tenant_id ?? null,
+    tenant: user.tenant ?? null,
     facility_ids: Array.isArray(user.facility_ids) ? user.facility_ids : [],
     station_id: user.station_id ?? null,
   }

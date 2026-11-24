@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { ASSIGNABLE_ROLE_OPTIONS, staffRoleLabel } from "@/lib/admin/roles"
-import { getRoleRedirect } from "@/lib/auth/redirect"
+import { getRoleRedirect, roleApplication } from "@/lib/auth/redirect"
 import {
   CAPABILITIES,
   USER_ROLES,
@@ -49,16 +49,26 @@ describe("role normalization", () => {
 })
 
 describe("role landing pages", () => {
-  it("routes each tenant role to its workspace", () => {
-    expect(getRoleRedirect("tenant_admin")).toBe("/admin/dashboard")
-    expect(getRoleRedirect("facility_admin")).toBe("/admin/dashboard")
-    expect(getRoleRedirect("operator")).toBe("/receptionist/dashboard")
+  it("routes each role to its application dashboard", () => {
+    expect(getRoleRedirect("platform_admin")).toBe("/platform/dashboard")
+    expect(getRoleRedirect("tenant_admin")).toBe("/portal/dashboard")
+    expect(getRoleRedirect("facility_admin")).toBe("/facility/dashboard")
+    expect(getRoleRedirect("operator")).toBe("/operator/dashboard")
     expect(getRoleRedirect("staff")).toBe("/staff/dashboard")
     expect(getRoleRedirect("client")).toBe("/client/dashboard")
   })
 
-  it("sends the platform role and unknown roles to access denied", () => {
-    expect(getRoleRedirect("platform_admin")).toBe("/unauthorized")
+  it("maps a role to the application it may use", () => {
+    expect(roleApplication("platform_admin")).toBe("portal")
+    expect(roleApplication("tenant_admin")).toBe("portal")
+    expect(roleApplication("facility_admin")).toBe("workspace")
+    expect(roleApplication("operator")).toBe("workspace")
+    expect(roleApplication("staff")).toBe("workspace")
+    expect(roleApplication("client")).toBe("workspace")
+    expect(roleApplication(null)).toBeNull()
+  })
+
+  it("sends unknown roles to access denied", () => {
     expect(getRoleRedirect(null)).toBe("/unauthorized")
     expect(getRoleRedirect("admin")).toBe("/unauthorized")
   })
@@ -81,6 +91,13 @@ describe("capability matrix", () => {
   it("allows only the owner to create facilities", () => {
     expect(hasCapability("tenant_admin", "facilities.create")).toBe(true)
     expect(hasCapability("facility_admin", "facilities.create")).toBe(false)
+  })
+
+  it("grants service transfer to staff only", () => {
+    expect(hasCapability("staff", "transfers.create")).toBe(true)
+    expect(hasCapability("operator", "transfers.create")).toBe(false)
+    expect(hasCapability("tenant_admin", "transfers.create")).toBe(false)
+    expect(hasCapability("facility_admin", "transfers.create")).toBe(false)
   })
 
   it("never grants a capability to an unknown role", () => {
@@ -119,6 +136,6 @@ describe("role union typing", () => {
     const role: UserRole = "facility_admin"
 
     // Compile-time proof that the union is exhaustive for the redirect table.
-    expect(getRoleRedirect(role)).toBe("/admin/dashboard")
+    expect(getRoleRedirect(role)).toBe("/facility/dashboard")
   })
 })

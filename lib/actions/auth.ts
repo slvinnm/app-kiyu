@@ -5,10 +5,11 @@ import { headers } from "next/headers"
 import { z } from "zod"
 
 import { clearSession, createSession, getSession } from "@/lib/auth/session"
-import { resolveTenantSlug } from "@/lib/tenant/host"
+import { classifyHost, requestHostname } from "@/lib/tenant/host"
 
 import { toSessionUser } from "@/types/auth"
 
+import type { Session } from "@/lib/auth/session-core"
 import type { AuthResponse, AuthUser } from "@/types/auth"
 
 const API_BASE_URL = process.env.API_BASE_URL
@@ -31,11 +32,21 @@ const AUTH_BASE_URL = API_BASE_URL.replace(/\/$/, "")
  */
 async function tenantHeaders(): Promise<Record<string, string>> {
   const headerList = await headers()
-  const host =
-    headerList.get("x-forwarded-host") ?? headerList.get("host") ?? null
-  const slug = resolveTenantSlug(host)
+  const host = classifyHost(requestHostname(headerList))
+  const slug = host.kind === "tenant" ? host.slug : null
 
   return slug ? { "X-Tenant-Slug": slug } : {}
+}
+
+/**
+ * The application context this login request is served for, derived from the
+ * hostname. The API refuses a role that does not belong to it (PRD §5.1, §6.2).
+ */
+async function currentSessionContext(): Promise<Session["context"]> {
+  const headerList = await headers()
+  const host = classifyHost(requestHostname(headerList))
+
+  return host.kind === "portal" ? "platform_portal" : "tenant_workspace"
 }
 
 export type AuthActionState =
@@ -110,6 +121,8 @@ export async function authenticate(
     )
   }
 
+  const context = await currentSessionContext()
+
   let credentials: Credentials | null = null
 
   try {
@@ -119,7 +132,7 @@ export async function authenticate(
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(parsed.data),
+      body: JSON.stringify({ ...parsed.data, context }),
       cache: "no-store",
     })
 
@@ -140,7 +153,11 @@ export async function authenticate(
     return errorState("Terjadi kesalahan saat login.")
   }
 
-  await createSession(credentials.token, toSessionUser(credentials.user))
+  await createSession(
+    credentials.token,
+    toSessionUser(credentials.user),
+    context
+  )
 
   redirect(safeCallback(callbackUrl))
 }
@@ -192,7 +209,11 @@ export async function register(
   }
 
   if (credentials) {
-    await createSession(credentials.token, toSessionUser(credentials.user))
+    await createSession(
+      credentials.token,
+      toSessionUser(credentials.user),
+      "tenant_workspace"
+    )
     redirect("/redirect")
   }
 

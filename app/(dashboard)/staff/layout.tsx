@@ -1,9 +1,18 @@
-import { requireRole } from "@/lib/auth/guard"
+import { requireRole, requireTenantHost } from "@/lib/auth/guard"
 
+/**
+ * Staff workspace guard (`/staff`, PRD §8.5).
+ *
+ * Staff only. Service Transfer lives here; manual registration and customer
+ * management do not.
+ */
 export default async function StaffLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  await requireRole(["tenant_admin", "facility_admin", "operator", "staff"])
+  // A workspace page must be served on a real tenant subdomain (PRD §7).
+  await requireTenantHost()
+
+  await requireRole(["staff"])
 
   return children
 }

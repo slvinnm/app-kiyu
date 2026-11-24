@@ -233,14 +233,14 @@ export async function getQueueMonitorServer(): Promise<PublicQueueStation[]> {
 /* -------------------------------------------------------------------------- */
 
 export type ReportSummary = {
-  visits: {
+  queue_sessions: {
     period: { from: string; to: string }
-    total_visits: number
-    completed_visits: number
+    total_sessions: number
+    completed_sessions: number
     completion_rate: number
     by_status: Record<string, number>
     by_channel: Record<string, number>
-    average_wait_minutes: number
+    average_wait_minutes: number | null
   }
   queue: {
     period: { from: string; to: string }

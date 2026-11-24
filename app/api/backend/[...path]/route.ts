@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { FACILITY_COOKIE_NAME } from "@/lib/facility/context"
 import { resolveFacilityId } from "@/lib/facility/selection"
 import { getVerifiedUser } from "@/lib/auth/guard"
-import { SESSION_COOKIE_NAME } from "@/lib/auth/session-core"
+import { SESSION_COOKIE_NAME, readSessionFromRequest } from "@/lib/auth/session-core"
 import { isSameOrigin, isStateChangingMethod } from "@/lib/auth/origin"
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
 
@@ -20,6 +20,33 @@ const ALLOWED_RESPONSE_HEADERS = [
   "content-disposition",
   "cache-control",
 ]
+
+/** Paths that already carry their application prefix (or are cross-cutting). */
+const PREFIXED_ROOTS = ["platform/", "portal/", "public/", "auth/"]
+
+/**
+ * Rewrite the path for the current session's application context.
+ *
+ * TenantAdmin sessions live in the Platform Portal (`/portal/*`); the pages
+ * call the same tenant-shaped paths as the workspace, so prefix them. Other
+ * contexts pass through unchanged.
+ */
+async function contextualPath(
+  path: string,
+  request: NextRequest
+): Promise<string> {
+  if (PREFIXED_ROOTS.some((root) => path.startsWith(root))) {
+    return path
+  }
+
+  const session = readSessionFromRequest(request)
+
+  if (session?.context === "platform_portal") {
+    return `portal/${path}`
+  }
+
+  return path
+}
 
 async function proxy(request: NextRequest) {
   if (isStateChangingMethod(request) && !isSameOrigin(request)) {
@@ -48,12 +75,18 @@ async function proxy(request: NextRequest) {
     )
   }
 
-  const path = request.nextUrl.pathname
+  const rawPath = request.nextUrl.pathname
     .replace(/^\/api\/backend\/?/, "")
     .split("/")
     .filter(Boolean)
     .map((segment) => encodeURIComponent(segment))
     .join("/")
+
+  // TenantAdmin signs in to the Platform Portal; its endpoints live under
+  // `/portal/*`. Browser components reuse the same client calls as the tenant
+  // workspace, so the proxy rewrites them for that context. Everything else is
+  // forwarded verbatim.
+  const path = await contextualPath(rawPath, request)
 
   const targetUrl = `${API_BASE_URL.replace(/\/$/, "")}/${path}${request.nextUrl.search}`
 

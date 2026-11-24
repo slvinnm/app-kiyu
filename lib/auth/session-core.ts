@@ -34,8 +34,12 @@ if (AUTH_SECRET.length === 0) {
   throw new Error("AUTH_SECRET is not configured.")
 }
 
+/** Application context a session was issued for (PRD §6.1). */
+export type SessionContext = "platform_portal" | "tenant_workspace"
+
 export type Session = {
   token: string
+  context: SessionContext
   user: AuthUser
 }
 
@@ -102,6 +106,15 @@ export function parseSession(value: string | null | undefined): Session | null {
       return null
     }
 
+    const context =
+      data.context === "platform_portal" || data.context === "tenant_workspace"
+        ? data.context
+        : null
+
+    if (context === null) {
+      return null
+    }
+
     if (!isRecord(data.user) || typeof data.user.role !== "string") {
       return null
     }
@@ -112,6 +125,7 @@ export function parseSession(value: string | null | undefined): Session | null {
 
     return {
       token: data.token,
+      context,
       user: data.user as AuthUser,
     }
   } catch {

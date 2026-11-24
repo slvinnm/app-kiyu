@@ -33,17 +33,22 @@ const isSecureCookie = process.env.NODE_ENV === "production"
  */
 export async function createSession(
   token: string,
-  user: AuthUser
+  user: AuthUser,
+  context: Session["context"]
 ): Promise<void> {
   const cookieStore = await cookies()
 
-  cookieStore.set(SESSION_COOKIE_NAME, serializeSession({ token, user }), {
-    httpOnly: true,
-    secure: isSecureCookie,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  })
+  cookieStore.set(
+    SESSION_COOKIE_NAME,
+    serializeSession({ token, context, user }),
+    {
+      httpOnly: true,
+      secure: isSecureCookie,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE_SECONDS,
+    }
+  )
 }
 
 export async function clearSession(): Promise<void> {

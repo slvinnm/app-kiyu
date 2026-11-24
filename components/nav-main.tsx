@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import type { NavItem } from "@/lib/navigation"
+import type { NavItem } from "@/lib/navigation/types"
 
 import {
   Collapsible,
