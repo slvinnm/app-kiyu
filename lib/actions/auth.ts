@@ -1,9 +1,11 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { z } from "zod"
 
 import { clearSession, createSession, getSession } from "@/lib/auth/session"
+import { resolveTenantSlug } from "@/lib/tenant/host"
 
 import { toSessionUser } from "@/types/auth"
 
@@ -21,15 +23,19 @@ const AUTH_BASE_URL = API_BASE_URL.replace(/\/$/, "")
  * Tenant locator for public endpoints.
  *
  * `POST /auth/register` is tenant-scoped: the backend resolves the tenant from
- * `X-Tenant-Slug`, the host's first label, or a `{tenant}` route parameter. This
- * app is served from one development host, so the slug is configuration, not
- * something the visitor types (PRD §2.4: a slug is a context selector and never
- * proof of authorization).
+ * `X-Tenant-Slug`, the host's first label, or a `{tenant}` route parameter.
+ * The slug comes from the request hostname (`acme.kiyu.test`), falling back to
+ * `NEXT_PUBLIC_TENANT_SLUG` when the app is reached on a non-tenant host, so one
+ * running server serves every tenant. A slug is a context selector and never
+ * proof of authorization (PRD §2.4).
  */
-const TENANT_SLUG = process.env.NEXT_PUBLIC_TENANT_SLUG ?? ""
+async function tenantHeaders(): Promise<Record<string, string>> {
+  const headerList = await headers()
+  const host =
+    headerList.get("x-forwarded-host") ?? headerList.get("host") ?? null
+  const slug = resolveTenantSlug(host)
 
-function tenantHeaders(): Record<string, string> {
-  return TENANT_SLUG ? { "X-Tenant-Slug": TENANT_SLUG } : {}
+  return slug ? { "X-Tenant-Slug": slug } : {}
 }
 
 export type AuthActionState =
@@ -164,7 +170,7 @@ export async function register(
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        ...tenantHeaders(),
+        ...(await tenantHeaders()),
       },
       body: JSON.stringify(parsed.data),
       cache: "no-store",

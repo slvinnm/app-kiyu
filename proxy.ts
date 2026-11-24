@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server"
 
 import { SESSION_COOKIE_NAME, readSessionFromRequest } from "@/lib/auth/session-core"
 import { isGatedPath } from "@/lib/auth/route-access"
+import { isMarketingHost } from "@/lib/tenant/host"
 
 /**
  * Clears the session cookie and sends the browser to the login page.
@@ -32,6 +33,19 @@ function reject(request: NextRequest, pathname: string, search: string) {
  */
 export default function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+
+  // The bare host is the marketing site; the rest of the app lives on the
+  // portal and tenant hosts. Rewriting (not redirecting) keeps `kiyu.test/` a
+  // single URL while rendering `app/marketing`. Every other path keeps working
+  // as before, so `/login` is still reachable there.
+  if (
+    pathname === "/" &&
+    isMarketingHost(
+      request.headers.get("x-forwarded-host") ?? request.headers.get("host")
+    )
+  ) {
+    return NextResponse.rewrite(new URL("/marketing", request.url))
+  }
 
   // Signed HttpOnly session cookie; tampered or absent cookies are rejected.
   const session = readSessionFromRequest(request)

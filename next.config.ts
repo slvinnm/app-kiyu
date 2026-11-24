@@ -28,7 +28,11 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["app-kiyu.test"],
+  // The dev server rejects asset and endpoint requests whose Origin hostname it
+  // does not recognise. nginx forwards the public host, so every frontend
+  // hostname has to be listed: the bare site, the portal, and tenant subdomains.
+  // `*.kiyu.test` matches one label only, hence the separate bare entry.
+  allowedDevOrigins: ["kiyu.test", "*.kiyu.test", "app-kiyu.test"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }]
   },
