@@ -27,7 +27,7 @@ export function ProfileRequired() {
         </div>
 
         <Link
-          href="/patient/profile"
+          href="/client/profile"
           className={buttonVariants({ size: "lg" })}
         >
           Lengkapi Profil

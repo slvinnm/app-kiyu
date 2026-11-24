@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator"
 
 import { channelLabel, visitStatusLabel } from "@/lib/reception/format"
 
-import type { Department, Visit } from "@/types/reception"
+import type { Department } from "@/types/reception"
 import type { OnlineBookingResult } from "@/types/client"
 
 export function OnlineBookingSuccess({
@@ -122,7 +122,7 @@ export function OnlineBookingSuccess({
           </Button>
 
           <Link
-            href="/patient/visits"
+            href="/client/visits"
             className={buttonVariants({ size: "lg" })}
           >
             Lihat Kunjungan

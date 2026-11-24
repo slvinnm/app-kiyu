@@ -51,7 +51,7 @@ export default async function OnboardingPage() {
 
   return (
     <OnboardingShell email={current.user.email}>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_=420px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         <Card>
           <CardHeader>
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">

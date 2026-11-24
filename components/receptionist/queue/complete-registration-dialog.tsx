@@ -268,7 +268,7 @@ export function CompleteRegistrationDialog({
       if (type === "BUSINESS_CONFLICT") {
         if (/nik/i.test(message)) {
           setMode("existing")
-          setSearch(newPatient.nik ?? ''.trim())
+          setSearch((newPatient.nik ?? "").trim())
           setFieldErrors({ nik: message })
           setSubmitError(message)
           toast.error(message)

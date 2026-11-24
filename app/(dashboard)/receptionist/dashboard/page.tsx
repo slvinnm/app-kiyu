@@ -303,7 +303,7 @@ export default async function Page() {
               </Link>
 
               <Link
-                href="/receptionist/patients"
+                href="/receptionist/clients"
                 className={buttonVariants({ variant: "outline" })}
               >
                 <SearchIcon />

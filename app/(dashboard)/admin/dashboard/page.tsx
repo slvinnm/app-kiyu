@@ -307,7 +307,7 @@ export default async function Page() {
           </Link>
 
           <Link
-            href="/admin/patients"
+            href="/admin/clients"
             className={buttonVariants({ variant: "outline" })}
           >
             <Users />
