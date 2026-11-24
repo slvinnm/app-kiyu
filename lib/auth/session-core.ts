@@ -10,7 +10,18 @@ import type { AuthUser } from "@/types/auth"
  * `@/lib/auth/session` for reading/writing the cookie inside the app.
  */
 
-export const SESSION_COOKIE_NAME = "kiyu_session"
+/**
+ * Session cookie name.
+ *
+ * In production the `__Host-` prefix is used: browsers then refuse any cookie
+ * with that name that also sets `Domain`, was set over plain HTTP, or uses a
+ * non-root path. That blocks a sibling subdomain from tossing a `Domain=.kiyu.test`
+ * cookie ahead of ours to pin the victim into an attacker-controlled session.
+ *
+ * The prefix requires `Secure`, so local HTTP development keeps the plain name.
+ */
+export const SESSION_COOKIE_NAME =
+  process.env.NODE_ENV === "production" ? "__Host-kiyu_session" : "kiyu_session"
 
 /** Must match the Laravel Sanctum token expiration (8 hours). */
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8
@@ -110,6 +121,11 @@ export function parseSession(value: string | null | undefined): Session | null {
 
 /**
  * Reads a session from a raw `Cookie` header value.
+ *
+ * Rejects the request outright when more than one cookie carries the session
+ * name. Two same-named cookies mean someone upstream (typically a sibling
+ * subdomain) is trying to shadow ours; picking either one is unsafe, and
+ * "first wins" is exactly the ambiguity that enables cookie tossing.
  */
 export function readSessionFromCookieHeader(
   cookieHeader: string | null | undefined
@@ -117,6 +133,8 @@ export function readSessionFromCookieHeader(
   if (!cookieHeader) {
     return null
   }
+
+  let rawValue: string | null = null
 
   for (const part of cookieHeader.split(";")) {
     const trimmed = part.trim()
@@ -126,22 +144,26 @@ export function readSessionFromCookieHeader(
       continue
     }
 
-    const name = trimmed.slice(0, separator)
-
-    if (name !== SESSION_COOKIE_NAME) {
+    if (trimmed.slice(0, separator) !== SESSION_COOKIE_NAME) {
       continue
     }
 
-    const rawValue = trimmed.slice(separator + 1)
-
-    try {
-      return parseSession(decodeURIComponent(rawValue))
-    } catch {
+    if (rawValue !== null) {
       return null
     }
+
+    rawValue = trimmed.slice(separator + 1)
   }
 
-  return null
+  if (rawValue === null) {
+    return null
+  }
+
+  try {
+    return parseSession(decodeURIComponent(rawValue))
+  } catch {
+    return null
+  }
 }
 
 /**
