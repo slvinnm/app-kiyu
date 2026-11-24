@@ -30,7 +30,7 @@ export async function AppSidebar({
   const user = {
     name: session.user.name ?? "",
     email: session.user.email ?? "",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   }
 
   return (
@@ -43,7 +43,7 @@ export async function AppSidebar({
               render={<a href="#" />}
             >
               <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">Acme Inc.</span>
+              <span className="text-base font-semibold">KIYU</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

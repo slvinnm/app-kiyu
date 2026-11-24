@@ -120,22 +120,17 @@ export function SignupForm({
 
               <Field>
                 <Button type="submit" disabled={isPending}>
-                  {isPending ? "Creating Account..." : "Create Account"}
+                  {isPending ? "Membuat akun..." : "Buat Akun"}
                 </Button>
 
                 <FieldDescription className="text-center">
-                  Already have an account? <Link href="/login">Sign in</Link>
+                  Sudah punya akun? <Link href="/login">Masuk</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
         </CardContent>
       </Card>
-
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </FieldDescription>
     </div>
   )
 }
