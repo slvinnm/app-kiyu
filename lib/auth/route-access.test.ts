@@ -46,6 +46,14 @@ describe("isGatedPath", () => {
     expect(routeContextOf("/login")).toBeNull()
   })
 
+  it("marks kiosk, display and tracking as tenant-public (not gated by a session)", () => {
+    for (const path of ["/kiosk", "/display", "/display/MAIN", "/track/abc"]) {
+      expect(routeContextOf(path), path).toBe("tenant-public")
+      // They require a tenant host, but are not behind a login cookie.
+      expect(isGatedPath(path), path).toBe(false)
+    }
+  })
+
   it("matches on a segment boundary, not a prefix", () => {
     expect(isGatedPath("/platformx")).toBe(false)
     expect(isGatedPath("/portals")).toBe(false)

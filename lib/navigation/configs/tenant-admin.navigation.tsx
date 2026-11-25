@@ -56,7 +56,12 @@ export const tenantAdminNavigation: NavigationConfig = {
       ],
     },
     { title: "Pelanggan", url: "/portal/customers", icon: <Users /> },
-    { title: "Laporan", url: "/portal/reports", icon: <FileText /> },
+    {
+      title: "Laporan",
+      url: "/portal/reports",
+      icon: <FileText />,
+      feature: "basic_reports",
+    },
     { title: "Audit Log", url: "/portal/audit-logs", icon: <ScrollText /> },
     {
       title: "Billing",

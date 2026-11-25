@@ -15,7 +15,14 @@ const WORKSPACE_PREFIXES = [
   "/client",
 ] as const
 
-export type RouteContext = "portal" | "workspace" | null
+export type RouteContext = "portal" | "workspace" | "tenant-public" | null
+
+/**
+ * Public device/tracking surfaces. They carry no session, but they are
+ * tenant-scoped: a kiosk, display, or tracking page must be served on a tenant
+ * subdomain (`acme.kiyu.test`), never on the central portal or marketing host.
+ */
+const TENANT_PUBLIC_PREFIXES = ["/kiosk", "/display", "/track"] as const
 
 /** Application context a pathname belongs to, or `null` for a public path. */
 export function routeContextOf(pathname: string): RouteContext {
@@ -32,10 +39,16 @@ export function routeContextOf(pathname: string): RouteContext {
     return "workspace"
   }
 
+  if (matches(TENANT_PUBLIC_PREFIXES)) {
+    return "tenant-public"
+  }
+
   return null
 }
 
 /** True when the pathname is inside a protected application area. */
 export function isGatedPath(pathname: string): boolean {
-  return routeContextOf(pathname) !== null
+  const context = routeContextOf(pathname)
+
+  return context === "portal" || context === "workspace"
 }

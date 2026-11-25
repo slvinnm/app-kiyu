@@ -40,6 +40,48 @@ export function getNavigation(role: unknown): NavItem[] {
   return getNavigationConfig(role)?.items ?? []
 }
 
+/** Entitlements the tenant's subscription grants (toggles → bool, limits → int). */
+export type Entitlements = Record<string, boolean | number>
+
+/**
+ * Hide entries whose required subscription feature the tenant does not have.
+ *
+ * Visibility only: every backend endpoint still enforces the same entitlement,
+ * so hiding a menu is never the authorization (PRD §9). Missing entitlement
+ * data (`null`) is treated as "unknown" and leaves the entry visible — a
+ * transient API failure must not silently strip a role's whole menu.
+ */
+export function filterNavigationByEntitlements(
+  items: NavItem[],
+  entitlements: Entitlements | null
+): NavItem[] {
+  if (entitlements === null) {
+    return items
+  }
+
+  const allowed = (item: NavItem): boolean => {
+    if (item.feature === undefined) {
+      return true
+    }
+
+    const value = entitlements[item.feature]
+
+    return typeof value === "boolean" ? value : Boolean(value)
+  }
+
+  return items
+    .filter(allowed)
+    .map((item) =>
+      item.items
+        ? {
+            ...item,
+            items: filterNavigationByEntitlements(item.items, entitlements),
+          }
+        : item
+    )
+    .filter((item) => item.items === undefined || item.items.length > 0)
+}
+
 /** Which application context a role belongs to, for host/route guards. */
 export function applicationOf(role: unknown): "portal" | "workspace" | null {
   const normalized = normalizeRole(role)

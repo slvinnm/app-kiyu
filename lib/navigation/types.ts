@@ -14,6 +14,11 @@ export type NavItem = {
   items?: NavItem[]
   /** Hidden unless the account holds the capability (rendering only). */
   capability?: string
+  /**
+   * Subscription entitlement required to show this entry. Visibility only —
+   * the matching API endpoint enforces the entitlement independently.
+   */
+  feature?: string
 }
 
 export type BreadcrumbItem = {

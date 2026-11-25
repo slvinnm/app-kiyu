@@ -1,7 +1,8 @@
 import { getVerifiedUser } from "@/lib/auth/guard"
 import { getSession } from "@/lib/auth/session"
 import { getFacilityContext } from "@/lib/facility/context"
-import { getNavigation } from "@/lib/navigation"
+import { filterNavigationByEntitlements, getNavigation } from "@/lib/navigation"
+import { getEntitlementsServer } from "@/lib/api/admin-server"
 import { normalizeRole } from "@/types/auth"
 
 import { FacilitySwitcher } from "@/components/facility-switcher"
@@ -37,8 +38,16 @@ export async function AppSidebar({
   }
 
   const user = await getVerifiedUser()
-  const items = getNavigation(role)
   const facilityContext = await getFacilityContext()
+
+  // Hide menus the tenant's subscription does not include. Only tenant roles
+  // have plan entitlements; the platform console is never plan-gated.
+  const portalHasPlan = role !== "platform_admin"
+  const entitlements = portalHasPlan ? await getEntitlementsServer() : null
+  const items = filterNavigationByEntitlements(
+    getNavigation(role),
+    entitlements
+  )
 
   // Portal roles are tenant/organization wide → show the tenant name.
   const isPortalRole = role === "platform_admin" || role === "tenant_admin"

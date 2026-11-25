@@ -5,7 +5,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AdminPageHeader } from "@/components/facility/admin-page-header"
 import { ReportSummaryView } from "@/components/facility/reports/report-summary"
 
-import { getReportSummaryServer } from "@/lib/api/admin-server"
+import {
+  getEntitlementsServer,
+  getReportSummaryServer,
+} from "@/lib/api/admin-server"
 import { getApiErrorMessage } from "@/lib/api/error"
 
 import type { ReportSummary } from "@/lib/api/admin-server"
@@ -20,10 +23,14 @@ export default async function Page({
   const to = typeof params.to === "string" ? params.to : undefined
 
   let summary: ReportSummary | null = null
+  let entitlements: Record<string, boolean | number> | null = null
   let error: string | null = null
 
   try {
-    summary = await getReportSummaryServer({ from, to })
+    ;[summary, entitlements] = await Promise.all([
+      getReportSummaryServer({ from, to }),
+      getEntitlementsServer(),
+    ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat laporan.")
   }
@@ -45,7 +52,10 @@ export default async function Page({
           </AlertDescription>
         </Alert>
       ) : (
-        <ReportSummaryView summary={summary} />
+        <ReportSummaryView
+          summary={summary}
+          canExport={entitlements?.advanced_reports === true}
+        />
       )}
     </div>
   )

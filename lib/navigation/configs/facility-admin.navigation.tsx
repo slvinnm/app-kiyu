@@ -40,7 +40,12 @@ export const facilityAdminNavigation: NavigationConfig = {
         },
       ],
     },
-    { title: "Laporan", url: "/facility/reports", icon: <FileText /> },
+    {
+      title: "Laporan",
+      url: "/facility/reports",
+      icon: <FileText />,
+      feature: "basic_reports",
+    },
     { title: "Audit Log", url: "/facility/audit-logs", icon: <ScrollText /> },
   ],
 }

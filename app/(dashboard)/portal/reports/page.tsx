@@ -5,14 +5,21 @@ import { ReportSummaryView } from "@/components/facility/reports/report-summary"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { getApiErrorMessage } from "@/lib/api/error"
-import { getReportSummaryServer } from "@/lib/api/admin-server"
+import {
+  getEntitlementsServer,
+  getReportSummaryServer,
+} from "@/lib/api/admin-server"
 
 export default async function Page() {
   let summary = null
+  let entitlements: Record<string, boolean | number> | null = null
   let error: string | null = null
 
   try {
-    summary = await getReportSummaryServer({})
+    ;[summary, entitlements] = await Promise.all([
+      getReportSummaryServer({}),
+      getEntitlementsServer(),
+    ])
   } catch (cause) {
     error = getApiErrorMessage(cause, "Gagal memuat ringkasan laporan.")
   }
@@ -32,7 +39,10 @@ export default async function Page() {
           <AlertDescription>{error ?? "Terjadi kesalahan."}</AlertDescription>
         </Alert>
       ) : (
-        <ReportSummaryView summary={summary} />
+        <ReportSummaryView
+          summary={summary}
+          canExport={entitlements?.advanced_reports === true}
+        />
       )}
     </div>
   )

@@ -92,6 +92,13 @@ export default async function proxy(request: NextRequest) {
     return notFound("Halaman ini berada di ruang kerja organisasi.")
   }
 
+  // Kiosk, display, and tracking are tenant-scoped surfaces. On any non-tenant
+  // host they are refused outright, so the central portal and marketing sites
+  // cannot serve another tenant's device or tracking page (PRD §7).
+  if (context === "tenant-public" && host.kind !== "tenant") {
+    return notFound("Halaman ini hanya tersedia melalui subdomain organisasi.")
+  }
+
   // Tenant existence/availability is proven before any document streams, which
   // is the only way to return a genuine 404 (PRD §7.7).
   if (host.kind === "tenant") {

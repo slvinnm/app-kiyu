@@ -301,9 +301,60 @@ export async function getWorkflowStatisticsServer(): Promise<CountStatistics> {
 /* Billing                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The tenant's resolved plan entitlements (sidebar visibility + gating).
+ * Returns `null` on failure so the sidebar falls back to showing everything
+ * rather than hiding a role's whole menu on a transient API blip.
+ */
+export async function getEntitlementsServer(): Promise<Record<
+  string,
+  boolean | number
+> | null> {
+  try {
+    const response = await serverApiFetch<{
+      data: Record<string, boolean | number>
+    }>("/billing/entitlements")
+    return response.data
+  } catch {
+    return null
+  }
+}
+
 export type SubscriptionView = {
   subscription: Subscription | null
   is_effective: boolean
+}
+
+export type TenantPlanCatalogue = {
+  plans: Array<{
+    id: number
+    code: string
+    name: string
+    description: string | null
+    is_active: boolean
+    is_current: boolean
+    prices: Array<{
+      id: number
+      billing_interval: "MONTHLY" | "YEARLY"
+      amount: number
+      currency: string
+      is_active: boolean
+    }>
+    entitlements: Array<{
+      id: number
+      feature_code: string
+      value: { limit?: number } | null
+    }>
+  }>
+  current_plan_id: number | null
+  subscription_status: string | null
+}
+
+export async function getTenantPlansServer(): Promise<TenantPlanCatalogue> {
+  const response = await serverApiFetch<{ data: TenantPlanCatalogue }>(
+    "/billing/plans"
+  )
+  return response.data
 }
 
 export async function getSubscriptionServer(): Promise<SubscriptionView> {

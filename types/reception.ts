@@ -281,6 +281,17 @@ export type Plan = {
   description: string | null
   is_active: boolean
   entitlements?: PlanEntitlement[]
+  prices?: PlanPrice[]
+}
+
+export type PlanPrice = {
+  id: number
+  plan_id: number
+  billing_interval: "MONTHLY" | "YEARLY"
+  amount: number
+  currency: string
+  provider: string
+  is_active: boolean
 }
 
 export type PlanEntitlement = {

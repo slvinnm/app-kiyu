@@ -21,7 +21,14 @@ import { requestReportExport } from "@/lib/api/admin"
 
 import type { ReportSummary } from "@/lib/api/admin-server"
 
-export function ReportSummaryView({ summary }: { summary: ReportSummary }) {
+export function ReportSummaryView({
+  summary,
+  canExport = false,
+}: {
+  summary: ReportSummary
+  /** Requires the `advanced_reports` entitlement; the API enforces it too. */
+  canExport?: boolean
+}) {
   const [from, setFrom] = useState(summary.queue_sessions.period.from)
   const [to, setTo] = useState(summary.queue_sessions.period.to)
   const [busy, setBusy] = useState(false)
@@ -120,41 +127,52 @@ export function ReportSummaryView({ summary }: { summary: ReportSummary }) {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Ekspor Laporan</CardTitle>
-          <CardDescription>
-            Unduh data kunjungan dalam rentang tanggal.
-          </CardDescription>
-        </CardHeader>
+      {canExport ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Ekspor Laporan</CardTitle>
+            <CardDescription>
+              Unduh data sesi antrean dalam rentang tanggal (Laporan Lanjutan).
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent className="flex flex-wrap items-end gap-3">
-          <div className="space-y-2">
-            <Label htmlFor="report-from">Dari</Label>
-            <Input
-              id="report-from"
-              type="date"
-              value={from}
-              onChange={(event) => setFrom(event.target.value)}
-            />
-          </div>
+          <CardContent className="flex flex-wrap items-end gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="report-from">Dari</Label>
+              <Input
+                id="report-from"
+                type="date"
+                value={from}
+                onChange={(event) => setFrom(event.target.value)}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="report-to">Sampai</Label>
-            <Input
-              id="report-to"
-              type="date"
-              value={to}
-              onChange={(event) => setTo(event.target.value)}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="report-to">Sampai</Label>
+              <Input
+                id="report-to"
+                type="date"
+                value={to}
+                onChange={(event) => setTo(event.target.value)}
+              />
+            </div>
 
-          <Button onClick={handleExport} disabled={busy}>
-            <Download />
-            Ekspor XLSX
-          </Button>
-        </CardContent>
-      </Card>
+            <Button onClick={handleExport} disabled={busy}>
+              <Download />
+              Ekspor XLSX
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Ekspor Laporan</CardTitle>
+            <CardDescription>
+              Ekspor tersedia pada paket dengan Laporan Lanjutan.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
     </div>
   )
 }
