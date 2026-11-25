@@ -263,12 +263,11 @@ export function CustomerProfileForm({
           </p>
 
           <p>
-            Jika data Anda sudah terdaftar, gunakan email yang sama agar
-            tidak terjadi duplikasi.
+            Jika data Anda sudah terdaftar, gunakan email yang sama agar tidak
+            terjadi duplikasi.
           </p>
         </CardContent>
       </Card>
     </div>
   )
 }
-

@@ -34,12 +34,22 @@ export function DepartmentManager({
   total,
   lastPage,
   state,
+  detailPathPrefix = "/facility/departments",
+  showCreate = true,
 }: {
   rows: Department[]
   total: number
   lastPage: number
   filters: Record<string, string>
   state: TableQueryState
+  /**
+   * Base path for a row's "Detail" action; the id is appended. A plain string
+   * (not a function) because this is a Client Component rendered from a Server
+   * Component, and functions cannot cross that boundary.
+   */
+  detailPathPrefix?: string
+  /** Hide the create button where the surface is read-only. */
+  showCreate?: boolean
 }) {
   const router = useRouter()
   const tq = useTableQuery(state)
@@ -97,13 +107,13 @@ export function DepartmentManager({
           cell: ({ row }) => (
             <div className="flex justify-end gap-2">
               <Link
-                href={`/admin/stations?department_id=${row.original.id}`}
+                href={`${detailPathPrefix}/${row.original.id}/detail`}
                 className={buttonVariants({
                   variant: "outline",
                   size: "sm",
                 })}
               >
-                Station
+                Detail
               </Link>
 
               <Button
@@ -119,7 +129,7 @@ export function DepartmentManager({
           enableSorting: false,
         }),
       ]),
-    []
+    [detailPathPrefix]
   )
 
   function openCreate() {
@@ -145,10 +155,12 @@ export function DepartmentManager({
               </CardDescription>
             </div>
 
-            <Button onClick={openCreate}>
-              <PlusIcon />
-              Tambah Departemen
-            </Button>
+            {showCreate && (
+              <Button onClick={openCreate}>
+                <PlusIcon />
+                Tambah Departemen
+              </Button>
+            )}
           </div>
         </CardHeader>
 

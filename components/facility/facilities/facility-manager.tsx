@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Building2, PlusIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -68,6 +69,13 @@ export function FacilityManager({ rows }: { rows: Facility[] }) {
                 <Badge variant={facility.is_active ? "default" : "outline"}>
                   {facility.is_active ? "Aktif" : "Nonaktif"}
                 </Badge>
+
+                <Link
+                  href={`/portal/facilities/${facility.id}/detail`}
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  Detail
+                </Link>
               </div>
             </div>
           ))

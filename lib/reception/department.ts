@@ -28,7 +28,9 @@ export function resolveDepartmentId(
   }
 
   if (typeof sessionStationId === "number") {
-    const station = stations.find((candidate) => candidate.id === sessionStationId)
+    const station = stations.find(
+      (candidate) => candidate.id === sessionStationId
+    )
 
     if (
       station &&

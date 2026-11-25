@@ -1,3 +1,4 @@
+import { normalisePayload } from "@/lib/api/normalize"
 import type { PublicQueueStation } from "@/types/admin"
 
 /**
@@ -57,7 +58,7 @@ export async function fetchPublicQueue(
       throw new DisplayApiError(response.status, "Respons server tidak valid.")
     }
 
-    return (payload as { data: PublicQueueStation[] }).data
+    return normalisePayload(payload).data as PublicQueueStation[]
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("Server tidak merespons.")

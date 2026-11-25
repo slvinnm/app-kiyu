@@ -130,8 +130,8 @@ export function ReferralDialog({
           <DialogTitle>Buat Referral</DialogTitle>
 
           <DialogDescription>
-            Rujuk {visit.visit_number} ke departemen lain. Sistem membuat kunjungan
-            dan tiket antrian tujuan secara otomatis.
+            Rujuk {visit.visit_number} ke departemen lain. Sistem membuat
+            kunjungan dan tiket antrian tujuan secara otomatis.
           </DialogDescription>
         </DialogHeader>
 
@@ -141,7 +141,8 @@ export function ReferralDialog({
               <AlertTitle>Tidak ada departemen tujuan</AlertTitle>
 
               <AlertDescription>
-                Tidak ada departemen aktif lain yang dapat dijadikan tujuan referral.
+                Tidak ada departemen aktif lain yang dapat dijadikan tujuan
+                referral.
               </AlertDescription>
             </Alert>
           ) : (

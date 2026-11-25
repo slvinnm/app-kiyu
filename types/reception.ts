@@ -38,11 +38,7 @@ export type QueueTicketStatus =
   | "TRANSFERRED"
 
 export type VisitStatus =
-  | "AWAITING_CHECKIN"
-  | "WAITING"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED"
+  "AWAITING_CHECKIN" | "WAITING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
 
 /** Mirrors `App\Enums\StationType`. */
 export type StationType = "INTAKE" | "SERVICE" | "CASHIER" | "COUNTER"
@@ -67,6 +63,7 @@ export type Department = {
   display_in_kiosk: boolean
   stations?: Station[]
   stations_count?: number
+  workflows?: Workflow[]
 }
 
 /**
@@ -227,6 +224,8 @@ export type Facility = {
   phone: string | null
   timezone: string | null
   is_active: boolean
+  departments?: Department[]
+  departments_count?: number
 }
 
 export type DisplayDevice = {

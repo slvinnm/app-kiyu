@@ -1,4 +1,4 @@
-import { getFacilitiesServer } from "@/lib/api/admin-server"
+import { getVerifiedUser } from "@/lib/auth/guard"
 import { getSession } from "@/lib/auth/session"
 import { getFacilityContext } from "@/lib/facility/context"
 import { getNavigation } from "@/lib/navigation"
@@ -16,8 +16,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { CommandIcon } from "lucide-react"
+import { BuildingIcon, CommandIcon, StoreIcon } from "lucide-react"
 
+/**
+ * Sidebar shell.
+ *
+ * The header identifies *where the user is*: a TenantAdmin sees the
+ * organization, a FacilityAdmin/Operator/Staff sees their active facility, and
+ * a Client sees the organization they belong to (PRD §8, §9). Navigation is
+ * role-specific (`lib/navigation`).
+ */
 export async function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
@@ -28,25 +36,39 @@ export async function AppSidebar({
     return null
   }
 
+  const user = await getVerifiedUser()
   const items = getNavigation(role)
   const facilityContext = await getFacilityContext()
 
-  // Only an administrator may list facilities; an operator sees just their own
-  // assignment, so the switcher falls back to the numeric reference.
-  const facilities =
-    facilityContext.facilityIds.length > 1
-      ? await getFacilitiesServer()
-          .then((rows) =>
-            rows
-              .filter((row) => facilityContext.facilityIds.includes(row.id))
-              .map((row) => ({ id: row.id, name: row.name }))
-          )
-          .catch(() =>
-            facilityContext.facilityIds.map((id) => ({ id, name: `Fasilitas #${id}` }))
-          )
-      : facilityContext.facilityIds.map((id) => ({ id, name: "Fasilitas" }))
+  // Portal roles are tenant/organization wide → show the tenant name.
+  const isPortalRole = role === "platform_admin" || role === "tenant_admin"
+  const tenant = user?.tenant ?? session.user.tenant ?? null
 
-  const user = {
+  // Workspace roles act at one facility → resolve the active facility's name
+  // from the facilities the API attached to the account (no extra request).
+  const facilities = (user?.facilities ?? session.user.facilities ?? []).map(
+    (row) => ({ id: row.id, name: row.name })
+  )
+  const activeFacility =
+    facilities.find((row) => row.id === facilityContext.activeId) ??
+    facilities[0] ??
+    null
+
+  let headerTitle: string
+  let headerSubtitle: string
+  let HeaderIcon = CommandIcon
+
+  if (isPortalRole) {
+    headerTitle = tenant?.name ?? "KIYU Platform"
+    headerSubtitle = role === "platform_admin" ? "Platform Admin" : "Organisasi"
+    HeaderIcon = BuildingIcon
+  } else {
+    headerTitle = activeFacility?.name ?? tenant?.name ?? "KIYU"
+    headerSubtitle = activeFacility ? "Fasilitas aktif" : (tenant?.name ?? "")
+    HeaderIcon = StoreIcon
+  }
+
+  const navUser = {
     name: session.user.name ?? "",
     email: session.user.email ?? "",
     avatar: "",
@@ -58,27 +80,43 @@ export async function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              size="lg"
               className="data-[slot=sidebar-menu-button]:p-1.5!"
               render={<a href="#" />}
             >
-              <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">KIYU</span>
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <HeaderIcon className="size-4" />
+              </div>
+
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate text-sm font-semibold">
+                  {headerTitle}
+                </span>
+
+                {headerSubtitle && (
+                  <span className="truncate text-xs text-muted-foreground">
+                    {headerSubtitle}
+                  </span>
+                )}
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent className="gap-0">
-        <FacilitySwitcher
-          facilities={facilities}
-          activeId={facilityContext.activeId}
-        />
+        {!isPortalRole && facilities.length > 1 && (
+          <FacilitySwitcher
+            facilities={facilities}
+            activeId={facilityContext.activeId}
+          />
+        )}
 
         <NavMain items={items} />
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={navUser} />
       </SidebarFooter>
     </Sidebar>
   )

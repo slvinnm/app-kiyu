@@ -1,11 +1,6 @@
 "use client"
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import {
   Activity,
@@ -21,12 +16,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { StatusBadge } from "@/components/visit-tracking/status-badge"
 import { VisitJourney } from "@/components/visit-tracking/visit-journey"
@@ -75,11 +65,7 @@ function formatChannel(channel: string | null) {
   }
 }
 
-function VisitOverview({
-  data,
-}: {
-  data: VisitTrackingData
-}) {
+function VisitOverview({ data }: { data: VisitTrackingData }) {
   const progress = Math.min(
     100,
     Math.max(0, data.summary.progress_percentage ?? 0)
@@ -118,14 +104,14 @@ function VisitOverview({
           </div>
 
           {data.queue_session.timestamps.registered_at && (
-  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-    <CalendarClock className="size-3.5 shrink-0" />
-    <span>
-      Terdaftar:{" "}
-      {formatDateTime(data.queue_session.timestamps.registered_at)}
-    </span>
-  </div>
-)}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CalendarClock className="size-3.5 shrink-0" />
+              <span>
+                Terdaftar:{" "}
+                {formatDateTime(data.queue_session.timestamps.registered_at)}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 rounded-lg bg-muted/60 p-3.5">
@@ -140,13 +126,11 @@ function VisitOverview({
           </div>
 
           <div>
-            <p className="text-sm font-medium">
-              {data.summary.message}
-            </p>
+            <p className="text-sm font-medium">{data.summary.message}</p>
 
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              Informasi kunjungan dan antrean dapat berubah mengikuti
-              proses pelayanan.
+              Informasi kunjungan dan antrean dapat berubah mengikuti proses
+              pelayanan.
             </p>
           </div>
         </div>
@@ -158,8 +142,7 @@ function VisitOverview({
             </span>
 
             <span className="font-semibold tabular-nums">
-              {data.summary.completed_steps} dari{" "}
-              {data.summary.total_steps}
+              {data.summary.completed_steps} dari {data.summary.total_steps}
             </span>
           </div>
 
@@ -178,8 +161,7 @@ function VisitOverview({
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            Progres indikatif berdasarkan tahapan workflow yang
-            dikonfigurasi.
+            Progres indikatif berdasarkan tahapan workflow yang dikonfigurasi.
           </p>
         </div>
       </CardContent>
@@ -187,11 +169,7 @@ function VisitOverview({
   )
 }
 
-function CurrentQueueCard({
-  data,
-}: {
-  data: VisitTrackingData
-}) {
+function CurrentQueueCard({ data }: { data: VisitTrackingData }) {
   const queue = data.current_queue
 
   return (
@@ -199,9 +177,7 @@ function CurrentQueueCard({
       <CardHeader className="border-b">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <CardTitle className="text-base">
-              Antrean saat ini
-            </CardTitle>
+            <CardTitle className="text-base">Antrean saat ini</CardTitle>
 
             <p className="mt-1 text-sm text-muted-foreground">
               Informasi antrean aktif Anda.
@@ -256,9 +232,7 @@ function CurrentQueueCard({
               <Clock3 className="size-6 text-muted-foreground" />
             </div>
 
-            <p className="text-sm font-semibold">
-              Belum ada antrean aktif
-            </p>
+            <p className="text-sm font-semibold">Belum ada antrean aktif</p>
 
             <p className="mt-1 max-w-64 text-xs leading-relaxed text-muted-foreground">
               {data.queue_session.status === "AWAITING_CHECKIN"
@@ -287,9 +261,7 @@ function VisitDetails({
     <div className="space-y-4">
       <Card>
         <CardHeader className="border-b">
-          <CardTitle className="text-base">
-            Informasi pendaftaran
-          </CardTitle>
+          <CardTitle className="text-base">Informasi pendaftaran</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-4">
@@ -329,9 +301,7 @@ function VisitDetails({
       {serviceTransfers.length > 0 && (
         <Card>
           <CardHeader className="border-b">
-            <CardTitle className="text-base">
-              Rujukan layanan
-            </CardTitle>
+            <CardTitle className="text-base">Rujukan layanan</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4 pt-4">
@@ -342,8 +312,7 @@ function VisitDetails({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">
-                    {referral.target_department?.name ??
-                      "Departemen tujuan"}
+                    {referral.target_department?.name ?? "Departemen tujuan"}
                   </p>
 
                   <StatusBadge status={referral.status} />
@@ -360,9 +329,7 @@ function VisitDetails({
                     </p>
 
                     <div className="mt-2">
-                      <StatusBadge
-                        status={referral.target_visit.status}
-                      />
+                      <StatusBadge status={referral.target_visit.status} />
                     </div>
                   </div>
                 )}
@@ -395,9 +362,7 @@ function TrackingSkeleton() {
   )
 }
 
-export function VisitTrackingPage({
-  token,
-}: VisitTrackingPageProps) {
+export function VisitTrackingPage({ token }: VisitTrackingPageProps) {
   const [data, setData] = useState<VisitTrackingData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -412,52 +377,55 @@ export function VisitTrackingPage({
   // restarting the interval on every response.
   const dataStatusRef = useRef<string | null>(null)
 
-  const loadTracking = useCallback(async (background = false) => {
-    if (inFlightRef.current) return
+  const loadTracking = useCallback(
+    async (background = false) => {
+      if (inFlightRef.current) return
 
-    inFlightRef.current = true
+      inFlightRef.current = true
 
-    const controller = new AbortController()
-    abortControllerRef.current = controller
+      const controller = new AbortController()
+      abortControllerRef.current = controller
 
-    if (!background && !hasDataRef.current) {
-      setIsLoading(true)
-    } else {
-      setIsRefreshing(true)
-    }
-
-    try {
-      const result = await getVisitTracking(token, controller.signal)
-
-      hasDataRef.current = true
-      setData(result)
-      setError(null)
-      setRefreshFailed(false)
-      setLastUpdated(new Date())
-    } catch (caughtError) {
-      if (controller.signal.aborted) return
-
-      const message =
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Terjadi kesalahan saat memuat informasi kunjungan."
-
-      if (!hasDataRef.current) {
-        setError(message)
+      if (!background && !hasDataRef.current) {
+        setIsLoading(true)
       } else {
-        // Keep the last successfully loaded tracking data visible.
-        setRefreshFailed(true)
+        setIsRefreshing(true)
       }
-    } finally {
-      inFlightRef.current = false
-      abortControllerRef.current = null
 
-      if (!controller.signal.aborted) {
-        setIsLoading(false)
-        setIsRefreshing(false)
+      try {
+        const result = await getVisitTracking(token, controller.signal)
+
+        hasDataRef.current = true
+        setData(result)
+        setError(null)
+        setRefreshFailed(false)
+        setLastUpdated(new Date())
+      } catch (caughtError) {
+        if (controller.signal.aborted) return
+
+        const message =
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Terjadi kesalahan saat memuat informasi kunjungan."
+
+        if (!hasDataRef.current) {
+          setError(message)
+        } else {
+          // Keep the last successfully loaded tracking data visible.
+          setRefreshFailed(true)
+        }
+      } finally {
+        inFlightRef.current = false
+        abortControllerRef.current = null
+
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+          setIsRefreshing(false)
+        }
       }
-    }
-  }, [token])
+    },
+    [token]
+  )
 
   useEffect(() => {
     void loadTracking()
@@ -502,9 +470,7 @@ export function VisitTrackingPage({
             </div>
 
             <div>
-              <p className="text-sm font-bold tracking-tight">
-                KIYU
-              </p>
+              <p className="text-sm font-bold tracking-tight">KIYU</p>
 
               <p className="text-[11px] text-muted-foreground">
                 Pelacakan kunjungan
@@ -527,10 +493,9 @@ export function VisitTrackingPage({
               disabled={isRefreshing || isLoading}
             >
               <RefreshCw
-                className={[
-                  "size-4",
-                  isRefreshing ? "animate-spin" : "",
-                ].join(" ")}
+                className={["size-4", isRefreshing ? "animate-spin" : ""].join(
+                  " "
+                )}
               />
             </Button>
           </div>

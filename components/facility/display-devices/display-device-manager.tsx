@@ -173,8 +173,8 @@ export function DisplayDeviceManager({ rows }: { rows: DisplayDevice[] }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Kode pairing baru</AlertDialogTitle>
             <AlertDialogDescription>
-              Masukkan kode ini di layar display. Berlaku 30 menit dan hanya bisa
-              dipakai sekali.
+              Masukkan kode ini di layar display. Berlaku 30 menit dan hanya
+              bisa dipakai sekali.
             </AlertDialogDescription>
           </AlertDialogHeader>
 

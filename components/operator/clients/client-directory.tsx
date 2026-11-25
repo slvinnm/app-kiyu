@@ -20,7 +20,6 @@ import { CustomerDetailSheet } from "@/components/operator/clients/client-detail
 
 import { useTableQuery } from "@/hooks/use-table-query"
 
-
 import type { TableQueryState } from "@/hooks/use-table-query"
 import type { Customer } from "@/types/reception"
 

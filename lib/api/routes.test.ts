@@ -53,7 +53,8 @@ function sourceFiles(dir: string): string[] {
  */
 function requestPaths(source: string): string[] {
   const paths: string[] = []
-  const pattern = /(?:apiFetch|serverApiFetch|postJson)<?[^(]*\(\s*[`"](\/[^`"]*)[`"]/g
+  const pattern =
+    /(?:apiFetch|serverApiFetch|postJson)<?[^(]*\(\s*[`"](\/[^`"]*)[`"]/g
 
   for (const match of source.matchAll(pattern)) {
     paths.push(match[1])
@@ -70,7 +71,11 @@ describe("API request paths", () => {
       for (const file of sourceFiles(root)) {
         for (const path of requestPaths(readFileSync(file, "utf8"))) {
           for (const [retired, replacement] of Object.entries(RETIRED)) {
-            if (path === retired || path.startsWith(`${retired}/`) || path.startsWith(`${retired}?`)) {
+            if (
+              path === retired ||
+              path.startsWith(`${retired}/`) ||
+              path.startsWith(`${retired}?`)
+            ) {
               violations.push(`${file}: "${path}" — use "${replacement}"`)
             }
           }

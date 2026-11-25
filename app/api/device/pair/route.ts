@@ -56,15 +56,18 @@ export async function POST(request: NextRequest) {
 
   const endpoint = kind === "kiosk" ? "kiosk/pair" : "display/pair"
 
-  const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/${endpoint}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ pairing_code: pairingCode }),
-    cache: "no-store",
-  })
+  const response = await fetch(
+    `${API_BASE_URL.replace(/\/$/, "")}/${endpoint}`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pairing_code: pairingCode }),
+      cache: "no-store",
+    }
+  )
 
   const payload = (await response.json().catch(() => null)) as {
     message?: string

@@ -31,13 +31,13 @@ import { STATION_TYPES, stationTypeLabel } from "@/lib/reception/format"
 import type { AdminStation } from "@/types/admin"
 import type { Department } from "@/types/reception"
 
-
 export function StationFormDialog({
   open,
   onOpenChange,
   station,
   departments,
   defaultDepartmentId,
+  scopedDepartmentId = null,
   onSaved,
 }: {
   open: boolean
@@ -45,6 +45,8 @@ export function StationFormDialog({
   station: AdminStation | null
   departments: Department[]
   defaultDepartmentId?: number | null
+  /** Opened inside a department's detail: the department is already fixed. */
+  scopedDepartmentId?: number | null
   onSaved: () => void
 }) {
   const [departmentId, setDepartmentId] = useState("")
@@ -65,9 +67,11 @@ export function StationFormDialog({
     setDepartmentId(
       station?.department_id
         ? String(station.department_id)
-        : defaultDepartmentId
-          ? String(defaultDepartmentId)
-          : ""
+        : scopedDepartmentId
+          ? String(scopedDepartmentId)
+          : defaultDepartmentId
+            ? String(defaultDepartmentId)
+            : ""
     )
     setName(station?.name ?? "")
     setCode(station?.code ?? "")
@@ -77,7 +81,7 @@ export function StationFormDialog({
     setError(null)
     setErrors({})
     setSubmitting(false)
-  }, [open, station, defaultDepartmentId])
+  }, [open, station, defaultDepartmentId, scopedDepartmentId])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -156,30 +160,37 @@ export function StationFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Departemen</Label>
+          {scopedDepartmentId === null && (
+            <div className="space-y-2">
+              <Label>Departemen</Label>
 
-            <Select
-              value={departmentId}
-              onValueChange={(value) => setDepartmentId(value ?? "")}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih departemen" />
-              </SelectTrigger>
+              <Select
+                value={departmentId}
+                onValueChange={(value) => setDepartmentId(value ?? "")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih departemen" />
+                </SelectTrigger>
 
-              <SelectContent>
-                {departments.map((department) => (
-                  <SelectItem key={department.id} value={String(department.id)}>
-                    {department.name} ({department.code})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem
+                      key={department.id}
+                      value={String(department.id)}
+                    >
+                      {department.name} ({department.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {errors.department_id && (
-              <p className="text-xs text-destructive">{errors.department_id}</p>
-            )}
-          </div>
+              {errors.department_id && (
+                <p className="text-xs text-destructive">
+                  {errors.department_id}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">

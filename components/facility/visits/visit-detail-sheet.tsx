@@ -312,8 +312,8 @@ export function VisitDetailSheet({
                     <Label>Referral</Label>
 
                     <p className="text-xs text-muted-foreground">
-                      Transfer pelanggan ke departemen lain; kunjungan dan tiket tujuan
-                      dibuat otomatis.
+                      Transfer pelanggan ke departemen lain; kunjungan dan tiket
+                      tujuan dibuat otomatis.
                     </p>
 
                     <Button

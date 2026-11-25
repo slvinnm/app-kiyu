@@ -1,6 +1,9 @@
 import { TrendingUp, Wallet } from "lucide-react"
 
-import { ConsolePageHeader, ConsoleStat } from "@/components/console/console-page-header"
+import {
+  ConsolePageHeader,
+  ConsoleStat,
+} from "@/components/console/console-page-header"
 import { SimpleTable } from "@/components/console/simple-table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -14,7 +17,10 @@ export default async function Page() {
   try {
     report = await getGrowthReportServer()
   } catch (cause) {
-    error = getApiErrorMessage(cause, "Gagal memuat laporan pertumbuhan tenant.")
+    error = getApiErrorMessage(
+      cause,
+      "Gagal memuat laporan pertumbuhan tenant."
+    )
   }
 
   return (

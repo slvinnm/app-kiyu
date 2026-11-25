@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { getStationQueue } from "@/lib/api/staff"
 import { getApiErrorMessage } from "@/lib/api/error"
-import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
+import {
+  bindEchoConnectionState,
+  getEcho,
+  publicFacilityChannel,
+} from "@/lib/echo"
 
 import type { QueueTicket, Station } from "@/types/reception"
 
@@ -86,7 +90,7 @@ export function useStaffQueue(
       }
 
       setStation(response.station)
-      setTickets(response.data)
+      setTickets(response.data.data)
       setError(null)
       setLastUpdatedAt(new Date())
     } catch (cause) {

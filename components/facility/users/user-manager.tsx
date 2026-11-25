@@ -57,6 +57,7 @@ export function UserManager({
   departments,
   stations,
   currentUserId,
+  scopedDepartmentId = null,
 }: {
   rows: AdminUser[]
   total: number
@@ -66,6 +67,7 @@ export function UserManager({
   departments: Department[]
   stations: AdminStation[]
   currentUserId: number
+  scopedDepartmentId?: number | null
 }) {
   const router = useRouter()
   const tq = useTableQuery(state)
@@ -129,8 +131,9 @@ export function UserManager({
           id: "facilities",
           header: "Fasilitas",
           cell: ({ row }) =>
-            row.original.facilities?.map((facility) => facility.name).join(", ") ||
-            "-",
+            row.original.facilities
+              ?.map((facility) => facility.name)
+              .join(", ") || "-",
           enableSorting: false,
         }),
         columnHelper.display({
@@ -237,6 +240,7 @@ export function UserManager({
         onOpenChange={setDialogOpen}
         user={editing}
         departments={departments}
+        scopedDepartmentId={scopedDepartmentId}
         stations={stations}
         onSaved={() => router.refresh()}
       />

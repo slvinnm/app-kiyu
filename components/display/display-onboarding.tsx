@@ -121,8 +121,8 @@ export function DisplayOnboarding() {
           </form>
 
           <p className="mt-4 text-xs text-neutral-500">
-            Kode kedaluwarsa setelah 30 menit. Minta admin membuat kode baru bila
-            sudah lewat.
+            Kode kedaluwarsa setelah 30 menit. Minta admin membuat kode baru
+            bila sudah lewat.
           </p>
         </div>
       </main>

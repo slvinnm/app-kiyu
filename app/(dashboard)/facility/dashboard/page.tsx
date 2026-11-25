@@ -7,6 +7,7 @@ import {
   LayoutDashboardIcon,
   ListOrdered,
   MapPin,
+  MonitorPlayIcon,
   Users,
 } from "lucide-react"
 
@@ -208,7 +209,9 @@ export default async function Page() {
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <CardTitle className="text-base">Departemen & Station</CardTitle>
+                <CardTitle className="text-base">
+                  Departemen & Station
+                </CardTitle>
 
                 <CardDescription>
                   Struktur organisasi yang terdaftar.
@@ -275,27 +278,19 @@ export default async function Page() {
           </Link>
 
           <Link
-            href="/facility/stations"
+            href="/facility/kiosk-devices"
             className={buttonVariants({ variant: "outline" })}
           >
-            <MapPin />
-            Station
+            <MonitorPlayIcon />
+            Kiosk
           </Link>
 
           <Link
-            href="/facility/workflows"
+            href="/facility/display-devices"
             className={buttonVariants({ variant: "outline" })}
           >
-            <GitBranch />
-            Workflow
-          </Link>
-
-          <Link
-            href="/facility/users"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            <Users />
-            Pengguna
+            <MonitorPlayIcon />
+            Display
           </Link>
         </CardContent>
       </Card>

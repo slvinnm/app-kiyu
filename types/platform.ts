@@ -12,11 +12,7 @@ export type { Paginated }
 export type TenantStatus = "ACTIVE" | "SUSPENDED" | "PENDING" | "CANCELLED"
 
 export type SubscriptionStatus =
-  | "TRIALING"
-  | "ACTIVE"
-  | "PAST_DUE"
-  | "CANCELLED"
-  | "EXPIRED"
+  "TRIALING" | "ACTIVE" | "PAST_DUE" | "CANCELLED" | "EXPIRED"
 
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED"
 
@@ -198,7 +194,12 @@ export type PlatformAuditLog = {
 
 export type RevenueReport = {
   range: { from: string; to: string }
-  series: Array<{ month: string; amount: number; currency: string; payments: number }>
+  series: Array<{
+    month: string
+    amount: number
+    currency: string
+    payments: number
+  }>
   total: number
 }
 

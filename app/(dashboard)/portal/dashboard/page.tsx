@@ -8,7 +8,10 @@ import {
   Wallet,
 } from "lucide-react"
 
-import { ConsolePageHeader, ConsoleStat } from "@/components/console/console-page-header"
+import {
+  ConsolePageHeader,
+  ConsoleStat,
+} from "@/components/console/console-page-header"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -58,6 +61,7 @@ export default async function Page({
           <Button
             variant="outline"
             size="sm"
+            nativeButton={false}
             render={<Link href="/portal/facilities" />}
           >
             <Building2 data-icon="inline-start" />
@@ -106,9 +110,15 @@ export default async function Page({
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-                <MiniStat label="Total" value={dashboard.counts.sessions_today} />
+                <MiniStat
+                  label="Total"
+                  value={dashboard.counts.sessions_today}
+                />
                 <MiniStat label="Menunggu" value={dashboard.counts.waiting} />
-                <MiniStat label="Diproses" value={dashboard.counts.in_progress} />
+                <MiniStat
+                  label="Diproses"
+                  value={dashboard.counts.in_progress}
+                />
                 <MiniStat label="Selesai" value={dashboard.counts.completed} />
               </CardContent>
             </Card>
@@ -129,7 +139,9 @@ export default async function Page({
                     <div className="flex items-center gap-2">
                       <Badge
                         variant={
-                          dashboard.subscription.is_effective ? "secondary" : "destructive"
+                          dashboard.subscription.is_effective
+                            ? "secondary"
+                            : "destructive"
                         }
                       >
                         {dashboard.subscription.status}
@@ -147,13 +159,18 @@ export default async function Page({
                     <Button
                       variant="outline"
                       size="sm"
+                      nativeButton={false}
                       render={<Link href="/portal/billing" />}
                     >
                       Kelola Langganan
                     </Button>
                   </>
                 ) : (
-                  <Button size="sm" render={<Link href="/portal/billing" />}>
+                  <Button
+                    size="sm"
+                    nativeButton={false}
+                    render={<Link href="/portal/billing" />}
+                  >
                     Pilih Paket
                   </Button>
                 )}

@@ -21,15 +21,11 @@ export function ProfileRequired() {
           <CardTitle>Profil belum terhubung</CardTitle>
 
           <CardDescription className="mt-2">
-            Lengkapi profil untuk melakukan booking online dan melihat
-            antrian.
+            Lengkapi profil untuk melakukan booking online dan melihat antrian.
           </CardDescription>
         </div>
 
-        <Link
-          href="/client/profile"
-          className={buttonVariants({ size: "lg" })}
-        >
+        <Link href="/client/profile" className={buttonVariants({ size: "lg" })}>
           Lengkapi Profil
         </Link>
       </CardContent>

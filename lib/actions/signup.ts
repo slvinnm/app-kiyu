@@ -62,7 +62,10 @@ export async function signupOrganization(
   try {
     const response = await fetch(`${AUTH_BASE_URL}/auth/signup`, {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         organization_name: organizationName,
         owner_name: ownerName,
@@ -72,9 +75,9 @@ export async function signupOrganization(
       cache: "no-store",
     })
 
-    const payload = (await response.json().catch(() => null)) as
-      | { message?: string }
-      | null
+    const payload = (await response.json().catch(() => null)) as {
+      message?: string
+    } | null
 
     if (!response.ok) {
       return errorState(payload?.message ?? "Pendaftaran gagal.")
@@ -93,12 +96,17 @@ export async function signupOrganization(
   try {
     const login = await fetch(`${AUTH_BASE_URL}/auth/login`, {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ email, password, context: "platform_portal" }),
       cache: "no-store",
     })
 
-    const payload = (await login.json().catch(() => null)) as AuthResponse | null
+    const payload = (await login
+      .json()
+      .catch(() => null)) as AuthResponse | null
 
     if (login.ok && payload?.data?.token && payload.data.user?.role) {
       await createSession(

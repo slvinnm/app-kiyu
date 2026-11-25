@@ -45,7 +45,10 @@ export default async function Page() {
           getRowKey={(row) => row.id}
           emptyMessage="Belum ada support access."
           columns={[
-            { header: "Tenant", cell: (row) => row.tenant?.name ?? row.tenant_id },
+            {
+              header: "Tenant",
+              cell: (row) => row.tenant?.name ?? row.tenant_id,
+            },
             {
               header: "Operator",
               cell: (row) => row.platform_user?.name ?? "-",

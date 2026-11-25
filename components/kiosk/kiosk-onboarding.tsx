@@ -82,7 +82,9 @@ export function KioskOnboarding() {
 
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8">
-            <h2 className="text-xl font-semibold">Perangkat ini belum terdaftar</h2>
+            <h2 className="text-xl font-semibold">
+              Perangkat ini belum terdaftar
+            </h2>
 
             <p className="mt-2 text-sm text-muted-foreground">
               Masukkan kode pairing 8 karakter yang dibuat admin di menu

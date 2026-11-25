@@ -55,8 +55,9 @@ export default async function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            Rincian transaksi per pembayaran tersedia melalui tim penagihan KIYU.
-            Perubahan paket dan pembayaran tercatat pada langganan organisasi Anda.
+            Rincian transaksi per pembayaran tersedia melalui tim penagihan
+            KIYU. Perubahan paket dan pembayaran tercatat pada langganan
+            organisasi Anda.
           </CardContent>
         </Card>
       )}

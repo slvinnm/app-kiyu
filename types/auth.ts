@@ -44,12 +44,7 @@ export const CAPABILITIES = {
   "audit.read": ["tenant_admin"],
   "devices.manage": ["tenant_admin", "facility_admin"],
   "reception.operate": ["tenant_admin", "facility_admin", "operator"],
-  "tickets.operate": [
-    "tenant_admin",
-    "facility_admin",
-    "operator",
-    "staff",
-  ],
+  "tickets.operate": ["tenant_admin", "facility_admin", "operator", "staff"],
   "transfers.create": ["staff"],
   "reports.summary": ["tenant_admin", "operator"],
   "reports.export": ["tenant_admin"],
@@ -94,6 +89,12 @@ export type AuthTenant = {
   timezone: string | null
 }
 
+export type AuthFacility = {
+  id: number
+  name: string
+  code: string
+}
+
 export type AuthUser = {
   id: number
   name: string
@@ -101,6 +102,7 @@ export type AuthUser = {
   role: string
   tenant_id?: number | null
   tenant?: AuthTenant | null
+  facilities?: AuthFacility[]
   facility_ids?: number[]
   station_id?: number | null
   profile?: unknown
@@ -123,6 +125,7 @@ export function toSessionUser(user: AuthUser): AuthUser {
     role: user.role,
     tenant_id: user.tenant_id ?? null,
     tenant: user.tenant ?? null,
+    facilities: Array.isArray(user.facilities) ? user.facilities : [],
     facility_ids: Array.isArray(user.facility_ids) ? user.facility_ids : [],
     station_id: user.station_id ?? null,
   }

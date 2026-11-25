@@ -1,6 +1,9 @@
 import { CalendarClock } from "lucide-react"
 
-import { ConsolePageHeader, ConsoleStat } from "@/components/console/console-page-header"
+import {
+  ConsolePageHeader,
+  ConsoleStat,
+} from "@/components/console/console-page-header"
 import { SimpleTable } from "@/components/console/simple-table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -60,14 +63,18 @@ export default async function Page() {
                 cell: (row) => (
                   <div className="flex flex-col">
                     <span className="font-medium">{row.name}</span>
-                    <span className="text-xs text-muted-foreground">{row.code}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {row.code}
+                    </span>
                   </div>
                 ),
               },
               {
                 header: "Langganan Aktif",
                 cell: (row) => (
-                  <span className="tabular-nums">{row.active_subscriptions}</span>
+                  <span className="tabular-nums">
+                    {row.active_subscriptions}
+                  </span>
                 ),
               },
             ]}

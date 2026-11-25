@@ -1,6 +1,7 @@
 "use client"
 
 import { ApiError } from "@/lib/api/error"
+import { normalisePayload } from "@/lib/api/normalize"
 
 /**
  * Client-side fetch through the `/api/backend` proxy, which attaches the
@@ -32,5 +33,5 @@ export async function apiFetch<T>(
     )
   }
 
-  return payload as T
+  return normalisePayload(payload) as T
 }

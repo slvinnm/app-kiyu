@@ -11,12 +11,7 @@ import {
   XCircle,
 } from "lucide-react"
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import type { VisitTrackingData } from "@/types/visit-tracking"
 
@@ -59,9 +54,7 @@ export function VisitTimeline({ timeline }: VisitTimelineProps) {
     <Card>
       <CardHeader className="border-b">
         <div>
-          <CardTitle className="text-base">
-            Aktivitas kunjungan
-          </CardTitle>
+          <CardTitle className="text-base">Aktivitas kunjungan</CardTitle>
 
           <p className="mt-1 text-sm text-muted-foreground">
             Riwayat perubahan antrean selama kunjungan.
@@ -76,9 +69,7 @@ export function VisitTimeline({ timeline }: VisitTimelineProps) {
               <Activity className="size-5 text-muted-foreground" />
             </div>
 
-            <p className="text-sm font-medium">
-              Belum ada aktivitas
-            </p>
+            <p className="text-sm font-medium">Belum ada aktivitas</p>
 
             <p className="mt-1 max-w-56 text-xs text-muted-foreground">
               Aktivitas antrean akan muncul di sini setelah tersedia.
@@ -88,8 +79,7 @@ export function VisitTimeline({ timeline }: VisitTimelineProps) {
           <div className="space-y-5">
             {timeline.map((event, index) => {
               const Icon =
-                EVENT_ICONS[event.type as keyof typeof EVENT_ICONS] ??
-                Activity
+                EVENT_ICONS[event.type as keyof typeof EVENT_ICONS] ?? Activity
 
               return (
                 <div
@@ -101,14 +91,12 @@ export function VisitTimeline({ timeline }: VisitTimelineProps) {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium leading-5">
+                    <p className="text-sm leading-5 font-medium">
                       {event.message}
                     </p>
 
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                      <span className="font-mono">
-                        {event.queue_number}
-                      </span>
+                      <span className="font-mono">{event.queue_number}</span>
 
                       {event.station && (
                         <>

@@ -37,6 +37,7 @@ export function UserFormDialog({
   user,
   departments,
   stations,
+  scopedDepartmentId = null,
   onSaved,
 }: {
   open: boolean
@@ -44,6 +45,8 @@ export function UserFormDialog({
   user: AdminUser | null
   departments: Department[]
   stations: AdminStation[]
+  /** Opened inside a department's detail: the department is already fixed. */
+  scopedDepartmentId?: number | null
   onSaved: () => void
 }) {
   const [name, setName] = useState("")
@@ -65,22 +68,64 @@ export function UserFormDialog({
     setEmail(user?.email ?? "")
     setPassword("")
     setRole(user?.role ?? "operator")
-    setDepartmentId("none")
+    setDepartmentId(scopedDepartmentId ? String(scopedDepartmentId) : "none")
     setStationId(user?.station_id ? String(user.station_id) : "none")
     setError(null)
     setErrors({})
     setSubmitting(false)
-  }, [open, user])
+  }, [open, user, scopedDepartmentId])
+
+  // Inside a department only operational roles belong here (PRD §8.3, §8.4).
+  const roleOptions =
+    scopedDepartmentId !== null
+      ? ASSIGNABLE_ROLE_OPTIONS.filter(
+          (option) => option.value === "operator" || option.value === "staff"
+        )
+      : ASSIGNABLE_ROLE_OPTIONS
+
+  // Operators work at INTAKE counters; staff at SERVICE/CASHIER/COUNTER.
+  const allowedStationTypesFor = (nextRole: string): string[] | null =>
+    nextRole === "operator"
+      ? ["INTAKE"]
+      : nextRole === "staff"
+        ? ["SERVICE", "CASHIER", "COUNTER"]
+        : null
 
   const stationOptions = useMemo(() => {
-    if (departmentId === "none") {
-      return stations
+    const inDepartment =
+      departmentId === "none"
+        ? stations
+        : stations.filter(
+            (station) => station.department_id === Number(departmentId)
+          )
+
+    const allowed = allowedStationTypesFor(role)
+
+    return allowed === null
+      ? inDepartment
+      : inDepartment.filter((station) => allowed.includes(String(station.type)))
+  }, [stations, departmentId, role])
+
+  // Changing the role can invalidate the chosen station; drop it there, not in
+  // an effect, so there is no extra render.
+  function handleRoleChange(next: string | null) {
+    const nextRole = next ?? "operator"
+    setRole(nextRole)
+
+    if (stationId === "none") {
+      return
     }
 
-    return stations.filter(
-      (station) => station.department_id === Number(departmentId)
-    )
-  }, [stations, departmentId])
+    const allowed = allowedStationTypesFor(nextRole)
+    const chosen = stations.find((station) => station.id === Number(stationId))
+    const stillValid =
+      chosen !== undefined &&
+      (allowed === null || allowed.includes(String(chosen.type)))
+
+    if (!stillValid) {
+      setStationId("none")
+    }
+  }
 
   function handleDepartmentChange(value: string | null) {
     const next = value ?? "none"
@@ -132,6 +177,16 @@ export function UserFormDialog({
       nextErrors.password = "Password wajib diisi untuk pengguna baru."
     } else if (password && password.length < 8) {
       nextErrors.password = "Password minimal 8 karakter."
+    }
+
+    // Inside a department an operator must be placed at an INTAKE station; the
+    // backend enforces this too, this is only a faster message.
+    if (
+      scopedDepartmentId !== null &&
+      role === "operator" &&
+      stationId === "none"
+    ) {
+      nextErrors.station_id = "Operator harus memiliki loket."
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -254,16 +309,13 @@ export function UserFormDialog({
           <div className="space-y-2">
             <Label>Role</Label>
 
-            <Select
-              value={role}
-              onValueChange={(v) => setRole(v ?? "operator")}
-            >
+            <Select value={role} onValueChange={handleRoleChange}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
 
               <SelectContent>
-                {ASSIGNABLE_ROLE_OPTIONS.map((option) => (
+                {roleOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -276,38 +328,44 @@ export function UserFormDialog({
             )}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Department</Label>
+          <div
+            className={`grid gap-4 ${
+              scopedDepartmentId === null ? "sm:grid-cols-2" : "grid-cols-1"
+            }`}
+          >
+            {scopedDepartmentId === null && (
+              <div className="space-y-2">
+                <Label>Department</Label>
 
-              <Select
-                value={departmentId}
-                onValueChange={handleDepartmentChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
+                <Select
+                  value={departmentId}
+                  onValueChange={handleDepartmentChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
 
-                <SelectContent>
-                  <SelectItem value="none">Tidak ada</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="none">Tidak ada</SelectItem>
 
-                  {departments.map((department) => (
-                    <SelectItem
-                      key={department.id}
-                      value={String(department.id)}
-                    >
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {departments.map((department) => (
+                      <SelectItem
+                        key={department.id}
+                        value={String(department.id)}
+                      >
+                        {department.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              {errors.department_id && (
-                <p className="text-xs text-destructive">
-                  {errors.department_id}
-                </p>
-              )}
-            </div>
+                {errors.department_id && (
+                  <p className="text-xs text-destructive">
+                    {errors.department_id}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Station</Label>

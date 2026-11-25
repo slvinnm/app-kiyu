@@ -17,6 +17,8 @@ export type VerifiedUser = {
     status: string | null
     timezone: string | null
   } | null
+  /** Facilities the account may act at, with names for the sidebar header. */
+  facilities: Array<{ id: number; name: string; code: string }>
   /** Every facility the account may act at. The API sends an array; there is
    * no single `facility_id` on the payload. */
   facility_ids: number[]
@@ -32,6 +34,7 @@ type MeResponse = {
     role?: unknown
     tenant_id?: unknown
     tenant?: unknown
+    facilities?: unknown
     facility_ids?: unknown
     station_id?: unknown
   }
@@ -55,6 +58,26 @@ function toTenant(value: unknown): VerifiedUser["tenant"] {
     status: typeof record.status === "string" ? record.status : null,
     timezone: typeof record.timezone === "string" ? record.timezone : null,
   }
+}
+
+function toFacilities(value: unknown): VerifiedUser["facilities"] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .filter(
+      (row): row is { id: number; name: string; code: string } =>
+        typeof row === "object" &&
+        row !== null &&
+        typeof (row as Record<string, unknown>).id === "number" &&
+        typeof (row as Record<string, unknown>).name === "string"
+    )
+    .map((row) => ({
+      id: row.id,
+      name: row.name,
+      code: typeof row.code === "string" ? row.code : "",
+    }))
 }
 
 function toVerifiedUser(data: MeResponse["data"]): VerifiedUser | null {
@@ -82,6 +105,7 @@ function toVerifiedUser(data: MeResponse["data"]): VerifiedUser | null {
     role: data.role,
     tenant_id: optionalNumber(data.tenant_id),
     tenant: toTenant(data.tenant),
+    facilities: toFacilities(data.facilities),
     facility_ids: facilityIds,
     station_id: optionalNumber(data.station_id),
   }

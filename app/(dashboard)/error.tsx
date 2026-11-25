@@ -29,7 +29,11 @@ export default function DashboardError({
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button onClick={reset}>Coba Lagi</Button>
 
-        <Button variant="outline" render={<Link href="/redirect" />}>
+        <Button
+          variant="outline"
+          nativeButton={false}
+          render={<Link href="/redirect" />}
+        >
           Ke Dasbor
         </Button>
       </div>

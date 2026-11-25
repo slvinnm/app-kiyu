@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { getApiErrorMessage, getApiErrorType } from "@/lib/api/error"
 import { getReceptionQueue } from "@/lib/api/reception"
-import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
+import {
+  bindEchoConnectionState,
+  getEcho,
+  publicFacilityChannel,
+} from "@/lib/echo"
 
 import type { ReceptionQueueSnapshot } from "@/types/reception"
 

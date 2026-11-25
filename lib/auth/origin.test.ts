@@ -5,9 +5,8 @@ import type { NextRequest } from "next/server"
 /** Read at module scope; set before the dynamic import for the same reason. */
 process.env.APP_ORIGIN = "https://app-kiyu.test"
 
-const { isSameOrigin, isStateChangingMethod } = await import(
-  "@/lib/auth/origin"
-)
+const { isSameOrigin, isStateChangingMethod } =
+  await import("@/lib/auth/origin")
 
 /**
  * Only `method` and `headers.get()` are read, so a plain `Request` stands in

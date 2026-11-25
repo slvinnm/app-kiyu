@@ -22,7 +22,11 @@ export const clientNavigation: NavigationConfig = {
       title: "Kunjungan",
       icon: <FileText />,
       items: [
-        { title: "Daftar Kunjungan", url: "/client/visits", icon: <FileText /> },
+        {
+          title: "Daftar Kunjungan",
+          url: "/client/visits",
+          icon: <FileText />,
+        },
       ],
     },
     { title: "Booking Online", url: "/client/booking", icon: <CalendarPlus /> },

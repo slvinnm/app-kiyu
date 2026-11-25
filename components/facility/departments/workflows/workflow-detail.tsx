@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ArrowLeftIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -30,7 +30,7 @@ import {
   createDataTableColumnHelper,
 } from "@/components/ui/data-table"
 
-import { WorkflowStepFormDialog } from "@/components/facility/workflows/workflow-step-form-dialog"
+import { WorkflowStepFormDialog } from "@/components/facility/departments/workflows/workflow-step-form-dialog"
 
 import { getApiErrorMessage } from "@/lib/api/error"
 import { deleteWorkflowStep } from "@/lib/api/admin"
@@ -47,6 +47,7 @@ export function WorkflowDetail({
   stations: AdminStation[]
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const steps = workflow.steps ?? []
   const nextSequence =
     steps.length > 0 ? Math.max(...steps.map((step) => step.sequence)) + 1 : 1
@@ -183,11 +184,12 @@ export function WorkflowDetail({
     <>
       <div className="mb-4">
         <Link
-          href="/facility/workflows"
+          // Back to the department's Alur tab, not a standalone page.
+          href={`${pathname}?tab=alur`}
           className={buttonVariants({ variant: "ghost", size: "sm" })}
         >
           <ArrowLeftIcon />
-          Kembali ke Workflow
+          Kembali ke Daftar Workflow
         </Link>
       </div>
 
@@ -198,8 +200,8 @@ export function WorkflowDetail({
               <CardTitle className="text-base">Langkah Workflow</CardTitle>
 
               <CardDescription>
-                {workflow.department?.name ?? "Departemen"} · urutan pelayanan dari
-                station ke station.
+                {workflow.department?.name ?? "Departemen"} · urutan pelayanan
+                dari station ke station.
               </CardDescription>
             </div>
 

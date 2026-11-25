@@ -44,7 +44,9 @@ export default async function Page() {
             {
               header: "Tenant",
               cell: (row) => (
-                <span className="font-medium">{row.tenant?.name ?? row.tenant_id}</span>
+                <span className="font-medium">
+                  {row.tenant?.name ?? row.tenant_id}
+                </span>
               ),
             },
             { header: "Paket", cell: (row) => row.plan?.name ?? "-" },
@@ -56,7 +58,9 @@ export default async function Page() {
             {
               header: "Akhir Periode",
               cell: (row) =>
-                row.current_period_end ? formatDateTime(row.current_period_end) : "-",
+                row.current_period_end
+                  ? formatDateTime(row.current_period_end)
+                  : "-",
             },
           ]}
         />

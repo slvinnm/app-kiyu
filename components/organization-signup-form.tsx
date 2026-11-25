@@ -54,7 +54,9 @@ export function OrganizationSignupForm({
           <form action={formAction}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="organization_name">Nama Organisasi</FieldLabel>
+                <FieldLabel htmlFor="organization_name">
+                  Nama Organisasi
+                </FieldLabel>
                 <Input
                   id="organization_name"
                   name="organization_name"

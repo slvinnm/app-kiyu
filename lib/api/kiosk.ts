@@ -1,3 +1,5 @@
+import { normalisePayload } from "@/lib/api/normalize"
+
 import type {
   ApiResponse,
   Department,
@@ -71,7 +73,7 @@ async function request<T>(
       throw new Error(payload?.message ?? "Respons server tidak valid.")
     }
 
-    return payload as ApiResponse<T>
+    return normalisePayload(payload) as ApiResponse<T>
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("Server tidak merespons. Silakan coba lagi.")

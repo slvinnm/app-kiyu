@@ -48,7 +48,9 @@ export default async function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Badge variant={settings.allow_public_signup ? "secondary" : "outline"}>
+              <Badge
+                variant={settings.allow_public_signup ? "secondary" : "outline"}
+              >
                 {settings.allow_public_signup ? "Terbuka" : "Ditutup"}
               </Badge>
             </CardContent>

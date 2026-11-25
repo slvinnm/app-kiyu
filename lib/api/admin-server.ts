@@ -47,6 +47,99 @@ export async function getFacilitiesServer(): Promise<Facility[]> {
   return response.data
 }
 
+/**
+ * One facility with its departments (portal nested navigation).
+ * Facility-scoped reads send `X-Facility-Id` when the caller can reach several.
+ */
+/**
+ * Facility-scoped reads for the nested portal navigation: the facility id is
+ * named in the URL, so it is sent as `X-Facility-Id` (validated by the API)
+ * instead of relying on the browser's persisted selection.
+ */
+function facilityHeaders(facilityId: number): RequestInit {
+  return { headers: { "X-Facility-Id": String(facilityId) } }
+}
+
+export async function getFacilityDetailByIdServer(
+  facilityId: number
+): Promise<Facility> {
+  const response = await serverApiFetch<{ data: Facility }>(
+    `/facilities/${facilityId}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getDepartmentDetailInFacilityServer(
+  facilityId: number,
+  departmentId: number
+): Promise<Department> {
+  const response = await serverApiFetch<{ data: Department }>(
+    `/departments/${departmentId}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getStationsInFacilityServer(
+  facilityId: number,
+  filters: TableFilters = {}
+): Promise<Paginated<Station>> {
+  const response = await serverApiFetch<{ data: Paginated<Station> }>(
+    `/stations${toQuery(filters)}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getWorkflowsInFacilityServer(
+  facilityId: number,
+  filters: TableFilters = {}
+): Promise<Paginated<Workflow>> {
+  const response = await serverApiFetch<{ data: Paginated<Workflow> }>(
+    `/workflows${toQuery(filters)}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getUsersInFacilityServer(
+  facilityId: number,
+  filters: TableFilters = {}
+): Promise<Paginated<AdminUser>> {
+  const response = await serverApiFetch<{ data: Paginated<AdminUser> }>(
+    `/users${toQuery(filters)}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getWorkflowDetailInFacilityServer(
+  facilityId: number,
+  workflowId: number
+): Promise<Workflow> {
+  const response = await serverApiFetch<{ data: Workflow }>(
+    `/workflows/${workflowId}`,
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getDepartmentOptionsInFacilityServer(
+  facilityId: number
+): Promise<Department[]> {
+  const response = await serverApiFetch<{ data: Department[] }>(
+    "/departments/options",
+    facilityHeaders(facilityId)
+  )
+  return response.data
+}
+
+export async function getFacilityDetailServer(id: number): Promise<Facility> {
+  const response = await serverApiFetch<{ data: Facility }>(`/facilities/${id}`)
+  return response.data
+}
+
 export async function getKioskDevicesServer(): Promise<KioskDevice[]> {
   const response = await serverApiFetch<{ data: KioskDevice[] }>(
     "/kiosk-devices"
@@ -88,6 +181,19 @@ export async function getStationsServer(
 ): Promise<Paginated<Station>> {
   const response = await serverApiFetch<{ data: Paginated<Station> }>(
     `/stations${toQuery(filters)}`
+  )
+  return response.data
+}
+
+/**
+ * A single department with its stations and full workflows (steps included).
+ * Backs the nested department-detail page (PRD §8.2, §8.3).
+ */
+export async function getDepartmentDetailServer(
+  id: number
+): Promise<Department> {
+  const response = await serverApiFetch<{ data: Department }>(
+    `/departments/${id}`
   )
   return response.data
 }

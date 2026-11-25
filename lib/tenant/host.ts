@@ -105,7 +105,9 @@ export function classifyHost(host: string | null | undefined): HostContext {
 }
 
 /** Tenant slug carried by the host, or `null` for any non-tenant host. */
-export function tenantSlugFromHost(host: string | null | undefined): string | null {
+export function tenantSlugFromHost(
+  host: string | null | undefined
+): string | null {
   const context = classifyHost(host)
 
   return context.kind === "tenant" ? context.slug : null

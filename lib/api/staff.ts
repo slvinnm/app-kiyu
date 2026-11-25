@@ -14,7 +14,9 @@ import type {
 
 export type StationQueueResponse = {
   station: Station
-  data: QueueTicket[]
+  data: {
+    data: QueueTicket[]
+  }
 }
 
 export function getStationQueue(

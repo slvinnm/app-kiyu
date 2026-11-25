@@ -126,6 +126,7 @@ async function fallbackToCookieUser(): Promise<VerifiedUser> {
     role: session.user.role,
     tenant_id: session.user.tenant_id ?? null,
     tenant: session.user.tenant ?? null,
+    facilities: session.user.facilities ?? [],
     facility_ids: session.user.facility_ids ?? [],
     station_id: session.user.station_id ?? null,
   }

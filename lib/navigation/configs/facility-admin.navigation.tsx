@@ -1,13 +1,10 @@
 import {
   Building2,
   FileText,
-  GitBranch,
   LayoutDashboardIcon,
-  MapPin,
   MonitorPlay,
   ScrollText,
   Ticket,
-  UserCog,
 } from "lucide-react"
 
 import type { NavigationConfig } from "@/lib/navigation/types"
@@ -27,24 +24,10 @@ export const facilityAdminNavigation: NavigationConfig = {
       url: "/facility/dashboard",
       icon: <LayoutDashboardIcon />,
     },
-    {
-      title: "Departemen",
-      icon: <Building2 />,
-      items: [
-        {
-          title: "Daftar Departemen",
-          url: "/facility/departments",
-          icon: <Building2 />,
-        },
-        { title: "Loket", url: "/facility/stations", icon: <MapPin /> },
-        {
-          title: "Alur Layanan",
-          url: "/facility/workflows",
-          icon: <GitBranch />,
-        },
-      ],
-    },
-    { title: "Pengguna", url: "/facility/users", icon: <UserCog /> },
+    // Loket and Alur Layanan are tabs of a department's detail page, not
+    // separate sidebar entries (PRD §8.3).
+    // Departments contain Loket, Alur Layanan and Pengguna as tabs (PRD §8.3).
+    { title: "Departemen", url: "/facility/departments", icon: <Building2 /> },
     {
       title: "Perangkat",
       icon: <MonitorPlay />,

@@ -49,7 +49,12 @@ export default async function Page({
           description={error ?? "Tenant tidak ditemukan."}
           icon={<Building2 className="size-5" />}
           actions={
-            <Button variant="outline" size="sm" render={<Link href="/platform/tenants" />}>
+            <Button
+              variant="outline"
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/platform/tenants" />}
+            >
               <ArrowLeftIcon data-icon="inline-start" />
               Kembali
             </Button>
@@ -70,10 +75,17 @@ export default async function Page({
         icon={<Building2 className="size-5" />}
         actions={
           <>
-            <Badge variant={tenant.status === "ACTIVE" ? "secondary" : "destructive"}>
+            <Badge
+              variant={tenant.status === "ACTIVE" ? "secondary" : "destructive"}
+            >
               {tenant.status}
             </Badge>
-            <Button variant="outline" size="sm" render={<Link href="/platform/tenants" />}>
+            <Button
+              variant="outline"
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/platform/tenants" />}
+            >
               <ArrowLeftIcon data-icon="inline-start" />
               Kembali
             </Button>
@@ -108,12 +120,17 @@ export default async function Page({
           <CardHeader>
             <CardTitle className="text-base">Langganan</CardTitle>
             <CardDescription>
-              {subscription ? subscription.plan?.name ?? "-" : "Belum berlangganan"}
+              {subscription
+                ? (subscription.plan?.name ?? "-")
+                : "Belum berlangganan"}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             <Row label="Status" value={subscription?.status ?? "-"} />
-            <Row label="Interval" value={subscription?.billing_interval ?? "-"} />
+            <Row
+              label="Interval"
+              value={subscription?.billing_interval ?? "-"}
+            />
             <Row
               label="Akhir Periode"
               value={
@@ -150,10 +167,16 @@ export default async function Page({
                 )}
                 {tenant.facilities.map((facility) => (
                   <TableRow key={facility.id}>
-                    <TableCell className="font-medium">{facility.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{facility.code}</TableCell>
+                    <TableCell className="font-medium">
+                      {facility.name}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {facility.code}
+                    </TableCell>
                     <TableCell>
-                      <Badge variant={facility.is_active ? "secondary" : "outline"}>
+                      <Badge
+                        variant={facility.is_active ? "secondary" : "outline"}
+                      >
                         {facility.is_active ? "Aktif" : "Nonaktif"}
                       </Badge>
                     </TableCell>
@@ -169,10 +192,19 @@ export default async function Page({
             <CardTitle className="text-base">Penggunaan Perangkat</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 text-sm">
-            <Row label="Kiosk" value={String(tenant.kiosk_devices_count ?? 0)} />
-            <Row label="Display" value={String(tenant.display_devices_count ?? 0)} />
+            <Row
+              label="Kiosk"
+              value={String(tenant.kiosk_devices_count ?? 0)}
+            />
+            <Row
+              label="Display"
+              value={String(tenant.display_devices_count ?? 0)}
+            />
             <Row label="Pengguna" value={String(tenant.users_count ?? 0)} />
-            <Row label="Pelanggan" value={String(tenant.customers_count ?? 0)} />
+            <Row
+              label="Pelanggan"
+              value={String(tenant.customers_count ?? 0)}
+            />
           </CardContent>
         </Card>
       </div>

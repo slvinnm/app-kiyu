@@ -91,8 +91,7 @@ export function LoginForm({
                 </Button>
 
                 <FieldDescription className="text-center">
-                  Belum punya akun?{" "}
-                  <Link href="/signup">Daftar</Link>
+                  Belum punya akun? <Link href="/signup">Daftar</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

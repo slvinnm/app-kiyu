@@ -64,9 +64,7 @@ export function FacilitySwitcher({
             </div>
 
             <div className="grid flex-1 text-left leading-tight">
-              <span className="truncate text-sm font-medium">
-                {activeName}
-              </span>
+              <span className="truncate text-sm font-medium">{activeName}</span>
 
               <span className="truncate text-xs text-muted-foreground">
                 Fasilitas aktif

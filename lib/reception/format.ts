@@ -41,7 +41,12 @@ const CHANNEL_LABELS: Record<IntakeChannel, string> = {
  * Mirrors `App\Enums\StationType`. Neutral labels: the type says what kind of
  * work a service point does, the station's own name says where.
  */
-export const STATION_TYPES = ["INTAKE", "SERVICE", "CASHIER", "COUNTER"] as const
+export const STATION_TYPES = [
+  "INTAKE",
+  "SERVICE",
+  "CASHIER",
+  "COUNTER",
+] as const
 
 export type StationTypeValue = (typeof STATION_TYPES)[number]
 

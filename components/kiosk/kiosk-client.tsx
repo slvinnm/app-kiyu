@@ -11,6 +11,7 @@ import { OnlineCheckinPanel } from "@/components/kiosk/online-checkin-panel"
 import { SuccessScreen } from "@/components/kiosk/success-screen"
 import { ErrorScreen } from "@/components/kiosk/error-screen"
 import { SUCCESS_RESET_DELAY } from "@/lib/api/kiosk"
+import { newIdempotencyKey } from "@/lib/id"
 import { useRouter } from "next/navigation"
 
 type KioskMode = "walk-in" | "online"
@@ -110,7 +111,7 @@ export function KioskClient() {
   const handleAcquireQueue = useCallback(
     async (department: Department, retry = false) => {
       if (!retry || !activeIdempotencyKey.current) {
-        activeIdempotencyKey.current = crypto.randomUUID()
+        activeIdempotencyKey.current = newIdempotencyKey()
       }
 
       const idempotencyKey = activeIdempotencyKey.current

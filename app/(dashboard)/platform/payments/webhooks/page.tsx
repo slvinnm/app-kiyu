@@ -73,7 +73,9 @@ export default async function Page() {
             {
               header: "Error",
               cell: (row) => (
-                <span className="text-xs text-destructive">{row.error ?? "-"}</span>
+                <span className="text-xs text-destructive">
+                  {row.error ?? "-"}
+                </span>
               ),
             },
           ]}

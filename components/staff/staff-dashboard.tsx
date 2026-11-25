@@ -126,10 +126,7 @@ export async function StaffDashboard({ role }: { role: string }) {
 
   return (
     <div className="mx-auto w-full max-w-7xl p-4 md:p-6 lg:p-8">
-      <LiveRefresh
-        facilityId={facilityId}
-        stationId={stationId}
-      />
+      <LiveRefresh facilityId={facilityId} stationId={stationId} />
       <DashboardHeader
         label={label}
         stationCode={station.code}
@@ -160,7 +157,9 @@ export async function StaffDashboard({ role }: { role: string }) {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-base">Pelanggan Saat Ini</CardTitle>
+                  <CardTitle className="text-base">
+                    Pelanggan Saat Ini
+                  </CardTitle>
 
                   <CardDescription>
                     Pelanggan yang sedang ditangani di station Anda.
@@ -207,7 +206,9 @@ export async function StaffDashboard({ role }: { role: string }) {
                 <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
                   <BellRingIcon className="size-6 text-muted-foreground" />
 
-                  <p className="text-sm font-medium">Tidak ada pelanggan aktif</p>
+                  <p className="text-sm font-medium">
+                    Tidak ada pelanggan aktif
+                  </p>
 
                   <Link href={queuePath} className={buttonVariants()}>
                     Buka Antrian

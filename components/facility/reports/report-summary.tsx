@@ -58,8 +58,14 @@ export function ReportSummaryView({ summary }: { summary: ReportSummary }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Total Sesi Antrean" value={summary.queue_sessions.total_sessions} />
-        <Stat label="Selesai" value={summary.queue_sessions.completed_sessions} />
+        <Stat
+          label="Total Sesi Antrean"
+          value={summary.queue_sessions.total_sessions}
+        />
+        <Stat
+          label="Selesai"
+          value={summary.queue_sessions.completed_sessions}
+        />
         <Stat
           label="Rasio Selesai"
           value={`${summary.queue_sessions.completion_rate}%`}
@@ -79,16 +85,19 @@ export function ReportSummaryView({ summary }: { summary: ReportSummary }) {
           <CardHeader>
             <CardTitle>Sesi Antrean per Status</CardTitle>
             <CardDescription>
-              {summary.queue_sessions.period.from} – {summary.queue_sessions.period.to}
+              {summary.queue_sessions.period.from} –{" "}
+              {summary.queue_sessions.period.to}
             </CardDescription>
           </CardHeader>
 
           <CardContent className="flex flex-wrap gap-2">
-            {Object.entries(summary.queue_sessions.by_status).map(([status, total]) => (
-              <Badge key={status} variant="outline">
-                {status}: {total}
-              </Badge>
-            ))}
+            {Object.entries(summary.queue_sessions.by_status).map(
+              ([status, total]) => (
+                <Badge key={status} variant="outline">
+                  {status}: {total}
+                </Badge>
+              )
+            )}
           </CardContent>
         </Card>
 

@@ -34,12 +34,15 @@ export function WorkflowFormDialog({
   onOpenChange,
   departments,
   defaultDepartmentId,
+  scopedDepartment = false,
   onSaved,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   departments: Department[]
   defaultDepartmentId: number | null
+  /** Opened inside a department's detail: the department is already fixed. */
+  scopedDepartment?: boolean
   onSaved: () => void
 }) {
   const [departmentId, setDepartmentId] = useState("")
@@ -126,30 +129,37 @@ export function WorkflowFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Departemen</Label>
+          {!scopedDepartment && (
+            <div className="space-y-2">
+              <Label>Departemen</Label>
 
-            <Select
-              value={departmentId}
-              onValueChange={(value) => setDepartmentId(value ?? "")}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih departemen" />
-              </SelectTrigger>
+              <Select
+                value={departmentId}
+                onValueChange={(value) => setDepartmentId(value ?? "")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih departemen" />
+                </SelectTrigger>
 
-              <SelectContent>
-                {departments.map((department) => (
-                  <SelectItem key={department.id} value={String(department.id)}>
-                    {department.name} ({department.code})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem
+                      key={department.id}
+                      value={String(department.id)}
+                    >
+                      {department.name} ({department.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {errors.department_id && (
-              <p className="text-xs text-destructive">{errors.department_id}</p>
-            )}
-          </div>
+              {errors.department_id && (
+                <p className="text-xs text-destructive">
+                  {errors.department_id}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="workflow-name">Nama Workflow</Label>

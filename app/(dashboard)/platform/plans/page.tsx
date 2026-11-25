@@ -64,15 +64,20 @@ export default async function Page() {
                   <span className="text-xs font-medium text-muted-foreground">
                     Harga
                   </span>
-                  {plan.prices.filter((price) => price.is_active).length === 0 && (
-                    <span className="text-muted-foreground">Belum ada harga aktif.</span>
+                  {plan.prices.filter((price) => price.is_active).length ===
+                    0 && (
+                    <span className="text-muted-foreground">
+                      Belum ada harga aktif.
+                    </span>
                   )}
                   {plan.prices
                     .filter((price) => price.is_active)
                     .map((price) => (
                       <span key={price.id}>
                         {formatMoney(price.amount, price.currency)} /{" "}
-                        {price.billing_interval === "MONTHLY" ? "bulan" : "tahun"}
+                        {price.billing_interval === "MONTHLY"
+                          ? "bulan"
+                          : "tahun"}
                       </span>
                     ))}
                 </div>
@@ -82,11 +87,17 @@ export default async function Page() {
                     Fitur & Batas
                   </span>
                   {plan.entitlements.length === 0 && (
-                    <span className="text-muted-foreground">Tidak ada entitlement.</span>
+                    <span className="text-muted-foreground">
+                      Tidak ada entitlement.
+                    </span>
                   )}
                   <div className="flex flex-wrap gap-1">
                     {plan.entitlements.map((entitlement) => (
-                      <Badge key={entitlement.id} variant="outline" className="gap-1">
+                      <Badge
+                        key={entitlement.id}
+                        variant="outline"
+                        className="gap-1"
+                      >
                         {entitlement.feature_code}
                         {entitlement.value?.limit !== undefined &&
                           `: ${entitlement.value.limit}`}

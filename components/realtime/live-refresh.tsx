@@ -3,7 +3,11 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-import { bindEchoConnectionState, getEcho, publicFacilityChannel } from "@/lib/echo"
+import {
+  bindEchoConnectionState,
+  getEcho,
+  publicFacilityChannel,
+} from "@/lib/echo"
 
 /**
  * Re-runs the enclosing server component whenever a queue channel changes.

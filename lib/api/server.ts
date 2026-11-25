@@ -1,6 +1,7 @@
 import "server-only"
 
 import { ApiError } from "@/lib/api/error"
+import { normalisePayload } from "@/lib/api/normalize"
 import { getLaravelAccessToken } from "@/lib/auth/server"
 import { getSession } from "@/lib/auth/session"
 import { getActiveFacilityId } from "@/lib/facility/server"
@@ -63,20 +64,17 @@ export async function serverApiFetch<T>(
   // the account can reach several. An explicit `X-Facility-Id` in `init` wins.
   const facilityId = await getActiveFacilityId()
 
-  const response = await fetch(
-    `${API_BASE_URL.replace(/\/$/, "")}/${target}`,
-    {
-      ...init,
-      cache: "no-store",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(facilityId !== null ? { "X-Facility-Id": String(facilityId) } : {}),
-        ...(init?.body ? { "Content-Type": "application/json" } : {}),
-        ...init?.headers,
-      },
-    }
-  )
+  const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/${target}`, {
+    ...init,
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(facilityId !== null ? { "X-Facility-Id": String(facilityId) } : {}),
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...init?.headers,
+    },
+  })
 
   const payload: unknown = await response
     .json()
@@ -90,5 +88,5 @@ export async function serverApiFetch<T>(
     )
   }
 
-  return payload as T
+  return normalisePayload(payload) as T
 }

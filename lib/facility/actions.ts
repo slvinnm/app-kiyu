@@ -6,7 +6,8 @@ import { FACILITY_COOKIE_NAME } from "@/lib/facility/context"
 import { resolveFacilityId } from "@/lib/facility/selection"
 import { getVerifiedUser } from "@/lib/auth/guard"
 
-export type FacilitySelectionResult = { ok: true } | { ok: false; message: string }
+export type FacilitySelectionResult =
+  { ok: true } | { ok: false; message: string }
 
 /**
  * Persist the active facility for the current session.
@@ -24,7 +25,10 @@ export async function selectFacility(
     return { ok: false, message: "Sesi berakhir. Muat ulang halaman." }
   }
 
-  const requested = typeof facilityId === "number" ? String(facilityId) : String(facilityId ?? "")
+  const requested =
+    typeof facilityId === "number"
+      ? String(facilityId)
+      : String(facilityId ?? "")
   const resolved = resolveFacilityId(requested, user.facility_ids)
 
   if (resolved === null) {

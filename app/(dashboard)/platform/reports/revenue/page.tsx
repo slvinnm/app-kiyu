@@ -1,6 +1,9 @@
 import { Wallet } from "lucide-react"
 
-import { ConsolePageHeader, ConsoleStat } from "@/components/console/console-page-header"
+import {
+  ConsolePageHeader,
+  ConsoleStat,
+} from "@/components/console/console-page-header"
 import { SimpleTable } from "@/components/console/simple-table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -52,13 +55,16 @@ export default async function Page() {
                 header: "Pendapatan",
                 cell: (row) => (
                   <span className="tabular-nums">
-                    {row.currency} {new Intl.NumberFormat("id-ID").format(row.amount)}
+                    {row.currency}{" "}
+                    {new Intl.NumberFormat("id-ID").format(row.amount)}
                   </span>
                 ),
               },
               {
                 header: "Jumlah Pembayaran",
-                cell: (row) => <span className="tabular-nums">{row.payments}</span>,
+                cell: (row) => (
+                  <span className="tabular-nums">{row.payments}</span>
+                ),
               },
             ]}
           />

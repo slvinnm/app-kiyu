@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-import { SESSION_COOKIE_NAME, readSessionFromRequest } from "@/lib/auth/session-core"
+import {
+  SESSION_COOKIE_NAME,
+  readSessionFromRequest,
+} from "@/lib/auth/session-core"
 import { routeContextOf } from "@/lib/auth/route-access"
 import { classifyHost, requestHostname } from "@/lib/tenant/host"
 import { resolveTenantAvailability } from "@/lib/tenant/availability"
@@ -101,7 +104,10 @@ export default async function proxy(request: NextRequest) {
     if (availability.status === 403) {
       return new NextResponse(
         "Organisasi ini sedang tidak tersedia. Hubungi administrator organisasi Anda.",
-        { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } }
+        {
+          status: 403,
+          headers: { "content-type": "text/plain; charset=utf-8" },
+        }
       )
     }
   }

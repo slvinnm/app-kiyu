@@ -9,7 +9,10 @@ import {
   Wallet,
 } from "lucide-react"
 
-import { ConsolePageHeader, ConsoleStat } from "@/components/console/console-page-header"
+import {
+  ConsolePageHeader,
+  ConsoleStat,
+} from "@/components/console/console-page-header"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -88,7 +91,10 @@ export default async function Page() {
             />
             <ConsoleStat
               label="Koleksi Pembayaran"
-              value={formatMoney(dashboard.collection_in_range, dashboard.mrr.currency)}
+              value={formatMoney(
+                dashboard.collection_in_range,
+                dashboard.mrr.currency
+              )}
               hint="Pembayaran PAID dalam rentang"
               icon={<CircleDollarSign className="size-4" />}
             />
@@ -104,15 +110,20 @@ export default async function Page() {
                 <CardDescription>Distribusi seluruh langganan.</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
-                {Object.entries(dashboard.subscriptions.by_status).length === 0 && (
-                  <p className="text-sm text-muted-foreground">Belum ada langganan.</p>
+                {Object.entries(dashboard.subscriptions.by_status).length ===
+                  0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Belum ada langganan.
+                  </p>
                 )}
 
                 {Object.entries(dashboard.subscriptions.by_status).map(
                   ([status, total]) => (
                     <Badge key={status} variant="secondary" className="gap-1">
                       {status}
-                      <span className="tabular-nums">{formatNumber(total)}</span>
+                      <span className="tabular-nums">
+                        {formatNumber(total)}
+                      </span>
                     </Badge>
                   )
                 )}
@@ -125,14 +136,18 @@ export default async function Page() {
                   <Building2 className="size-4 text-muted-foreground" />
                   Status Tenant
                 </CardTitle>
-                <CardDescription>Distribusi tenant menurut status.</CardDescription>
+                <CardDescription>
+                  Distribusi tenant menurut status.
+                </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
                 {Object.entries(dashboard.tenants.by_status).map(
                   ([status, total]) => (
                     <Badge key={status} variant="secondary" className="gap-1">
                       {status}
-                      <span className="tabular-nums">{formatNumber(total)}</span>
+                      <span className="tabular-nums">
+                        {formatNumber(total)}
+                      </span>
                     </Badge>
                   )
                 )}
@@ -148,16 +163,30 @@ export default async function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-3">
-              <Badge variant={dashboard.failed_payments_in_range > 0 ? "destructive" : "secondary"}>
-                {formatNumber(dashboard.failed_payments_in_range)} pembayaran gagal
+              <Badge
+                variant={
+                  dashboard.failed_payments_in_range > 0
+                    ? "destructive"
+                    : "secondary"
+                }
+              >
+                {formatNumber(dashboard.failed_payments_in_range)} pembayaran
+                gagal
               </Badge>
-              <Badge variant={dashboard.failed_webhooks_in_range > 0 ? "destructive" : "secondary"}>
+              <Badge
+                variant={
+                  dashboard.failed_webhooks_in_range > 0
+                    ? "destructive"
+                    : "secondary"
+                }
+              >
                 {formatNumber(dashboard.failed_webhooks_in_range)} webhook gagal
               </Badge>
 
               <Button
                 variant="outline"
                 size="sm"
+                nativeButton={false}
                 render={<Link href="/platform/payments/webhooks" />}
               >
                 Riwayat Webhook

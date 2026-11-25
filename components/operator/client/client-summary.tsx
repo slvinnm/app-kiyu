@@ -2,7 +2,6 @@ import { UserRoundIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 
-
 import type { Customer } from "@/types/reception"
 
 export function CustomerSummary({

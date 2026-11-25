@@ -16,7 +16,7 @@ export async function getVisitTracking(
   }
 
   const response = await fetch(
-    `${API_BASE_URL.replace(/\/$/, "")}/visits/${encodeURIComponent(token)}/track`,
+    `${API_BASE_URL.replace(/\/$/, "")}/queue-sessions/${encodeURIComponent(token)}/track`,
     {
       method: "GET",
       headers: {

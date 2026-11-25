@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ArrowRightIcon, PlusIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { WorkflowFormDialog } from "@/components/facility/workflows/workflow-form-dialog"
+import { WorkflowFormDialog } from "@/components/facility/departments/workflows/workflow-form-dialog"
 
 import { useTableQuery } from "@/hooks/use-table-query"
 
@@ -42,6 +42,7 @@ export function WorkflowManager({
   lastPage,
   departments,
   state,
+  scopedDepartment = false,
 }: {
   rows: Workflow[]
   total: number
@@ -49,8 +50,11 @@ export function WorkflowManager({
   departments: Department[]
   filters: Record<string, string>
   state: TableQueryState
+  /** Opened inside a department's detail: hide the department filter/column. */
+  scopedDepartment?: boolean
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const tq = useTableQuery(state)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -99,7 +103,10 @@ export function WorkflowManager({
           cell: ({ row }) => (
             <div className="text-right">
               <Link
-                href={`/admin/workflows/${row.original.id}`}
+                // Keep the user on the department detail page; the workflow is
+                // selected through the URL so Back/Forward and refresh restore
+                // the same view (PRD §8.2).
+                href={`${pathname}?tab=alur&workflow=${row.original.id}`}
                 className={buttonVariants({
                   variant: "outline",
                   size: "sm",
@@ -113,7 +120,7 @@ export function WorkflowManager({
           enableSorting: false,
         }),
       ]),
-    [departments]
+    [departments, pathname]
   )
 
   return (
@@ -155,32 +162,34 @@ export function WorkflowManager({
             searching={tq.pending}
             searchPlaceholder="Cari nama workflow..."
             toolbar={
-              <Select
-                value={departmentFilter}
-                onValueChange={(value) =>
-                  tq.setFilter(
-                    "department_id",
-                    !value || value === "all" ? null : value
-                  )
-                }
-              >
-                <SelectTrigger className="w-full sm:w-[220px]">
-                  <SelectValue />
-                </SelectTrigger>
+              scopedDepartment ? undefined : (
+                <Select
+                  value={departmentFilter}
+                  onValueChange={(value) =>
+                    tq.setFilter(
+                      "department_id",
+                      !value || value === "all" ? null : value
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full sm:w-[220px]">
+                    <SelectValue />
+                  </SelectTrigger>
 
-                <SelectContent>
-                  <SelectItem value="all">Semua Departemen</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Departemen</SelectItem>
 
-                  {departments.map((department) => (
-                    <SelectItem
-                      key={department.id}
-                      value={String(department.id)}
-                    >
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {departments.map((department) => (
+                      <SelectItem
+                        key={department.id}
+                        value={String(department.id)}
+                      >
+                        {department.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )
             }
           />
         </CardContent>
@@ -191,6 +200,7 @@ export function WorkflowManager({
         onOpenChange={setDialogOpen}
         departments={departments}
         defaultDepartmentId={defaultDepartmentId}
+        scopedDepartment={scopedDepartment}
         onSaved={() => router.refresh()}
       />
     </>

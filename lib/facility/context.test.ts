@@ -23,7 +23,9 @@ describe("resolveFacilityId", () => {
 
   it("refuses malformed and missing values", () => {
     for (const value of ["abc", "1.5", "", null, undefined]) {
-      expect(resolveFacilityId(value as string | null | undefined, [5])).toBeNull()
+      expect(
+        resolveFacilityId(value as string | null | undefined, [5])
+      ).toBeNull()
     }
   })
 })

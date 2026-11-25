@@ -124,7 +124,9 @@ export function DepartmentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{department ? "Edit Departemen" : "Tambah Departemen"}</DialogTitle>
+          <DialogTitle>
+            {department ? "Edit Departemen" : "Tambah Departemen"}
+          </DialogTitle>
 
           <DialogDescription>
             Departemen adalah unit pelayanan yang memiliki station dan workflow.

@@ -64,7 +64,10 @@ export function updateClientProfile(
 /* -------------------------------------------------------------------------- */
 
 export function getVisitDetail(visitId: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<ClientVisitDetail>>(`/queue-sessions/${visitId}`, {
-    signal,
-  })
+  return apiFetch<ApiResponse<ClientVisitDetail>>(
+    `/queue-sessions/${visitId}`,
+    {
+      signal,
+    }
+  )
 }

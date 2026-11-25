@@ -71,13 +71,17 @@ export function TenantTable({
         columnHelper.accessor("facilities_count", {
           header: "Fasilitas",
           cell: ({ row }) => (
-            <span className="tabular-nums">{row.original.facilities_count ?? 0}</span>
+            <span className="tabular-nums">
+              {row.original.facilities_count ?? 0}
+            </span>
           ),
         }),
         columnHelper.accessor("users_count", {
           header: "Pengguna",
           cell: ({ row }) => (
-            <span className="tabular-nums">{row.original.users_count ?? 0}</span>
+            <span className="tabular-nums">
+              {row.original.users_count ?? 0}
+            </span>
           ),
         }),
         columnHelper.display({
@@ -105,6 +109,7 @@ export function TenantTable({
             <Button
               variant="outline"
               size="sm"
+              nativeButton={false}
               render={<Link href={`/platform/tenants/${row.original.id}`} />}
             >
               Detail

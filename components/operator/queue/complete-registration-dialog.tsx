@@ -102,7 +102,9 @@ export function CompleteRegistrationDialog({
 
   const [mode, setMode] = useState<CustomerMode>("existing")
   const [priority, setPriority] = useState<Priority>(1)
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  )
   const [search, setSearch] = useState("")
   const [newPatient, setNewPatient] = useState<CustomerInput>(initialPatient)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})

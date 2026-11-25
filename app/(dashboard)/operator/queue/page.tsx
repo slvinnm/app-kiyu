@@ -14,8 +14,8 @@ export default async function Page() {
     try {
       const stations = await getStationOptionsServer()
       departmentId =
-        stations.find((station) => station.id === user.station_id)?.department_id ??
-        null
+        stations.find((station) => station.id === user.station_id)
+          ?.department_id ?? null
     } catch {
       departmentId = null
     }

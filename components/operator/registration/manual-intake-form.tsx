@@ -4,6 +4,8 @@ import { useState } from "react"
 import { ArrowRightIcon, ClipboardPlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { newIdempotencyKey } from "@/lib/id"
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -53,7 +55,7 @@ export function ManualIntakeForm({
   )
   const [priority, setPriority] = useState<Priority>(1)
   const [idempotencyKey, setIdempotencyKey] = useState(() =>
-    crypto.randomUUID()
+    newIdempotencyKey()
   )
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,7 +67,7 @@ export function ManualIntakeForm({
     }
 
     setDepartmentId(nextValue)
-    setIdempotencyKey(crypto.randomUUID())
+    setIdempotencyKey(newIdempotencyKey())
     setError(null)
   }
 
@@ -77,7 +79,7 @@ export function ManualIntakeForm({
     }
 
     setPriority(parsed)
-    setIdempotencyKey(crypto.randomUUID())
+    setIdempotencyKey(newIdempotencyKey())
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -120,7 +122,7 @@ export function ManualIntakeForm({
     setResult(null)
     setError(null)
     setPriority(1)
-    setIdempotencyKey(crypto.randomUUID())
+    setIdempotencyKey(newIdempotencyKey())
   }
 
   if (result) {
@@ -181,8 +183,8 @@ export function ManualIntakeForm({
               </Select>
 
               <p className="text-xs text-muted-foreground">
-                Pelanggan akan mendapat nomor antrean di meja registrasi departemen yang
-                dipilih.
+                Pelanggan akan mendapat nomor antrean di meja registrasi
+                departemen yang dipilih.
               </p>
             </div>
 
@@ -259,8 +261,8 @@ export function ManualIntakeForm({
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>
               Pelanggan mendapat nomor antrean reception terlebih dahulu. Data
-              pelanggan dicari atau dibuat saat petugas menyelesaikan registrasi di
-              halaman Antrian.
+              pelanggan dicari atau dibuat saat petugas menyelesaikan registrasi
+              di halaman Antrian.
             </p>
 
             <p>

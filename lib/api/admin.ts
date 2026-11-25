@@ -127,6 +127,8 @@ export type UserInput = {
   /** Required for facility-scoped roles; ignored for tenant_admin and client. */
   facility_ids?: number[]
   station_id?: number | null
+  /** Present when managing users from inside a department (scopes validation). */
+  department_id?: number | null
 }
 
 export type AdminUser = {
@@ -229,7 +231,9 @@ export function createReferral(input: ReferralInput) {
 }
 
 export function getReferral(id: number, signal?: AbortSignal) {
-  return apiFetch<ApiResponse<ReferralDetail>>(`/service-transfers/${id}`, { signal })
+  return apiFetch<ApiResponse<ReferralDetail>>(`/service-transfers/${id}`, {
+    signal,
+  })
 }
 
 /* -------------------------------------------------------------------------- */
@@ -376,10 +380,13 @@ export function requestReportExport(
   format: "xlsx" | "pdf",
   range: ReportRange = {}
 ) {
-  return apiFetch<ApiResponse<ReportExport>>("/reports/queue-sessions/export-file", {
-    method: "POST",
-    body: JSON.stringify({ format, ...range }),
-  })
+  return apiFetch<ApiResponse<ReportExport>>(
+    "/reports/queue-sessions/export-file",
+    {
+      method: "POST",
+      body: JSON.stringify({ format, ...range }),
+    }
+  )
 }
 
 /* -------------------------------------------------------------------------- */

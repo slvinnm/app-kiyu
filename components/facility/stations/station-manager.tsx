@@ -36,13 +36,13 @@ import type { TableQueryState } from "@/hooks/use-table-query"
 
 const columnHelper = createDataTableColumnHelper<AdminStation>()
 
-
 export function StationManager({
   rows,
   total,
   lastPage,
   departments,
   state,
+  scopedDepartment = false,
 }: {
   rows: AdminStation[]
   total: number
@@ -50,6 +50,8 @@ export function StationManager({
   departments: Department[]
   filters: Record<string, string>
   state: TableQueryState
+  /** Opened inside a department's detail: hide the department filter/column. */
+  scopedDepartment?: boolean
 }) {
   const router = useRouter()
   const tq = useTableQuery(state)
@@ -134,6 +136,16 @@ export function StationManager({
     [departments]
   )
 
+  // Hide the department column when this table already lives inside a
+  // department's detail page — the value is constant there.
+  const visibleColumns = useMemo(
+    () =>
+      scopedDepartment
+        ? columns.filter((column) => column.id !== "department")
+        : columns,
+    [columns, scopedDepartment]
+  )
+
   function openCreate() {
     setEditing(null)
     setDialogOpen(true)
@@ -166,7 +178,7 @@ export function StationManager({
 
         <CardContent className="p-0">
           <DataTable
-            columns={columns}
+            columns={visibleColumns}
             data={rows}
             getRowId={(station) => String(station.id)}
             emptyMessage="Station tidak ditemukan."
@@ -184,32 +196,34 @@ export function StationManager({
             searchPlaceholder="Cari kode atau nama station..."
             toolbar={
               <>
-                <Select
-                  value={departmentFilter}
-                  onValueChange={(value) =>
-                    tq.setFilter(
-                      "department_id",
-                      !value || value === "all" ? null : value
-                    )
-                  }
-                >
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue />
-                  </SelectTrigger>
+                {!scopedDepartment && (
+                  <Select
+                    value={departmentFilter}
+                    onValueChange={(value) =>
+                      tq.setFilter(
+                        "department_id",
+                        !value || value === "all" ? null : value
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue />
+                    </SelectTrigger>
 
-                  <SelectContent>
-                    <SelectItem value="all">Semua Departemen</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Departemen</SelectItem>
 
-                    {departments.map((department) => (
-                      <SelectItem
-                        key={department.id}
-                        value={String(department.id)}
-                      >
-                        {department.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      {departments.map((department) => (
+                        <SelectItem
+                          key={department.id}
+                          value={String(department.id)}
+                        >
+                          {department.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
 
                 <Select
                   value={typeFilter}
@@ -246,6 +260,7 @@ export function StationManager({
         station={editing}
         departments={departments}
         defaultDepartmentId={defaultDepartmentId}
+        scopedDepartmentId={scopedDepartment ? defaultDepartmentId : null}
         onSaved={() => router.refresh()}
       />
     </>

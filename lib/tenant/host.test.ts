@@ -76,4 +76,3 @@ describe("host predicates", () => {
     expect(isPortalHost("kiyu.test")).toBe(false)
   })
 })
-

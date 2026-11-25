@@ -21,7 +21,9 @@ export function resolveFacilityId(
 
   const parsed = Number(raw)
 
-  return Number.isInteger(parsed) && facilityIds.includes(parsed) ? parsed : null
+  return Number.isInteger(parsed) && facilityIds.includes(parsed)
+    ? parsed
+    : null
 }
 
 /**

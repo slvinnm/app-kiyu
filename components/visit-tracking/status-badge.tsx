@@ -49,8 +49,7 @@ const STATUS_CONFIG: Record<
   },
   SKIPPED: {
     label: "Dilewati",
-    className:
-      "border-muted bg-muted text-muted-foreground",
+    className: "border-muted bg-muted text-muted-foreground",
   },
   CANCELLED: {
     label: "Dibatalkan",
@@ -69,8 +68,7 @@ const STATUS_CONFIG: Record<
   },
   NOT_STARTED: {
     label: "Belum dimulai",
-    className:
-      "border-muted bg-muted text-muted-foreground",
+    className: "border-muted bg-muted text-muted-foreground",
   },
   ACQUIRED: {
     label: "Berhasil diambil",
@@ -94,21 +92,15 @@ const STATUS_CONFIG: Record<
   },
 }
 
-export function StatusBadge({
-  status,
-  className,
-}: StatusBadgeProps) {
-  const config = status
-    ? STATUS_CONFIG[status]
-    : undefined
+export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const config = status ? STATUS_CONFIG[status] : undefined
 
   return (
     <Badge
       variant="outline"
       className={[
         "h-auto rounded-full px-2.5 py-1 text-[11px] font-medium",
-        config?.className ??
-          "border-muted bg-muted text-muted-foreground",
+        config?.className ?? "border-muted bg-muted text-muted-foreground",
         className,
       ]
         .filter(Boolean)

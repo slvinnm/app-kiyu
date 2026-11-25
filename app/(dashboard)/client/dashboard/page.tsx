@@ -365,7 +365,9 @@ function PageShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2">
           <Badge variant="outline">Pelanggan</Badge>
 
-          <span className="text-xs text-muted-foreground">Portal Pelanggan</span>
+          <span className="text-xs text-muted-foreground">
+            Portal Pelanggan
+          </span>
         </div>
 
         <div className="flex items-start gap-3">

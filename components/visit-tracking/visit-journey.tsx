@@ -1,9 +1,4 @@
-import {
-  Check,
-  Clock3,
-  MapPin,
-  Repeat2,
-} from "lucide-react"
+import { Check, Clock3, MapPin, Repeat2 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/visit-tracking/status-badge"
@@ -51,9 +46,7 @@ export function VisitJourney({ journey }: VisitJourneyProps) {
       <CardHeader className="border-b">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-base">
-              Perjalanan kunjungan
-            </CardTitle>
+            <CardTitle className="text-base">Perjalanan kunjungan</CardTitle>
 
             <p className="mt-1 text-sm text-muted-foreground">
               Tahapan layanan berdasarkan alur kunjungan.
@@ -99,9 +92,7 @@ export function VisitJourney({ journey }: VisitJourneyProps) {
                   ) : isCurrent ? (
                     <Clock3 className="size-4" />
                   ) : (
-                    <span className="text-xs font-semibold">
-                      {index + 1}
-                    </span>
+                    <span className="text-xs font-semibold">{index + 1}</span>
                   )}
                 </div>
 
@@ -133,9 +124,7 @@ export function VisitJourney({ journey }: VisitJourneyProps) {
                       {item.step.station && (
                         <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="size-3.5 shrink-0" />
-                          <span>
-                            {item.step.station.name}
-                          </span>
+                          <span>{item.step.station.name}</span>
                         </div>
                       )}
                     </div>
@@ -181,9 +170,7 @@ export function VisitJourney({ journey }: VisitJourneyProps) {
                           {ticket.timestamps.completed_at && (
                             <p className="mt-2 text-xs text-muted-foreground">
                               Selesai:{" "}
-                              {formatDateTime(
-                                ticket.timestamps.completed_at
-                              )}
+                              {formatDateTime(ticket.timestamps.completed_at)}
                             </p>
                           )}
 

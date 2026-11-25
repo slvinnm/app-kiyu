@@ -4,6 +4,8 @@ import { useState } from "react"
 import { ArrowRightIcon, CalendarPlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { newIdempotencyKey } from "@/lib/id"
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -40,7 +42,7 @@ export function OnlineBookingForm({
 }) {
   const [departmentId, setDepartmentId] = useState("")
   const [idempotencyKey, setIdempotencyKey] = useState(() =>
-    crypto.randomUUID()
+    newIdempotencyKey()
   )
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +54,7 @@ export function OnlineBookingForm({
     }
 
     setDepartmentId(value)
-    setIdempotencyKey(crypto.randomUUID())
+    setIdempotencyKey(newIdempotencyKey())
     setError(null)
   }
 
@@ -93,7 +95,7 @@ export function OnlineBookingForm({
   function reset() {
     setResult(null)
     setDepartmentId("")
-    setIdempotencyKey(crypto.randomUUID())
+    setIdempotencyKey(newIdempotencyKey())
     setError(null)
   }
 
@@ -118,7 +120,8 @@ export function OnlineBookingForm({
           <CardTitle className="text-base">Booking Kunjungan Online</CardTitle>
 
           <CardDescription>
-            Pilih departemen tujuan. Anda dapat check-in di kiosk saat tiba di lokasi.
+            Pilih departemen tujuan. Anda dapat check-in di kiosk saat tiba di
+            lokasi.
           </CardDescription>
         </CardHeader>
 

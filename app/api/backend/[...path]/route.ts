@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { FACILITY_COOKIE_NAME } from "@/lib/facility/context"
 import { resolveFacilityId } from "@/lib/facility/selection"
 import { getVerifiedUser } from "@/lib/auth/guard"
-import { SESSION_COOKIE_NAME, readSessionFromRequest } from "@/lib/auth/session-core"
+import {
+  SESSION_COOKIE_NAME,
+  readSessionFromRequest,
+} from "@/lib/auth/session-core"
 import { isSameOrigin, isStateChangingMethod } from "@/lib/auth/origin"
 import { getLaravelAccessTokenFromRequest } from "@/lib/auth/server"
 

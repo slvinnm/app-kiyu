@@ -58,7 +58,10 @@ export default async function Page() {
               header: "Aktor",
               cell: (row) => row.platform_user?.name ?? "-",
             },
-            { header: "Aksi", cell: (row) => <span className="font-medium">{row.action}</span> },
+            {
+              header: "Aksi",
+              cell: (row) => <span className="font-medium">{row.action}</span>,
+            },
             { header: "Tenant", cell: (row) => row.tenant?.name ?? "-" },
             {
               header: "Metadata",

@@ -7,7 +7,11 @@ import { platformAdminNavigation } from "@/lib/navigation/configs/platform-admin
 import { staffNavigation } from "@/lib/navigation/configs/staff.navigation"
 import { tenantAdminNavigation } from "@/lib/navigation/configs/tenant-admin.navigation"
 
-import type { BreadcrumbItem, NavItem, NavigationConfig } from "@/lib/navigation/types"
+import type {
+  BreadcrumbItem,
+  NavItem,
+  NavigationConfig,
+} from "@/lib/navigation/types"
 import type { UserRole } from "@/types/auth"
 
 /**
