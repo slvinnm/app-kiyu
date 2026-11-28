@@ -71,9 +71,18 @@ async function handleProxy(
     )
   }
 
-  // Get auth token from cookie (only for authenticated contexts)
+  // Build endpoint path early so we can detect guest endpoints
+  const endpoint = "/" + path.join("/")
+
+  // Tenant-origin-bound guest endpoints (public queue, kiosk departments,
+  // device pairing) are callable without a user token.
+  const isTenantGuestEndpoint =
+    apiContext === "tenant" && endpoint.startsWith("/public/")
+
+  // Get auth token from cookie (only for authenticated contexts and
+  // non-guest tenant endpoints)
   let token: string | undefined
-  if (apiContext !== "public") {
+  if (apiContext !== "public" && !isTenantGuestEndpoint) {
     const cookieStore = await cookies()
     token = cookieStore.get(
       AUTH_COOKIES[apiContext as keyof typeof AUTH_COOKIES]
@@ -86,9 +95,6 @@ async function handleProxy(
       )
     }
   }
-
-  // Build endpoint path
-  const endpoint = "/" + path.join("/")
 
   // Handle request body
   let body: string | FormData | undefined

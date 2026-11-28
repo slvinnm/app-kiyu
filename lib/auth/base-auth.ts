@@ -64,7 +64,7 @@ export const AUTH_CONTEXTS: Record<AuthContextKey, AuthContextConfig> = {
     contextKey: "customer",
     apiContext: "customer",
     cookieName: AUTH_COOKIES.customer,
-    loginPath: "/customer/login",
+    loginPath: "/login?mode=customer",
     meEndpoint: "/auth/me",
     logoutEndpoint: "/auth/logout",
   },

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useToastManager } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,11 +35,16 @@ export function TenantLoginClient({
   initialTab = "staff",
 }: TenantLoginClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const toast = useToastManager()
 
-  const [activeTab, setActiveTab] = useState<"staff" | "customer">(initialTab)
+  const requestedMode = searchParams.get("mode")
+  const initialMode: "staff" | "customer" =
+    requestedMode === "customer" ? "customer" : initialTab
+
+  const [activeTab, setActiveTab] = useState<"staff" | "customer">(initialMode)
   const [customerMode, setCustomerMode] = useState<"login" | "register">(
-    "login"
+    searchParams.get("register") === "1" ? "register" : "login"
   )
 
   // Staff form state
