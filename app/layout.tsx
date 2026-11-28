@@ -1,11 +1,11 @@
-import { Geist, Geist_Mono, Public_Sans } from "next/font/google"
-
+import { Geist_Mono, Public_Sans } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from "@/components/ui/toast"
 
-const publicSans = Public_Sans({subsets:['latin'],variable:'--font-sans'})
+const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-sans" })
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -21,14 +21,19 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", publicSans.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        "font-sans",
+        publicSans.variable
+      )}
     >
       <body>
         <ThemeProvider>
           <TooltipProvider>
-            {children}
+            <Toaster>{children}</Toaster>
           </TooltipProvider>
-          </ThemeProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
