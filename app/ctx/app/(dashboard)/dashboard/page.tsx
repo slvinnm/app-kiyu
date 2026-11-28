@@ -256,7 +256,7 @@ export default function AppDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button render={<Link href="/facilities" />}>
+            <Button render={<Link href="/facilities" />} nativeButton={false}>
               Manage Facilities
             </Button>
           </CardContent>
@@ -271,7 +271,11 @@ export default function AppDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" render={<Link href="/team" />}>
+            <Button
+              variant="outline"
+              render={<Link href="/team" />}
+              nativeButton={false}
+            >
               Manage Team
             </Button>
           </CardContent>
