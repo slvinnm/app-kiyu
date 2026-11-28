@@ -1,23 +1,19 @@
-import { redirect } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
-import { getRoleRedirect } from "@/lib/auth/redirect"
-import { getVerifiedUser } from "@/lib/auth/guard"
-import { getSession } from "@/lib/auth/session"
-import { normalizeRole } from "@/types/auth"
-
-export default async function Page() {
-  const verified = await getVerifiedUser()
-
-  if (verified === null) {
-    redirect("/login")
-  }
-
-  // On an API outage (`undefined`) fall back to the cookie's snapshot so a
-  // visitor lands on their dashboard instead of a login loop; the workspace
-  // re-checks the role against the API before rendering.
-  const role = verified
-    ? normalizeRole(verified.role)
-    : normalizeRole((await getSession())?.user.role)
-
-  redirect(getRoleRedirect(role))
+export default function Page() {
+  return (
+    <div className="flex min-h-svh p-6">
+      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+        <div>
+          <h1 className="font-medium">Project ready!</h1>
+          <p>You may now add components and start building.</p>
+          <p>We&apos;ve already added the button component for you.</p>
+          <Button className="mt-2">Button</Button>
+        </div>
+        <div className="font-mono text-xs text-muted-foreground">
+          (Press <kbd>d</kbd> to toggle dark mode)
+        </div>
+      </div>
+    </div>
+  )
 }

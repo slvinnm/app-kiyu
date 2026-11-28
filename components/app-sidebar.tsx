@@ -1,132 +1,194 @@
-import { getVerifiedUser } from "@/lib/auth/guard"
-import { getSession } from "@/lib/auth/session"
-import { getFacilityContext } from "@/lib/facility/context"
-import { filterNavigationByEntitlements, getNavigation } from "@/lib/navigation"
-import { getEntitlementsServer } from "@/lib/api/admin-server"
-import { normalizeRole } from "@/types/auth"
+"use client"
 
-import { FacilitySwitcher } from "@/components/facility-switcher"
+import * as React from "react"
+
 import { NavMain } from "@/components/nav-main"
+import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
+import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar"
-import { BuildingIcon, CommandIcon, StoreIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
 
-/**
- * Sidebar shell.
- *
- * The header identifies *where the user is*: a TenantAdmin sees the
- * organization, a FacilityAdmin/Operator/Staff sees their active facility, and
- * a Client sees the organization they belong to (PRD §8, §9). Navigation is
- * role-specific (`lib/navigation`).
- */
-export async function AppSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
-  const session = await getSession()
-  const role = normalizeRole(session?.user?.role)
+// This is sample data.
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  teams: [
+    {
+      name: "Acme Inc",
+      logo: (
+        <GalleryVerticalEndIcon
+        />
+      ),
+      plan: "Enterprise",
+    },
+    {
+      name: "Acme Corp.",
+      logo: (
+        <AudioLinesIcon
+        />
+      ),
+      plan: "Startup",
+    },
+    {
+      name: "Evil Corp.",
+      logo: (
+        <TerminalIcon
+        />
+      ),
+      plan: "Free",
+    },
+  ],
+  navMain: [
+    {
+      title: "Playground",
+      url: "#",
+      icon: (
+        <TerminalSquareIcon
+        />
+      ),
+      isActive: true,
+      items: [
+        {
+          title: "History",
+          url: "#",
+        },
+        {
+          title: "Starred",
+          url: "#",
+        },
+        {
+          title: "Settings",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Models",
+      url: "#",
+      icon: (
+        <BotIcon
+        />
+      ),
+      items: [
+        {
+          title: "Genesis",
+          url: "#",
+        },
+        {
+          title: "Explorer",
+          url: "#",
+        },
+        {
+          title: "Quantum",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Documentation",
+      url: "#",
+      icon: (
+        <BookOpenIcon
+        />
+      ),
+      items: [
+        {
+          title: "Introduction",
+          url: "#",
+        },
+        {
+          title: "Get Started",
+          url: "#",
+        },
+        {
+          title: "Tutorials",
+          url: "#",
+        },
+        {
+          title: "Changelog",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Settings",
+      url: "#",
+      icon: (
+        <Settings2Icon
+        />
+      ),
+      items: [
+        {
+          title: "General",
+          url: "#",
+        },
+        {
+          title: "Team",
+          url: "#",
+        },
+        {
+          title: "Billing",
+          url: "#",
+        },
+        {
+          title: "Limits",
+          url: "#",
+        },
+      ],
+    },
+  ],
+  projects: [
+    {
+      name: "Design Engineering",
+      url: "#",
+      icon: (
+        <FrameIcon
+        />
+      ),
+    },
+    {
+      name: "Sales & Marketing",
+      url: "#",
+      icon: (
+        <PieChartIcon
+        />
+      ),
+    },
+    {
+      name: "Travel",
+      url: "#",
+      icon: (
+        <MapIcon
+        />
+      ),
+    },
+  ],
+}
 
-  if (!session?.user || !role) {
-    return null
-  }
-
-  const user = await getVerifiedUser()
-  const facilityContext = await getFacilityContext()
-
-  // Hide menus the tenant's subscription does not include. Only tenant roles
-  // have plan entitlements; the platform console is never plan-gated.
-  const portalHasPlan = role !== "platform_admin"
-  const entitlements = portalHasPlan ? await getEntitlementsServer() : null
-  const items = filterNavigationByEntitlements(
-    getNavigation(role),
-    entitlements
-  )
-
-  // Portal roles are tenant/organization wide → show the tenant name.
-  const isPortalRole = role === "platform_admin" || role === "tenant_admin"
-  const tenant = user?.tenant ?? session.user.tenant ?? null
-
-  // Workspace roles act at one facility → resolve the active facility's name
-  // from the facilities the API attached to the account (no extra request).
-  const facilities = (user?.facilities ?? session.user.facilities ?? []).map(
-    (row) => ({ id: row.id, name: row.name })
-  )
-  const activeFacility =
-    facilities.find((row) => row.id === facilityContext.activeId) ??
-    facilities[0] ??
-    null
-
-  let headerTitle: string
-  let headerSubtitle: string
-  let HeaderIcon = CommandIcon
-
-  if (isPortalRole) {
-    headerTitle = tenant?.name ?? "KIYU Platform"
-    headerSubtitle = role === "platform_admin" ? "Platform Admin" : "Organisasi"
-    HeaderIcon = BuildingIcon
-  } else {
-    headerTitle = activeFacility?.name ?? tenant?.name ?? "KIYU"
-    headerSubtitle = activeFacility ? "Fasilitas aktif" : (tenant?.name ?? "")
-    HeaderIcon = StoreIcon
-  }
-
-  const navUser = {
-    name: session.user.name ?? "",
-    email: session.user.email ?? "",
-    avatar: "",
-  }
-
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
-            >
-              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <HeaderIcon className="size-4" />
-              </div>
-
-              <div className="grid flex-1 text-left leading-tight">
-                <span className="truncate text-sm font-semibold">
-                  {headerTitle}
-                </span>
-
-                {headerSubtitle && (
-                  <span className="truncate text-xs text-muted-foreground">
-                    {headerSubtitle}
-                  </span>
-                )}
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-
-      <SidebarContent className="gap-0">
-        {!isPortalRole && facilities.length > 1 && (
-          <FacilitySwitcher
-            facilities={facilities}
-            activeId={facilityContext.activeId}
-          />
-        )}
-
-        <NavMain items={items} />
+      <SidebarContent>
+        <NavMain items={data.navMain} />
+        <NavProjects projects={data.projects} />
       </SidebarContent>
-
       <SidebarFooter>
-        <NavUser user={navUser} />
+        <NavUser user={data.user} />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }
